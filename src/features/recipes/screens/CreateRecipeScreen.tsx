@@ -1,5 +1,5 @@
-import { NavigationProp } from '@react-navigation/native';
-import React, { RefObject, useLayoutEffect, useRef, useState } from 'react';
+import {NavigationProp} from '@react-navigation/native';
+import React, {RefObject, useLayoutEffect, useRef, useState} from 'react';
 import {
   Button,
   KeyboardAvoidingView,
@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { ScrollView, Text } from 'react-native';
-import { Input, Validation } from '../../../components/Input/Input';
+import {ScrollView, Text} from 'react-native';
+import {Input, Validation} from '../../../components/Input/Input';
 import {
   LabelledInput,
   requiredValidator,
@@ -27,71 +27,53 @@ type FieldValidation = Record<FieldName, boolean>;
 
 const useCreateForm = () => {
   const [validation, setValidation] = useState<FieldValidation>({
-    name: true,
+    name: false,
     description: true,
     servings: true,
     prepTime: true,
     cookTime: true,
-    ingredients: true,
-    method: true,
+    ingredients: false,
+    method: false,
   });
 
   const checkValidation = (error: Validation | undefined, key: FieldName) => {
-    setValidation(pValidation => ({ ...pValidation, [key]: !error }));
+    setValidation(pValidation => ({...pValidation, [key]: !error}));
   };
 
-  const createRecipe = () => {
-    console.log('do nothing');
+  const createRecipe = (recipe: any) => {
+    console.log(recipe);
   };
 
-  return { validFields: validation, check: checkValidation, createRecipe };
+  return {validFields: validation, check: checkValidation, createRecipe};
 };
 
-export const CreateRecipeScreen = ({
-  navigation,
-}: {
-  navigation: NavigationProp<{}>;
-}) => {
+export const CreateRecipeScreen = () => {
   const scrollViewRef = useRef<ScrollView>(null);
-  const { validFields, check, createRecipe } = useCreateForm();
+  const {validFields, check, createRecipe} = useCreateForm();
   const [formState, setFormState] = useState<Record<FieldName, any>>({
     name: '',
     description: '',
-    servings: '',
+    servings: '2',
     prepTime: '',
     cookTime: '',
     ingredients: [],
     method: [],
   });
   const updateForm = (key: FieldName) => (value: any) =>
-    setFormState(pState => ({ ...pState, [key]: value }));
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          onPress={createRecipe}
-          title="Create"
-          disabled={Object.values(validFields).some(valid => valid === false)}
-        />
-      ),
-    });
-  }, [navigation]);
+    setFormState(pState => ({...pState, [key]: value}));
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{flex: 1}}
       behavior={'padding'}
-      keyboardVerticalOffset={100}
-    >
+      keyboardVerticalOffset={100}>
       <ScrollView ref={scrollViewRef}>
         <View
           style={{
             padding: 16,
             paddingTop: 32,
-          }}
-        >
-          <View style={{ paddingBottom: 8 }}>
+          }}>
+          <View style={{paddingBottom: 8}}>
             <LabelledInput
               label="Name"
               required
@@ -101,33 +83,63 @@ export const CreateRecipeScreen = ({
               onIsValidChanged={error => check(error, 'name')}
             />
           </View>
-          <View style={{ paddingBottom: 8 }}>
-            <LabelledInput label="Description" multiline />
+          <View style={{paddingBottom: 8}}>
+            <LabelledInput
+              label="Description"
+              multiline
+              value={formState.description}
+              onChangeText={updateForm('description')}
+            />
           </View>
-          <View style={{ paddingBottom: 8 }}>
+          <View style={{paddingBottom: 8}}>
             <LabelledInput
               label="Servings"
               required
-              value={'2'}
+              value={formState.servings}
+              onChangeText={updateForm('servings')}
               keyboardType="number-pad"
             />
           </View>
           <View style={styles.row}>
             <View style={[styles.rowItem]}>
-              <LabelledInput label="Prep Time" keyboardType="number-pad" />
+              <LabelledInput
+                label="Prep Time"
+                keyboardType="number-pad"
+                value={formState.prepTime}
+                onChangeText={updateForm('prepTime')}
+              />
             </View>
-            <View style={[styles.rowItem, { paddingLeft: 8 }]}>
-              <LabelledInput label="Cook Time" keyboardType="number-pad" />
+            <View style={[styles.rowItem, {paddingLeft: 8}]}>
+              <LabelledInput
+                label="Cook Time"
+                keyboardType="number-pad"
+                value={formState.cookTime}
+                onChangeText={updateForm('cookTime')}
+              />
             </View>
           </View>
           <IngredientList
             scrollViewRef={scrollViewRef}
+            value={formState.ingredients}
+            onChange={updateForm('ingredients')}
             onIsValidChanged={error => check(error, 'ingredients')}
           />
           <MethodList
             scrollViewRef={scrollViewRef}
+            value={formState.method}
+            onChange={updateForm('method')}
             onIsValidChanged={error => check(error, 'method')}
           />
+
+          <View style={{paddingTop: 8}}>
+            <Button
+              onPress={() => createRecipe(formState)}
+              title="Create"
+              disabled={Object.values(validFields).some(
+                valid => valid === false,
+              )}
+            />
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -137,11 +149,14 @@ export const CreateRecipeScreen = ({
 const IngredientList = ({
   scrollViewRef,
   onIsValidChanged,
+  value,
+  onChange,
 }: {
   scrollViewRef: RefObject<ScrollView>;
   onIsValidChanged: (error: Validation | undefined) => void;
+  value: string[];
+  onChange: (newState: string[]) => void;
 }) => {
-  const [ingredients, setIngredients] = useState<string[]>([]);
   const [input, setInput] = useState<string>('');
   const [errorHint, setErrorHint] = useState<string | undefined>();
   const ref = useRef<TextInput>(null);
@@ -151,11 +166,11 @@ const IngredientList = ({
   };
   const submitText = () => {
     if (input.trim().length > 0) {
-      setIngredients(ingredients => [...ingredients, input]);
+      onChange([...value, input]);
       setTimeout(
         () =>
           ref.current?.measure((x, y) =>
-            scrollViewRef.current?.scrollTo({ x, y }),
+            scrollViewRef.current?.scrollTo({x, y}),
           ),
         0,
       );
@@ -165,20 +180,16 @@ const IngredientList = ({
 
   return (
     <View>
-      <Text style={{ paddingTop: 8, paddingBottom: 8 }}>Ingredients*</Text>
-      {ingredients.map((ingredient, i) => {
+      <Text style={{paddingTop: 8, paddingBottom: 8}}>Ingredients*</Text>
+      {value.map((ingredient, i) => {
         return (
           <View style={styles.input} key={ingredient}>
-            <TouchableOpacity style={{ flexGrow: 1 }}>
+            <TouchableOpacity style={{flexGrow: 1}}>
               <Text>{ingredient}</Text>
             </TouchableOpacity>
             <Button
               title="X"
-              onPress={() =>
-                setIngredients(ingredients =>
-                  ingredients.filter((_, j) => i != j),
-                )
-              }
+              onPress={() => onChange(value.filter((_, j) => i != j))}
             />
           </View>
         );
@@ -191,7 +202,7 @@ const IngredientList = ({
         onBlur={submitText}
         onChangeText={setInput}
         blurOnSubmit={false}
-        validation={ingredients.length === 0 ? [requiredValidator] : []}
+        validation={value.length === 0 ? [requiredValidator] : []}
         onIsValidChanged={handleIsValidChanged}
         onSubmitEditing={submitText}
       />
@@ -203,11 +214,14 @@ const IngredientList = ({
 const MethodList = ({
   scrollViewRef,
   onIsValidChanged,
+  value,
+  onChange,
 }: {
   scrollViewRef: RefObject<ScrollView>;
   onIsValidChanged: (error: Validation | undefined) => void;
+  value: string[];
+  onChange: (newState: string[]) => void;
 }) => {
-  const [steps, setSteps] = useState<string[]>([]);
   const [input, setInput] = useState<string>('');
   const [errorHint, setErrorHint] = useState<string | undefined>();
   const ref = useRef<TextInput>(null);
@@ -218,11 +232,11 @@ const MethodList = ({
 
   const submitText = () => {
     if (input.trim().length > 0) {
-      setSteps(steps => [...steps, input]);
+      onChange([...value, input]);
       setTimeout(
         () =>
           ref.current?.measure((x, y) =>
-            scrollViewRef.current?.scrollTo({ x, y }),
+            scrollViewRef.current?.scrollTo({x, y}),
           ),
         0,
       );
@@ -231,18 +245,16 @@ const MethodList = ({
   };
   return (
     <View>
-      <Text style={{ paddingTop: 8, paddingBottom: 8 }}>Method*</Text>
-      {steps.map((ingredient, i) => {
+      <Text style={{paddingTop: 8, paddingBottom: 8}}>Method*</Text>
+      {value.map((step, i) => {
         return (
-          <View style={styles.input}>
-            <TouchableOpacity style={{ flexGrow: 1 }}>
-              <Text>{ingredient}</Text>
+          <View style={styles.input} key={step}>
+            <TouchableOpacity style={{flexGrow: 1}}>
+              <Text>{step}</Text>
             </TouchableOpacity>
             <Button
               title="X"
-              onPress={() =>
-                setSteps(ingredients => ingredients.filter((_, j) => i != j))
-              }
+              onPress={() => onChange(value.filter((_, j) => i != j))}
             />
           </View>
         );
@@ -255,7 +267,7 @@ const MethodList = ({
         onChangeText={setInput}
         blurOnSubmit={false}
         onBlur={submitText}
-        validation={steps.length === 0 ? [requiredValidator] : []}
+        validation={value.length === 0 ? [requiredValidator] : []}
         onIsValidChanged={handleIsValidChanged}
         onSubmitEditing={submitText}
       />

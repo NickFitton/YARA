@@ -1,6 +1,6 @@
-import React, { forwardRef, useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
-import { Input, InputProps, Validation } from '../Input/Input';
+import React, {forwardRef, useState} from 'react';
+import {View, Text, TextInput, StyleSheet} from 'react-native';
+import {Input, InputProps, Validation} from '../Input/Input';
 
 export interface LabelledInputProps extends InputProps {
   required?: boolean;
@@ -26,6 +26,7 @@ export const LabelledInput = forwardRef<TextInput, LabelledInputProps>(
   ) => {
     const [errorHint, setErrorHint] = useState<string | undefined>();
     const handleError = (error: Validation | undefined) => {
+      onError?.(error);
       setErrorHint(error?.errorHint);
     };
     return (

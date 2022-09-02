@@ -1,5 +1,5 @@
-import { forwardRef, useEffect, useState } from 'react';
-import { StyleSheet, TextInput, TextInputProps } from 'react-native';
+import {forwardRef, useEffect, useState} from 'react';
+import {StyleSheet, TextInput, TextInputProps} from 'react-native';
 import React from 'react';
 
 export interface Validation {
@@ -18,8 +18,7 @@ export const Input = forwardRef<TextInput, InputProps>((props, ref) => {
   const [isErroneous, setIsErroneus] = useState<boolean>(false);
 
   const validate = (text: string, propogate = true) => {
-    const error = props.validation?.find(({ validator }) => !validator(text));
-    console.log(text, error, props.validation?.length);
+    const error = props.validation?.find(({validator}) => !validator(text));
     props.onIsValidChanged?.(error);
     setIsErroneus(!!error);
     if (propogate) {
