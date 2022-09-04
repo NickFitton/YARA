@@ -1,5 +1,5 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BooksScreen } from './screens/BooksScreen';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {BooksScreen} from './screens/BooksScreen';
 import React from 'react';
 
 const Stack = createNativeStackNavigator();
@@ -9,7 +9,7 @@ export const BooksStack = () => {
     <Stack.Navigator>
       <Stack.Screen
         name="BooksRoot"
-        options={{ title: 'Books' }}
+        options={{title: 'Books'}}
         component={BooksScreen}
       />
     </Stack.Navigator>

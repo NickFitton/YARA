@@ -14,24 +14,27 @@ import {
   LabelledInput,
   requiredValidator,
 } from '../../../components/LabelledInput/LabelledInput';
+import {useRecipeStorage} from '../recipeHooks';
+import {Recipe} from '../types/Recipe';
 
-type FieldName =
-  | 'name'
-  | 'description'
-  | 'servings'
-  | 'prepTime'
-  | 'cookTime'
-  | 'ingredients'
-  | 'method';
+type FieldName = keyof Recipe;
 type FieldValidation = Record<FieldName, boolean>;
 
+interface RecipeForm
+  extends Omit<Recipe, 'servings' | 'prepTimeMinutes' | 'cookTimeMinutes'> {
+  servings: string;
+  prepTimeMinutes: string;
+  cookTimeMinutes: string;
+}
+
 const useCreateForm = () => {
+  const {createRecipe: create} = useRecipeStorage();
   const [validation, setValidation] = useState<FieldValidation>({
     name: false,
     description: true,
     servings: true,
-    prepTime: true,
-    cookTime: true,
+    prepTimeMinutes: true,
+    cookTimeMinutes: true,
     ingredients: false,
     method: false,
   });
@@ -40,8 +43,34 @@ const useCreateForm = () => {
     setValidation(pValidation => ({...pValidation, [key]: !error}));
   };
 
-  const createRecipe = (recipe: any) => {
-    console.log(recipe);
+  const createRecipe = (recipe: RecipeForm) => {
+    const {
+      servings: servingsString,
+      prepTimeMinutes: prepTimeMinutesString,
+      cookTimeMinutes: cookTimeMinutesString,
+    } = recipe;
+
+    const servings = parseInt(servingsString);
+    const prepTimeMinutes = parseInt(prepTimeMinutesString);
+    const cookTimeMinutes = parseInt(cookTimeMinutesString);
+
+    if (
+      servings === NaN ||
+      prepTimeMinutes === NaN ||
+      cookTimeMinutes === NaN
+    ) {
+      console.error(
+        "There was an error, we'll probably want to handle this better.",
+      );
+      return;
+    }
+
+    create({
+      ...recipe,
+      servings,
+      prepTimeMinutes,
+      cookTimeMinutes,
+    }).then(recipeId => {});
   };
 
   return {validFields: validation, check: checkValidation, createRecipe};
@@ -50,12 +79,12 @@ const useCreateForm = () => {
 export const CreateRecipeScreen = () => {
   const scrollViewRef = useRef<ScrollView>(null);
   const {validFields, check, createRecipe} = useCreateForm();
-  const [formState, setFormState] = useState<Record<FieldName, any>>({
+  const [formState, setFormState] = useState<RecipeForm>({
     name: '',
     description: '',
     servings: '2',
-    prepTime: '',
-    cookTime: '',
+    prepTimeMinutes: '',
+    cookTimeMinutes: '',
     ingredients: [],
     method: [],
   });
@@ -105,16 +134,16 @@ export const CreateRecipeScreen = () => {
               <LabelledInput
                 label="Prep Time"
                 keyboardType="number-pad"
-                value={formState.prepTime}
-                onChangeText={updateForm('prepTime')}
+                value={formState.prepTimeMinutes}
+                onChangeText={updateForm('prepTimeMinutes')}
               />
             </View>
             <View style={[styles.rowItem, {paddingLeft: 8}]}>
               <LabelledInput
                 label="Cook Time"
                 keyboardType="number-pad"
-                value={formState.cookTime}
-                onChangeText={updateForm('cookTime')}
+                value={formState.cookTimeMinutes}
+                onChangeText={updateForm('cookTimeMinutes')}
               />
             </View>
           </View>
