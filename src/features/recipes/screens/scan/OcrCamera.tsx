@@ -1,3 +1,4 @@
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {PropsWithChildren} from 'react';
 import {Button, Text, TouchableOpacity, View} from 'react-native';
 import {runOnJS} from 'react-native-reanimated';
@@ -8,6 +9,7 @@ import {
 } from 'react-native-vision-camera';
 import {OCRFrame, scanOCR} from 'vision-camera-ocr';
 import {Permission, Prompt, useCamera} from '../../../../utils/hooks/useCamera';
+import {RecipeStackParamList} from '../../RecipesStack';
 
 type TextBlock = OCRFrame['result']['blocks'][0];
 
@@ -16,6 +18,7 @@ export const OcrCamera = ({
 }: PropsWithChildren<{
   onSelect: (name: TextBlock[]) => void;
 }>) => {
+  const {navigate} = useNavigation<NavigationProp<RecipeStackParamList>>();
   const {hasPermission, requestPermission, device} = useCamera(Prompt.AUTO);
   switch (hasPermission) {
     case Permission.LOADING:
@@ -43,8 +46,18 @@ export const OcrCamera = ({
         return <CameraComponent device={device} onSelect={onSelect} />;
       }
       return (
-        <View>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
           <Text>No cameras found</Text>
+          <Button
+            title="Enter manually instead"
+            onPress={() => navigate('Create Recipe')}
+          />
         </View>
       );
   }

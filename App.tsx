@@ -5,7 +5,13 @@ import {BooksStack} from './src/features/books/BooksStack';
 import {RecipesStack} from './src/features/recipes/RecipesStack';
 import {SearchStack} from './src/features/search/SearchStack';
 
-const Tab = createBottomTabNavigator();
+export type TabParamList = {
+  Recipes: undefined;
+  Search: undefined;
+  Books: undefined;
+};
+
+const Tab = createBottomTabNavigator<TabParamList>();
 
 const App = () => {
   return (

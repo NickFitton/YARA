@@ -53,6 +53,7 @@ export const LabelledInput = forwardRef<TextInput, LabelledInputProps>(
 const styles = StyleSheet.create({
   label: {
     paddingBottom: 4,
+    color: '#000',
   },
   hint: {
     color: '#e55',

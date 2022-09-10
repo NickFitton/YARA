@@ -8,7 +8,21 @@ import {DescriptionScreen} from './screens/scan/Description';
 import {IngredientScreen} from './screens/scan/Ingredients';
 import {MethodScreen} from './screens/scan/Method';
 
-const Stack = createNativeStackNavigator();
+export type RecipeStackParamList = {
+  RecipesRoot: undefined;
+  'Create Recipe'?: {
+    name?: string;
+    description?: string;
+    ingredients?: string[];
+    method?: string[];
+  };
+  'Scan Name': undefined;
+  'Scan Description': {name?: string};
+  'Scan Ingredient': {name?: string; description?: string};
+  'Scan Method': {name?: string; description?: string; ingredients?: string[]};
+};
+
+const Stack = createNativeStackNavigator<RecipeStackParamList>();
 
 export const RecipesStack = () => {
   return (

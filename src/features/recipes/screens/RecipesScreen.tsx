@@ -1,40 +1,16 @@
 import {NavigationProp} from '@react-navigation/native';
 import React, {useLayoutEffect} from 'react';
 import {Button, View, Text} from 'react-native';
+import {Column} from '../../../components/Column/Column';
 import {useRecipeStorage} from '../recipeHooks';
+import {RecipeStackParamList} from '../RecipesStack';
 
 export const RecipesScreen = ({
   navigation,
 }: {
-  navigation: NavigationProp<any>;
+  navigation: NavigationProp<RecipeStackParamList, 'RecipesRoot'>;
 }) => {
-  const {createRecipe: create, recipes} = useRecipeStorage();
-
-  // const createRecipe = () => {
-  //   const recipe: Recipe = {
-  //     name: 'Pasta alio et olio',
-  //     description: 'Pasta with garlic and olive oil',
-  //     servings: 2,
-  //     ingredients: [
-  //       '100g pasta',
-  //       '2 cloves of garlic',
-  //       '2tbsp extra virgin olive oil',
-  //     ],
-  //     method: [
-  //       'Heat pan with oil on medium-high heat.',
-  //       'Dice the garlic.',
-  //       'Fry the garlic in the pan',
-  //       'add pasta',
-  //     ],
-  //     prepTimeMinutes: 0,
-  //     cookTimeMinutes: 10,
-  //   };
-  //   create(recipe)
-  //     .then(id => {
-  //       console.log(id);
-  //     })
-  //     .catch(console.error);
-  // };
+  const {recipes} = useRecipeStorage();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -45,28 +21,49 @@ export const RecipesScreen = ({
   }, [navigation]);
 
   return (
-    <View style={{padding: 24}}>
-      {recipes.map(recipe => {
-        return (
-          <View
-            key={JSON.stringify(recipe._id)}
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: 4,
-              shadowOffset: {
-                width: 0,
-                height: 0,
-              },
-              shadowOpacity: 0.2,
-              shadowRadius: 5,
-              padding: 8,
-              marginBottom: 16,
-            }}>
-            <Text>{recipe.name}</Text>
-            <Text>{recipe.description}</Text>
-          </View>
-        );
-      })}
+    <View style={{padding: 24, height: '100%'}}>
+      {recipes.length === 0 ? (
+        <Column
+          style={{
+            height: '100%',
+            flex: 1,
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          space={8}>
+          <Text style={{color: '#000', textAlign: 'center'}}>
+            You don't have any recipes yet
+          </Text>
+          <Button
+            title="Create a Recipe"
+            onPress={() => navigation.navigate('Scan Name')}
+          />
+        </Column>
+      ) : (
+        recipes.map(recipe => {
+          return (
+            <View
+              key={recipe.name}
+              style={{
+                backgroundColor: '#fff',
+                borderRadius: 4,
+                shadowOffset: {
+                  width: 0,
+                  height: 0,
+                },
+                elevation: 5,
+                shadowOpacity: 0.2,
+                shadowRadius: 5,
+                padding: 8,
+                marginBottom: 16,
+              }}>
+              <Text style={{color: '#000'}}>{recipe.name}</Text>
+              <Text style={{color: '#000'}}>{recipe.description}</Text>
+            </View>
+          );
+        })
+      )}
     </View>
   );
 };

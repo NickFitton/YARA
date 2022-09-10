@@ -1,5 +1,5 @@
 import {NavigationProp} from '@react-navigation/native';
-import React, {useLayoutEffect, useState} from 'react';
+import React from 'react';
 import {
   Button,
   FlatList,
@@ -8,34 +8,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {OCRFrame} from 'vision-camera-ocr';
 import {Column} from '../../../../components/Column/Column';
+import {RecipeStackParamList} from '../../RecipesStack';
+import {useBlocks} from './useBlocks';
 import {OcrCamera} from './OcrCamera';
 
-type TextBlock = OCRFrame['result']['blocks'][0];
-
-export const NameScreen = ({navigation}: {navigation: NavigationProp<{}>}) => {
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      tabBarStyle: {display: 'none'},
-    });
-  }, []);
-
-  const onSelect = (blocks: TextBlock[]) => {
-    const autoSelect = blocks.length < 10;
-    setBlocks(blocks.map(block => ({block, selected: autoSelect})));
-  };
-  const [blocks, setBlocks] =
-    useState<{block: TextBlock; selected: boolean}[]>();
-
-  const toggleBlock = (block: {block: TextBlock; selected: boolean}) => [
-    setBlocks(pBlocks => {
-      const toggleIndex = pBlocks?.indexOf(block);
-      return pBlocks?.map(({block, selected}, i) =>
-        i === toggleIndex ? {block, selected: !selected} : {block, selected},
-      );
-    }),
-  ];
+export const NameScreen = ({
+  navigation,
+}: {
+  navigation: NavigationProp<RecipeStackParamList>;
+}) => {
+  const {loadBlocks, blocks, toggleBlock, selectAllBlocks, unselectBlocks} =
+    useBlocks();
 
   const name = blocks
     ?.filter(({selected}) => selected)
@@ -45,7 +29,7 @@ export const NameScreen = ({navigation}: {navigation: NavigationProp<{}>}) => {
   return (
     <View style={{flex: 1, flexDirection: 'column', height: '100%'}}>
       {!blocks ? (
-        <OcrCamera onSelect={onSelect} />
+        <OcrCamera onSelect={loadBlocks} />
       ) : (
         <View style={{flex: 1}}>
           <FlatList
@@ -72,24 +56,15 @@ export const NameScreen = ({navigation}: {navigation: NavigationProp<{}>}) => {
             }}
           />
           <Column space={8} style={{padding: 8, backgroundColor: '#fff'}}>
-            <Button title="Try again" onPress={() => setBlocks(undefined)} />
-            <Button title="Continue" onPress={() => console.log('Wahoo!')} />
+            <Button title="Try again" onPress={() => loadBlocks(undefined)} />
             <Button
-              title="Select none"
+              title="Continue"
               onPress={() =>
-                setBlocks(pBlocks =>
-                  pBlocks?.map(block => ({...block, selected: false})),
-                )
+                navigation.navigate('Scan Description', {name: name || ''})
               }
             />
-            <Button
-              title="Select all"
-              onPress={() =>
-                setBlocks(pBlocks =>
-                  pBlocks?.map(block => ({...block, selected: true})),
-                )
-              }
-            />
+            <Button title="Select none" onPress={unselectBlocks} />
+            <Button title="Select all" onPress={selectAllBlocks} />
           </Column>
         </View>
       )}

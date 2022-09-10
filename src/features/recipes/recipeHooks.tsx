@@ -11,9 +11,7 @@ export const useRecipeStorage = () => {
     const newLocal = RecipeModel.generate(newRecipe);
     // Save recipe somewhere
     try {
-      realm.write(() => {
-        realm.create(RecipeModel.type, newLocal);
-      });
+      realm.write(() => realm.create(RecipeModel.type, newLocal));
     } catch (e) {
       console.log(e);
     }

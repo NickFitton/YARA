@@ -54,6 +54,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 5,
+    color: '#000',
+    elevation: 5,
   },
   error: {
     borderColor: '#e55',

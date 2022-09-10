@@ -1,4 +1,8 @@
-import {NavigationProp} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from '@react-navigation/native';
 import React, {RefObject, useLayoutEffect, useRef, useState} from 'react';
 import {
   Button,
@@ -15,6 +19,7 @@ import {
   requiredValidator,
 } from '../../../components/LabelledInput/LabelledInput';
 import {useRecipeStorage} from '../recipeHooks';
+import {RecipeStackParamList} from '../RecipesStack';
 import {Recipe} from '../types/Recipe';
 
 type FieldName = keyof Recipe;
@@ -28,6 +33,7 @@ interface RecipeForm
 }
 
 const useCreateForm = () => {
+  const {navigate} = useNavigation<NavigationProp<RecipeStackParamList>>();
   const {createRecipe: create} = useRecipeStorage();
   const [validation, setValidation] = useState<FieldValidation>({
     name: false,
@@ -70,13 +76,19 @@ const useCreateForm = () => {
       servings,
       prepTimeMinutes,
       cookTimeMinutes,
-    }).then(recipeId => {});
+    }).then(recipeId => {
+      navigate('RecipesRoot');
+    });
   };
 
   return {validFields: validation, check: checkValidation, createRecipe};
 };
 
-export const CreateRecipeScreen = () => {
+export const CreateRecipeScreen = ({
+  route,
+}: {
+  route: RouteProp<RecipeStackParamList, 'Create Recipe'>;
+}) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const {validFields, check, createRecipe} = useCreateForm();
   const [formState, setFormState] = useState<RecipeForm>({
@@ -90,6 +102,17 @@ export const CreateRecipeScreen = () => {
   });
   const updateForm = (key: FieldName) => (value: any) =>
     setFormState(pState => ({...pState, [key]: value}));
+
+  useLayoutEffect(() => {
+    const {name, description, ingredients, method} = route.params || {};
+    setFormState(pFormState => ({
+      ...pFormState,
+      name: name || pFormState.name,
+      description: description || pFormState.description,
+      ingredients: ingredients || pFormState.ingredients,
+      method: method || pFormState.method,
+    }));
+  }, [route]);
 
   return (
     <KeyboardAvoidingView
@@ -209,12 +232,19 @@ const IngredientList = ({
 
   return (
     <View>
-      <Text style={{paddingTop: 8, paddingBottom: 8}}>Ingredients*</Text>
+      <Text style={{paddingTop: 8, paddingBottom: 8, color: '#000'}}>
+        Ingredients*
+      </Text>
       {value.map((ingredient, i) => {
         return (
           <View style={styles.input} key={ingredient}>
             <TouchableOpacity style={{flexGrow: 1}}>
-              <Text>{ingredient}</Text>
+              <Text
+                style={{
+                  color: '#000',
+                }}>
+                {ingredient}
+              </Text>
             </TouchableOpacity>
             <Button
               title="X"
@@ -274,12 +304,14 @@ const MethodList = ({
   };
   return (
     <View>
-      <Text style={{paddingTop: 8, paddingBottom: 8}}>Method*</Text>
+      <Text style={{paddingTop: 8, paddingBottom: 8, color: '#000'}}>
+        Method*
+      </Text>
       {value.map((step, i) => {
         return (
           <View style={styles.input} key={step}>
             <TouchableOpacity style={{flexGrow: 1}}>
-              <Text>{step}</Text>
+              <Text style={{color: '#000'}}>{step}</Text>
             </TouchableOpacity>
             <Button
               title="X"
@@ -325,11 +357,13 @@ const styles = StyleSheet.create({
       width: 0,
       height: 0,
     },
+    elevation: 5,
     shadowOpacity: 0.2,
     shadowRadius: 5,
   },
   input: {
     flex: 1,
+    color: '#000',
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
@@ -342,6 +376,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 5,
+    elevation: 5,
     marginBottom: 8,
   },
 

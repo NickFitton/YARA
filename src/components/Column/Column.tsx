@@ -8,7 +8,9 @@ export const Column = ({
 }: ViewProps & {space: number}) => (
   <View {...rest}>
     {Children.map(children, (child, i) => (
-      <View style={i > 0 && {marginTop: space}}>{child}</View>
+      <View key={i} style={i > 0 && {marginTop: space}}>
+        {child}
+      </View>
     ))}
   </View>
 );
