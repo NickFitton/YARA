@@ -20,7 +20,7 @@ export const useCreateRecipe = () => {
       db.transaction(tx => {
         const recipeId = v4();
         tx.executeSql(
-          `INSERT INTO Recipe (id, name, description, servings, prepTimeMinutes, cookTimeMinutes) VALUES (?, ?, ?, ?, ?, ?)`,
+          'INSERT INTO Recipe (id, name, description, servings, prepTimeMinutes, cookTimeMinutes) VALUES (?, ?, ?, ?, ?, ?)',
           [
             recipeId,
             recipe.name,
@@ -35,7 +35,7 @@ export const useCreateRecipe = () => {
               switch (ingredient.type) {
                 case 'parsed':
                   tx.executeSql(
-                    `INSERT INTO ParsedIngredient (id, recipeId, quantity, unit, name) VALUES (?, ?, ?, ?, ?)`,
+                    'INSERT INTO ParsedIngredient (id, recipeId, quantity, unit, name) VALUES (?, ?, ?, ?, ?)',
                     [
                       ingredientId,
                       recipeId,
@@ -47,7 +47,7 @@ export const useCreateRecipe = () => {
                   break;
                 case 'raw':
                   tx.executeSql(
-                    `INSERT INTO RawIngredient (id, recipeId, ingredient) VALUES (?, ?, ?)`,
+                    'INSERT INTO RawIngredient (id, recipeId, ingredient) VALUES (?, ?, ?)',
                     [ingredientId, recipeId, ingredient.ingredient],
                   );
                   break;
@@ -58,7 +58,7 @@ export const useCreateRecipe = () => {
               switch (step.type) {
                 case 'raw':
                   tx.executeSql(
-                    `INSERT INTO RawMethod (id, recipeId, step, stepIndex) VALUES (?, ?, ?, ?)`,
+                    'INSERT INTO RawMethod (id, recipeId, step, stepIndex) VALUES (?, ?, ?, ?)',
                     [stepId, recipeId, step.step, i],
                   );
               }
@@ -82,7 +82,7 @@ export const useDeleteRecipe = (id: string) => {
 
   const deleteRecipe = () => {
     db.transaction(tx => {
-      tx.executeSql(`DELETE FROM Recipe WHERE id=?`, [id], () => {
+      tx.executeSql('DELETE FROM Recipe WHERE id=?', [id], () => {
         queryClient.invalidateQueries(['recipes']);
       });
     });

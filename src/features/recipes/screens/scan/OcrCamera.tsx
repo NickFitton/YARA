@@ -100,7 +100,8 @@ const CameraComponent = ({
           borderRadius: 32,
           backgroundColor: '#0000',
         }}
-        onPress={() => onSelect(blocks)}></TouchableOpacity>
+        onPress={() => onSelect(blocks)}
+      />
     </>
   );
 };

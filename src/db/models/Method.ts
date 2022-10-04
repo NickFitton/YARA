@@ -1,6 +1,6 @@
 import {DBRecord} from './shared';
 
-interface RawMethodModel extends Partial<DBRecord> {
+export interface RawMethodModel extends Partial<DBRecord> {
   step: string;
 }
 

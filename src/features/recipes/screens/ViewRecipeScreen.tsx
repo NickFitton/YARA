@@ -10,10 +10,11 @@ import {
   View,
 } from 'react-native';
 import {Row} from '../../../components/Row/Row';
+import {IngredientModel} from '../../../db/models/Ingredient';
 import {MethodModel} from '../../../db/models/Method';
+import {toString} from '../../../utils/measurement';
 import {useDeleteRecipe, useRecipe} from '../recipeHooks';
 import {RecipeStackParamList} from '../RecipesStack';
-import {IngredientModel} from '../types/Recipe';
 
 type Props = NativeStackScreenProps<RecipeStackParamList, 'View Recipe'>;
 
@@ -145,9 +146,14 @@ const IngredientCheckboxes = ({
 }) => (
   <View>
     <Text style={{fontSize: 18}}>Ingredients</Text>
-    {ingredients.map(ingredient => (
-      <Text>{displayIngredient(ingredient)}</Text>
-    ))}
+    {ingredients.map(ingredient => {
+      switch (ingredient.type) {
+        case 'parsed':
+          return <Text>{toString(ingredient)}</Text>;
+        case 'raw':
+          return <Text>{ingredient.ingredient}</Text>;
+      }
+    })}
   </View>
 );
 

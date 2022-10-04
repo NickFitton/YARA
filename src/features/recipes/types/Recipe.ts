@@ -1,37 +1,39 @@
-export interface DBRecord {
+import {Measurement} from '../../../utils/measurement';
+
+export interface IDBRecord {
   id: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface Recipe extends Partial<DBRecord> {
+export interface IRecipe extends Partial<IDBRecord> {
   name: string;
   description: string;
   servings: number;
   prepTimeMinutes: number;
   cookTimeMinutes: number;
-  ingredients: IngredientModel[];
-  method: MethodModel[];
+  ingredients: IIngredientModel[];
+  method: IMethodModel[];
 }
 
-export interface RecipeModel extends Required<Recipe> {}
+export interface IRecipeModel extends Required<IRecipe> {}
 
-export interface RawIngredientModel extends Partial<DBRecord> {
+export interface IRawIngredientModel extends Partial<IDBRecord> {
   ingredient: string;
 }
 
-export interface ParsedIngredientModel extends Partial<DBRecord> {
+export interface IParsedIngredientModel extends Partial<IDBRecord> {
   quantity: number;
-  unit?: string;
+  unit?: Measurement;
   name: string;
 }
 
-export interface RawMethodModel extends Partial<DBRecord> {
+export interface IRawMethodModel extends Partial<IDBRecord> {
   step: string;
 }
 
-export type IngredientModel =
-  | ({type: 'raw'} & RawIngredientModel)
-  | ({type: 'parsed'} & ParsedIngredientModel);
+export type IIngredientModel =
+  | ({type: 'raw'} & IRawIngredientModel)
+  | ({type: 'parsed'} & IParsedIngredientModel);
 
-export type MethodModel = {type: 'raw'} & RawMethodModel;
+export type IMethodModel = {type: 'raw'} & IRawMethodModel;
