@@ -1,34 +1,10 @@
-import {ParsedIngredientModel} from '../db/models/Ingredient';
-
-export type Measurement =
-  | 'tsp'
-  | 'tbsp'
-  | 'cup'
-  | 'l'
-  | 'ml'
-  | 'g'
-  | 'mg'
-  | 'kg';
+import {Measurement, ParsedIngredientModel} from '../db/models/Ingredient';
 
 type MeasurementData = {
   longName: string;
   shortName: string;
   plural: string;
   hasPrefixSpace: boolean;
-};
-
-// TODO Adopt this type
-type MeasurementDataCategorized = {
-  short: {
-    singular: string;
-    plural: string;
-    hasPrefixSpace: boolean;
-  };
-  long: {
-    singular: string;
-    plural: string;
-    hasPrefixSpace: boolean;
-  };
 };
 
 const measurementMatrix: Record<Measurement, MeasurementData> = {
@@ -87,11 +63,14 @@ export const toString = ({
   quantity,
   name,
 }: ParsedIngredientModel): string => {
+  if (!unit) {
+    return `${quantity} ${name}`;
+  }
   const measureData = measurementMatrix[unit];
   if (!measureData) {
     return `${quantity} ${name}`;
   }
-  return `${quantity}${measureData.hasPrefixSpace && ' '}${
+  return `${quantity}${measureData.hasPrefixSpace ? ' ' : ''}${
     measureData.shortName
   } of ${name}`;
 };

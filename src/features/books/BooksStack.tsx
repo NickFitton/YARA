@@ -1,10 +1,10 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {BooksScreen} from './screens/BooksScreen';
 import React from 'react';
+import {BooksScreen} from './screens/BooksScreen';
 
 const Stack = createNativeStackNavigator();
 
-export const BooksStack = () => {
+export function BooksStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -14,4 +14,4 @@ export const BooksStack = () => {
       />
     </Stack.Navigator>
   );
-};
+}

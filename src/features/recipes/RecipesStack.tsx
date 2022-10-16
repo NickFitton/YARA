@@ -1,29 +1,17 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React from 'react';
 import {CreateRecipeScreen} from './screens/CreateRecipe/CreateRecipeScreen';
 import {RecipesScreen} from './screens/RecipesScreen';
-import React from 'react';
 import {NameScreen} from './screens/scan/Name';
 import {DescriptionScreen} from './screens/scan/Description';
 import {IngredientScreen} from './screens/scan/Ingredients';
 import {MethodScreen} from './screens/scan/Method';
 import {ViewRecipeScreen} from './screens/ViewRecipeScreen';
-import {Recipe} from './types/Recipe';
-
-export type RecipeStackParamList = {
-  RecipesRoot: undefined;
-  'Create Recipe'?: Partial<Recipe>;
-  'Scan Name': undefined;
-  'View Recipe': {
-    id: string;
-  };
-  'Scan Description': {name?: string};
-  'Scan Ingredient': {name?: string; description?: string};
-  'Scan Method': {name?: string; description?: string; ingredients?: string[]};
-};
+import {RecipeStackParamList} from './RecipeStackParam';
 
 const Stack = createNativeStackNavigator<RecipeStackParamList>();
 
-export const RecipesStack = () => {
+export function RecipesStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -39,4 +27,4 @@ export const RecipesStack = () => {
       <Stack.Screen name="Scan Method" component={MethodScreen} />
     </Stack.Navigator>
   );
-};
+}

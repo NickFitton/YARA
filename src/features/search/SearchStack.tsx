@@ -1,10 +1,10 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {SearchScreen} from './screens/SearchScreen';
 import React from 'react';
+import {SearchScreen} from './screens/SearchScreen';
 
 const Stack = createNativeStackNavigator();
 
-export const SearchStack: React.FC = () => {
+export function SearchStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -14,4 +14,4 @@ export const SearchStack: React.FC = () => {
       />
     </Stack.Navigator>
   );
-};
+}

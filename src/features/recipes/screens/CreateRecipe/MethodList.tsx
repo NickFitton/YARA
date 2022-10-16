@@ -5,14 +5,39 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
+  Text,
 } from 'react-native';
-import {ScrollView, Text} from 'react-native';
-import {v4} from 'uuid';
 import {Input, Validation} from '../../../../components/Input/Input';
 import {requiredValidator} from '../../../../components/LabelledInput/LabelledInput';
-import {MethodModel} from '../../types/Recipe';
+import {MethodModel} from '../../../../db/models/Method';
 
-export const MethodList = ({
+const styles = StyleSheet.create({
+  input: {
+    flex: 1,
+    color: '#000',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    padding: 8,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    marginBottom: 8,
+  },
+  hint: {
+    color: '#e55',
+    fontSize: 12,
+  },
+});
+
+export function MethodList({
   scrollViewRef,
   onIsValidChanged,
   value,
@@ -22,7 +47,7 @@ export const MethodList = ({
   onIsValidChanged: (error: Validation | undefined) => void;
   value: MethodModel[];
   onChange: (newState: MethodModel[]) => void;
-}) => {
+}) {
   const [input, setInput] = useState<string>('');
   const [errorHint, setErrorHint] = useState<string | undefined>();
   const ref = useRef<TextInput>(null);
@@ -49,19 +74,17 @@ export const MethodList = ({
       <Text style={{paddingTop: 8, paddingBottom: 8, color: '#000'}}>
         Method*
       </Text>
-      {value.map((step, i) => {
-        return (
-          <View style={styles.input} key={step.id}>
-            <TouchableOpacity style={{flexGrow: 1}}>
-              <Text style={{color: '#000'}}>{step.step}</Text>
-            </TouchableOpacity>
-            <Button
-              title="X"
-              onPress={() => onChange(value.filter((_, j) => i != j))}
-            />
-          </View>
-        );
-      })}
+      {value.map((step, i) => (
+        <View style={styles.input} key={step.id}>
+          <TouchableOpacity style={{flexGrow: 1}}>
+            <Text style={{color: '#000'}}>{step.step}</Text>
+          </TouchableOpacity>
+          <Button
+            title="X"
+            onPress={() => onChange(value.filter((_, j) => i !== j))}
+          />
+        </View>
+      ))}
       <Input
         ref={ref}
         placeholder="Put the lime in the coconut"
@@ -77,29 +100,4 @@ export const MethodList = ({
       {errorHint ? <Text style={styles.hint}>{errorHint}</Text> : null}
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  input: {
-    flex: 1,
-    color: '#000',
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    padding: 8,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-    marginBottom: 8,
-  },
-  hint: {
-    color: '#e55',
-    fontSize: 12,
-  },
-});
+}

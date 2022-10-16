@@ -44,13 +44,12 @@ export const teardown = [
   'DROP TABLE IF EXISTS Recipe;',
 ];
 
-export const migrate = (db: SQLiteDatabase): Promise<void> => {
-  return new Promise((resolve, reject) => {
+export const migrate = (db: SQLiteDatabase): Promise<void> =>
+  new Promise((resolve, reject) => {
     db.transaction(txn => {
-      manifest.forEach(tableDef => txn.executeSql(tableDef, []));
+      manifest.forEach(tableDef => {
+        txn.executeSql(tableDef, []).catch(resolve);
+      });
       resolve();
-    });
+    }).catch(reject);
   });
-};
-
-const recursiveExecutions = (statements: string[]) => {};

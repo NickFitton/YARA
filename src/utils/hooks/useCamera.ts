@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useState} from 'react';
+import {Alert} from 'react-native';
 import {
   Camera,
   CameraDevice,
@@ -34,43 +35,48 @@ export const useCamera = (prompt: Prompt): CameraHook => {
   );
   const devices = useCameraDevices();
 
-  useEffect(() => {
-    checkStatus();
+  const requestPermission = async () => {
+    const result = await Camera.requestCameraPermission();
+    await AsyncStorage.setItem(CAMERA_PERMISSION_PREVIOUSLY_ASKED, 'true');
+    setPermission(
+      result === 'authorized' ? Permission.ENABLED : Permission.DISABLED,
+    );
+    return result;
+  };
 
+  useEffect(() => {
     async function checkStatus() {
       const status = await Camera.getCameraPermissionStatus();
       switch (status) {
         case 'authorized':
           setPermission(Permission.ENABLED);
-          return;
+          break;
         case 'denied':
         case 'restricted':
+        default:
           setPermission(Permission.DISABLED);
-          return;
+          break;
       }
 
       switch (prompt) {
-        case Prompt.FIRST:
+        case Prompt.FIRST: {
           const previouslyAsked = !!(await AsyncStorage.getItem(
             CAMERA_PERMISSION_PREVIOUSLY_ASKED,
           ));
           if (previouslyAsked) {
             return;
           }
+          await requestPermission();
+          break;
+        }
         case Prompt.AUTO:
-          requestPermission();
+        default:
+          await requestPermission();
       }
     }
-  }, [setPermission]);
 
-  const requestPermission = async () => {
-    const result = await Camera.requestCameraPermission();
-    AsyncStorage.setItem(CAMERA_PERMISSION_PREVIOUSLY_ASKED, 'true');
-    setPermission(
-      result === 'authorized' ? Permission.ENABLED : Permission.DISABLED,
-    );
-    return result;
-  };
+    checkStatus().catch(Alert.alert);
+  }, [setPermission, prompt]);
 
   return {
     hasPermission,
@@ -80,4 +86,4 @@ export const useCamera = (prompt: Prompt): CameraHook => {
   };
 };
 
-//'front' | 'back' | 'unspecified' | 'external'
+// 'front' | 'back' | 'unspecified' | 'external'

@@ -1,10 +1,10 @@
 import React from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {Text, View} from 'react-native';
 
-export const BooksScreen = () => {
+export function BooksScreen() {
   return (
     <View>
       <Text>Books</Text>
     </View>
   );
-};
+}

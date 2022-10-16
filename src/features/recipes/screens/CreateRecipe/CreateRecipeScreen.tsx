@@ -1,40 +1,95 @@
-import {
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-} from '@react-navigation/native';
-import React, {RefObject, useLayoutEffect, useRef, useState} from 'react';
+import {RouteProp} from '@react-navigation/native';
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {
   Button,
   KeyboardAvoidingView,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
   View,
+  ScrollView,
+  Alert,
 } from 'react-native';
-import {ScrollView, Text} from 'react-native';
-import {Input, Validation} from '../../../../components/Input/Input';
-import {
-  LabelledInput,
-  requiredValidator,
-} from '../../../../components/LabelledInput/LabelledInput';
-import {RecipeStackParamList} from '../../RecipesStack';
-import {Recipe} from '../../types/Recipe';
+import {Validation} from '../../../../components/Input/Input';
+import {LabelledInput} from '../../../../components/LabelledInput/LabelledInput';
+import {IngredientModel} from '../../../../db/models/Ingredient';
+import {MethodModel} from '../../../../db/models/Method';
+
+import {RecipeStackParamList} from '../../RecipeStackParam';
 import {IngredientList} from './IngredientList';
 import {MethodList} from './MethodList';
 
-type FieldName = keyof Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>;
+const styles = StyleSheet.create({
+  row: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  rowItem: {
+    flex: 1,
+    flexGrow: 1,
+  },
+
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    padding: 8,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    elevation: 5,
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  input: {
+    flex: 1,
+    color: '#000',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    padding: 8,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    marginBottom: 8,
+  },
+
+  hint: {
+    color: '#e55',
+    fontSize: 12,
+  },
+});
+
+interface RecipeFields {
+  name: string;
+  description: string;
+  servings: string;
+  prepTimeMinutes: string;
+  cookTimeMinutes: string;
+  ingredients: IngredientModel[];
+  method: MethodModel[];
+}
+
+type FieldName = keyof RecipeFields;
 type FieldValidation = Record<FieldName, boolean>;
 
 interface RecipeForm
-  extends Omit<Recipe, 'servings' | 'prepTimeMinutes' | 'cookTimeMinutes'> {
+  extends Omit<
+    RecipeFields,
+    'servings' | 'prepTimeMinutes' | 'cookTimeMinutes'
+  > {
   servings: string;
   prepTimeMinutes: string;
   cookTimeMinutes: string;
 }
 
 const useCreateForm = () => {
-  const {navigate} = useNavigation<NavigationProp<RecipeStackParamList>>();
   const [validation, setValidation] = useState<FieldValidation>({
     name: false,
     description: true,
@@ -56,19 +111,18 @@ const useCreateForm = () => {
       cookTimeMinutes: cookTimeMinutesString,
     } = recipe;
 
-    const servings = parseInt(servingsString);
-    const prepTimeMinutes = parseInt(prepTimeMinutesString);
-    const cookTimeMinutes = parseInt(cookTimeMinutesString);
+    const servings = parseInt(servingsString, 10);
+    const prepTimeMinutes = parseInt(prepTimeMinutesString, 10);
+    const cookTimeMinutes = parseInt(cookTimeMinutesString, 10);
 
     if (
-      servings === NaN ||
-      prepTimeMinutes === NaN ||
-      cookTimeMinutes === NaN
+      Number.isNaN(servings) ||
+      Number.isNaN(prepTimeMinutes) ||
+      Number.isNaN(cookTimeMinutes)
     ) {
-      console.error(
+      Alert.alert(
         "There was an error, we'll probably want to handle this better.",
       );
-      return;
     }
 
     // create({
@@ -84,11 +138,11 @@ const useCreateForm = () => {
   return {validFields: validation, check: checkValidation, createRecipe};
 };
 
-export const CreateRecipeScreen = ({
+export function CreateRecipeScreen({
   route,
 }: {
   route: RouteProp<RecipeStackParamList, 'Create Recipe'>;
-}) => {
+}) {
   const scrollViewRef = useRef<ScrollView>(null);
   const {validFields, check, createRecipe} = useCreateForm();
   const [formState, setFormState] = useState<RecipeForm>({
@@ -100,7 +154,7 @@ export const CreateRecipeScreen = ({
     ingredients: [],
     method: [],
   });
-  const updateForm = (key: FieldName) => (value: any) =>
+  const updateForm = (key: FieldName) => (value: RecipeFields[FieldName]) =>
     setFormState(pState => ({...pState, [key]: value}));
 
   useLayoutEffect(() => {
@@ -117,7 +171,7 @@ export const CreateRecipeScreen = ({
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
-      behavior={'padding'}
+      behavior="padding"
       keyboardVerticalOffset={100}>
       <ScrollView ref={scrollViewRef}>
         <View
@@ -196,53 +250,4 @@ export const CreateRecipeScreen = ({
       </ScrollView>
     </KeyboardAvoidingView>
   );
-};
-
-const styles = StyleSheet.create({
-  row: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  rowItem: {
-    flex: 1,
-    flexGrow: 1,
-  },
-
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    padding: 8,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    elevation: 5,
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  input: {
-    flex: 1,
-    color: '#000',
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    padding: 8,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-    marginBottom: 8,
-  },
-
-  hint: {
-    color: '#e55',
-    fontSize: 12,
-  },
-});
+}

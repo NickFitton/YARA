@@ -2,6 +2,17 @@ import React, {forwardRef, useState} from 'react';
 import {View, Text, TextInput, StyleSheet} from 'react-native';
 import {Input, InputProps, Validation} from '../Input/Input';
 
+const styles = StyleSheet.create({
+  label: {
+    paddingBottom: 4,
+    color: '#000',
+  },
+  hint: {
+    color: '#e55',
+    fontSize: 12,
+  },
+});
+
 export interface LabelledInputProps extends InputProps {
   required?: boolean;
   label: string;
@@ -49,14 +60,6 @@ export const LabelledInput = forwardRef<TextInput, LabelledInputProps>(
     );
   },
 );
-
-const styles = StyleSheet.create({
-  label: {
-    paddingBottom: 4,
-    color: '#000',
-  },
-  hint: {
-    color: '#e55',
-    fontSize: 12,
-  },
-});
+LabelledInput.defaultProps = {
+  required: false,
+};

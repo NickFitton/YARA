@@ -7,22 +7,28 @@ type SelectedBlock = {block: TextBlock; selected: boolean};
 export const useBlocks = () => {
   const [blockStash, setBlockStash] = useState<TextBlock[]>([]);
   const [blocks, setBlocks] = useState<SelectedBlock[]>();
-  const loadBlocks = (blocks?: TextBlock[]) => {
-    if (!blocks) {
-      setBlocks(blocks);
+  const loadBlocks = (loadingBlocks?: TextBlock[]) => {
+    if (!loadingBlocks) {
+      setBlocks(loadingBlocks);
       return;
     }
-    let loadedBlocks = [...blockStash.map(block => ({block, selected: true}))];
-    const autoSelect = blocks.length < 10;
-    loadedBlocks.push(...blocks.map(block => ({block, selected: autoSelect})));
+    const loadedBlocks = [
+      ...blockStash.map(block => ({block, selected: true})),
+    ];
+    const autoSelect = loadingBlocks.length < 10;
+    loadedBlocks.push(
+      ...loadingBlocks.map(block => ({block, selected: autoSelect})),
+    );
     setBlocks(loadedBlocks);
     setBlockStash([]);
   };
-  const toggleBlock = (block: SelectedBlock) => {
+  const toggleBlock = (selectedBlock: SelectedBlock) => {
     setBlocks(pBlocks => {
-      const toggleIndex = pBlocks?.indexOf(block);
-      return pBlocks?.map(({block, selected}, i) =>
-        i === toggleIndex ? {block, selected: !selected} : {block, selected},
+      const toggleIndex = pBlocks?.indexOf(selectedBlock);
+      return pBlocks?.map(({block: previousBlock, selected}, i) =>
+        i === toggleIndex
+          ? {block: previousBlock, selected: !selected}
+          : {block: previousBlock, selected},
       );
     });
   };

@@ -1,45 +1,5 @@
-import {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useCallback, useEffect, useState} from 'react';
 import {StyleSheet, TextInput, TextInputProps} from 'react-native';
-import React from 'react';
-
-export interface Validation {
-  errorName: string;
-  // Returns true if input is valid
-  validator: (input: string) => boolean;
-  errorHint: string;
-}
-
-export interface InputProps extends TextInputProps {
-  validation?: Validation[];
-  onIsValidChanged?: (error: Validation | undefined) => void;
-}
-
-export const Input = forwardRef<TextInput, InputProps>((props, ref) => {
-  const [isErroneous, setIsErroneus] = useState<boolean>(false);
-
-  const validate = (text: string, propogate = true) => {
-    const error = props.validation?.find(({validator}) => !validator(text));
-    props.onIsValidChanged?.(error);
-    setIsErroneus(!!error);
-    if (propogate) {
-      props.onChangeText?.(text);
-    }
-  };
-
-  useEffect(() => {
-    validate(props.value || '', false);
-  }, []);
-
-  return (
-    <TextInput
-      style={[styles.input, isErroneous && styles.error]}
-      {...props}
-      ref={ref}
-      placeholderTextColor={'#aaa'}
-      onChangeText={validate}
-    />
-  );
-});
 
 const styles = StyleSheet.create({
   input: {
@@ -61,3 +21,53 @@ const styles = StyleSheet.create({
     borderColor: '#e55',
   },
 });
+
+export interface Validation {
+  errorName: string;
+  // Returns true if input is valid
+  validator: (input: string) => boolean;
+  errorHint: string;
+}
+
+export interface InputProps extends TextInputProps {
+  validation?: Validation[];
+  onIsValidChanged?: (error: Validation | undefined) => void;
+}
+
+export const Input = forwardRef<TextInput, InputProps>((props, ref) => {
+  const {validation, onIsValidChanged, onChangeText, value} = props;
+  const [isErroneous, setIsErroneus] = useState<boolean>(false);
+
+  const validate = useCallback(
+    (text: string, propogate = true) => {
+      const error = validation?.find(({validator}) => !validator(text));
+      onIsValidChanged?.(error);
+      setIsErroneus(!!error);
+      if (propogate) {
+        onChangeText?.(text);
+      }
+    },
+    [validation, onIsValidChanged, onChangeText],
+  );
+
+  useEffect(() => {
+    validate(value || '', false);
+  }, [validate, value]);
+
+  return (
+    <TextInput
+      style={[styles.input, isErroneous && styles.error]}
+      {...props}
+      ref={ref}
+      placeholderTextColor="#aaa"
+      onChangeText={validate}
+    />
+  );
+});
+
+Input.defaultProps = {
+  validation: [],
+  onIsValidChanged: () => {
+    /* NO-OP */
+  },
+};

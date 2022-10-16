@@ -1,5 +1,5 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import React, {useLayoutEffect} from 'react';
+import React, {PropsWithChildren, useLayoutEffect} from 'react';
 import {
   Button,
   View,
@@ -7,21 +7,102 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {Column} from '../../../components/Column/Column';
 import {useCreateRecipe, useRecipe, useRecipes} from '../recipeHooks';
-import {RecipeStackParamList} from '../RecipesStack';
+import {RecipeStackParamList} from '../RecipeStackParam';
 
-export const RecipesScreen = ({
+function RecipePreviewWrapper({id, children}: PropsWithChildren<{id: string}>) {
+  const navigation =
+    useNavigation<NavigationProp<RecipeStackParamList, 'RecipesRoot'>>();
+
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.navigate({name: 'View Recipe', params: {id}})}
+      style={{
+        backgroundColor: '#fff',
+        borderRadius: 4,
+        shadowOffset: {
+          width: 0,
+          height: 0,
+        },
+        elevation: 5,
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        padding: 8,
+        marginBottom: 16,
+      }}>
+      {children}
+    </TouchableOpacity>
+  );
+}
+
+function RecipePreview({id}: {id: string}) {
+  const data = useRecipe(id);
+
+  switch (data.status) {
+    case 'error':
+      return (
+        <RecipePreviewWrapper id={id}>
+          <Text>!!!</Text>
+        </RecipePreviewWrapper>
+      );
+    case 'success':
+      return (
+        <RecipePreviewWrapper id={id}>
+          <>
+            <Text style={{color: '#000'}}>{data.data.name}</Text>
+            <Text style={{color: '#000'}}>{data.data.description}</Text>
+          </>
+        </RecipePreviewWrapper>
+      );
+    case 'loading':
+    default:
+      return (
+        <RecipePreviewWrapper id={id}>
+          <ActivityIndicator size="large" />
+        </RecipePreviewWrapper>
+      );
+  }
+}
+
+function ListEmpty() {
+  const navigation =
+    useNavigation<NavigationProp<RecipeStackParamList, 'RecipesRoot'>>();
+  return (
+    <Column
+      style={{
+        height: '100%',
+        padding: 24,
+        flex: 1,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      space={8}>
+      <Text style={{color: '#000', textAlign: 'center'}}>
+        You don&apos;t have any recipes yet
+      </Text>
+      <Button
+        title="Create a Recipe"
+        onPress={() => navigation.navigate('Scan Name')}
+      />
+    </Column>
+  );
+}
+
+export function RecipesScreen({
   navigation,
 }: {
   navigation: NavigationProp<RecipeStackParamList, 'RecipesRoot'>;
-}) => {
+}) {
   const data = useRecipes();
   const {createRecipe} = useCreateRecipe();
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <Button onPress={() => navigation.navigate('Scan Name')} title="New" />
       ),
@@ -38,8 +119,8 @@ export const RecipesScreen = ({
       cookTimeMinutes: 75,
       ingredients: [
         {type: 'parsed', quantity: 3, unit: 'cup', name: 'all-purpose flour'},
-        {type: 'parsed', quantity: 0.5, unit: 'teaspoon', name: 'baking soda'},
-        {type: 'parsed', quantity: 0.5, unit: 'teaspoon', name: 'salt'},
+        {type: 'parsed', quantity: 0.5, unit: 'tsp', name: 'baking soda'},
+        {type: 'parsed', quantity: 0.5, unit: 'tsp', name: 'salt'},
         {type: 'parsed', quantity: 1, unit: 'cup', name: 'unsalted butter'},
         {
           type: 'parsed',
@@ -55,10 +136,10 @@ export const RecipesScreen = ({
         {
           type: 'parsed',
           quantity: 1,
-          unit: 'tablespoon',
+          unit: 'tbsp',
           name: 'vanilla extract',
         },
-        {type: 'parsed', quantity: 2, unit: 'tablespoon', name: 'orange zest'},
+        {type: 'parsed', quantity: 2, unit: 'tbsp', name: 'orange zest'},
         {type: 'raw', ingredient: '3/4 cup buttermilk'},
         {type: 'parsed', quantity: 0.5, unit: 'cup', name: 'dark spiced rum'},
       ],
@@ -84,88 +165,40 @@ export const RecipesScreen = ({
           step: 'Allow cake to cool completely (in bundt pan) before inverting onto cake plate. Dust with powdered sugar before serving. Serve warm or room temperature.',
         },
       ],
-    });
+    }).catch(Alert.alert);
   };
 
-  return (
-    <View style={{height: '100%'}}>
-      {data.isLoading ? (
-        <View>
-          <Text>Loading your recipes</Text>
+  switch (data.status) {
+    case 'error':
+      return (
+        <View style={{height: '100%'}}>
+          <View>
+            <Text>Something went wrong</Text>
+          </View>
         </View>
-      ) : data.isError ? (
-        <View>
-          <Text>Something went wrong</Text>
+      );
+    case 'success':
+      return (
+        <View style={{height: '100%'}}>
+          <View style={{flex: 1}}>
+            <Button title="Create Test Recipe" onPress={createTestRecipe} />
+            <FlatList
+              style={{padding: 16}}
+              ListEmptyComponent={<ListEmpty />}
+              data={data.data}
+              renderItem={({item: {id}}) => <RecipePreview id={id} />}
+            />
+          </View>
         </View>
-      ) : (
-        <View style={{flex: 1}}>
-          <Button title="Create Test Recipe" onPress={createTestRecipe} />
-          <FlatList
-            style={{padding: 16}}
-            ListEmptyComponent={<ListEmpty />}
-            data={data.data}
-            renderItem={({item: {id}}) => <RecipePreview id={id} />}
-          />
+      );
+    case 'loading':
+    default:
+      return (
+        <View style={{height: '100%'}}>
+          <View>
+            <Text>Loading your recipes</Text>
+          </View>
         </View>
-      )}
-    </View>
-  );
-};
-
-const RecipePreview = ({id}: {id: string}) => {
-  const data = useRecipe(id);
-  const navigation =
-    useNavigation<NavigationProp<RecipeStackParamList, 'RecipesRoot'>>();
-  return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate({name: 'View Recipe', params: {id}})}
-      style={{
-        backgroundColor: '#fff',
-        borderRadius: 4,
-        shadowOffset: {
-          width: 0,
-          height: 0,
-        },
-        elevation: 5,
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        padding: 8,
-        marginBottom: 16,
-      }}>
-      {data.isLoading ? (
-        <ActivityIndicator size="large" />
-      ) : data.isError ? (
-        <Text>!!!</Text>
-      ) : (
-        <>
-          <Text style={{color: '#000'}}>{data.data.name}</Text>
-          <Text style={{color: '#000'}}>{data.data.description}</Text>
-        </>
-      )}
-    </TouchableOpacity>
-  );
-};
-const ListEmpty = () => {
-  const navigation =
-    useNavigation<NavigationProp<RecipeStackParamList, 'RecipesRoot'>>();
-  return (
-    <Column
-      style={{
-        height: '100%',
-        padding: 24,
-        flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      space={8}>
-      <Text style={{color: '#000', textAlign: 'center'}}>
-        You don't have any recipes yet
-      </Text>
-      <Button
-        title="Create a Recipe"
-        onPress={() => navigation.navigate('Scan Name')}
-      />
-    </Column>
-  );
-};
+      );
+  }
+}

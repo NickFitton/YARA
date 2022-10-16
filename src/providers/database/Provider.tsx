@@ -3,12 +3,12 @@ import {SQLiteDatabase} from 'react-native-sqlite-storage';
 
 const DbContext = createContext<SQLiteDatabase | null>(null);
 
-export const DatabaseProvider = ({
+export function DatabaseProvider({
   db,
   children,
-}: PropsWithChildren<{db: SQLiteDatabase}>) => (
-  <DbContext.Provider value={db}>{children}</DbContext.Provider>
-);
+}: PropsWithChildren<{db: SQLiteDatabase}>) {
+  return <DbContext.Provider value={db}>{children}</DbContext.Provider>;
+}
 
 export const useDatabase = () => {
   const db = useContext(DbContext);
