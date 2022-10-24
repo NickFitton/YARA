@@ -39,12 +39,10 @@ const styles = StyleSheet.create({
 
 export function MethodList({
   scrollViewRef,
-  onIsValidChanged,
   value,
   onChange,
 }: {
   scrollViewRef: RefObject<ScrollView>;
-  onIsValidChanged: (error: Validation | undefined) => void;
   value: MethodModel[];
   onChange: (newState: MethodModel[]) => void;
 }) {
@@ -53,7 +51,6 @@ export function MethodList({
   const ref = useRef<TextInput>(null);
   const handleIsValidChanged = (error: Validation | undefined) => {
     setErrorHint(error?.errorHint);
-    onIsValidChanged(error);
   };
 
   const submitText = () => {

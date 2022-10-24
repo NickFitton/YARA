@@ -80,12 +80,10 @@ const parseIngredient = (input: string): IngredientModel => {
 
 export function IngredientList({
   scrollViewRef,
-  onIsValidChanged,
   value,
   onChange,
 }: {
   scrollViewRef: RefObject<ScrollView>;
-  onIsValidChanged: (error: Validation | undefined) => void;
   value: IngredientModel[];
   onChange: (newState: IngredientModel[]) => void;
 }) {
@@ -94,7 +92,6 @@ export function IngredientList({
   const ref = useRef<TextInput>(null);
   const handleIsValidChanged = (error: Validation | undefined) => {
     setErrorHint(error?.errorHint);
-    onIsValidChanged(error);
   };
   const submitText = () => {
     if (input.trim().length > 0) {

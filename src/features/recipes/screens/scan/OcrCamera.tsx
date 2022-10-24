@@ -71,6 +71,10 @@ export function OcrCamera({
     requestPermission().catch(Alert.alert);
   };
 
+  const goToManual = () => {
+    navigate('Create Recipe');
+  };
+
   switch (hasPermission) {
     case Permission.DISABLED:
       return (
@@ -80,7 +84,7 @@ export function OcrCamera({
             to scan recipes you will have to enable this.
           </Text>
           <Button title="Enable Camera Permissions" onPress={onEnable} />
-          <Button title="Skip to Manual Creation" />
+          <Button title="Skip to Manual Creation" onPress={goToManual} />
         </View>
       );
     case Permission.ENABLED:

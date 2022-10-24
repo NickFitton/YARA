@@ -8,7 +8,6 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {Validation} from '../../../../components/Input/Input';
 import {LabelledInput} from '../../../../components/LabelledInput/LabelledInput';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
@@ -77,7 +76,6 @@ interface RecipeFields {
 }
 
 type FieldName = keyof RecipeFields;
-type FieldValidation = Record<FieldName, boolean>;
 
 interface RecipeForm
   extends Omit<
@@ -90,20 +88,6 @@ interface RecipeForm
 }
 
 const useCreateForm = () => {
-  const [validation, setValidation] = useState<FieldValidation>({
-    name: false,
-    description: true,
-    servings: true,
-    prepTimeMinutes: true,
-    cookTimeMinutes: true,
-    ingredients: false,
-    method: false,
-  });
-
-  const checkValidation = (error: Validation | undefined, key: FieldName) => {
-    setValidation(pValidation => ({...pValidation, [key]: !error}));
-  };
-
   const createRecipe = (recipe: RecipeForm) => {
     const {
       servings: servingsString,
@@ -135,7 +119,7 @@ const useCreateForm = () => {
     // });
   };
 
-  return {validFields: validation, check: checkValidation, createRecipe};
+  return {createRecipe};
 };
 
 export function CreateRecipeScreen({
@@ -144,7 +128,7 @@ export function CreateRecipeScreen({
   route: RouteProp<RecipeStackParamList, 'Create Recipe'>;
 }) {
   const scrollViewRef = useRef<ScrollView>(null);
-  const {validFields, check, createRecipe} = useCreateForm();
+  const {createRecipe} = useCreateForm();
   const [formState, setFormState] = useState<RecipeForm>({
     name: '',
     description: '',
@@ -186,7 +170,6 @@ export function CreateRecipeScreen({
               value={formState.name}
               onChangeText={updateForm('name')}
               placeholder="Beef Stew"
-              onIsValidChanged={error => check(error, 'name')}
             />
           </View>
           <View style={{paddingBottom: 8}}>
@@ -228,23 +211,15 @@ export function CreateRecipeScreen({
             scrollViewRef={scrollViewRef}
             value={formState.ingredients}
             onChange={updateForm('ingredients')}
-            onIsValidChanged={error => check(error, 'ingredients')}
           />
           <MethodList
             scrollViewRef={scrollViewRef}
             value={formState.method}
             onChange={updateForm('method')}
-            onIsValidChanged={error => check(error, 'method')}
           />
 
           <View style={{paddingTop: 8}}>
-            <Button
-              onPress={() => createRecipe(formState)}
-              title="Create"
-              disabled={Object.values(validFields).some(
-                valid => valid === false,
-              )}
-            />
+            <Button onPress={() => createRecipe(formState)} title="Create" />
           </View>
         </View>
       </ScrollView>
