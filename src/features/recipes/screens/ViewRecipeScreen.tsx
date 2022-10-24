@@ -64,7 +64,7 @@ function MethodCheckboxes({method}: {method: MethodModel[]}) {
     <View>
       <Text style={{fontSize: 18}}>Method</Text>
       {method.map(({step}) => (
-        <Text>{step}</Text>
+        <Text key={step}>{step}</Text>
       ))}
     </View>
   );
