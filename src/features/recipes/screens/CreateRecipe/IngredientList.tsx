@@ -18,7 +18,7 @@ const quantityIngredientRegex = /([0-9.]+) (\w+( \w+)*)/;
 const styles = StyleSheet.create({
   input: {
     flex: 1,
-    color: '#000',
+    color: '#111',
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
@@ -55,7 +55,7 @@ const displayIngredient = (ingredient: IngredientModel): string => {
   }
 };
 
-const parseIngredient = (input: string): IngredientModel => {
+export const parseIngredient = (input: string): IngredientModel => {
   let match = input.match(quantityUnitIngredientRegex);
   if (match) {
     const [, quantity, unit, name] = match;
@@ -110,7 +110,7 @@ export function IngredientList({
 
   return (
     <View>
-      <Text style={{paddingTop: 8, paddingBottom: 8, color: '#000'}}>
+      <Text style={{paddingTop: 8, paddingBottom: 8, color: '#111'}}>
         Ingredients*
       </Text>
       {value.map((ingredient, i) => (
@@ -118,7 +118,7 @@ export function IngredientList({
           <TouchableOpacity style={{flexGrow: 1}}>
             <Text
               style={{
-                color: '#000',
+                color: '#111',
               }}>
               {displayIngredient(ingredient)}
             </Text>

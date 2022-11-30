@@ -7,10 +7,9 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import {Column} from '../../../components/Column/Column';
-import {useCreateRecipe, useRecipe, useRecipes} from '../recipeHooks';
+import {useRecipe, useRecipes} from '../recipeHooks';
 import {RecipeStackParamList} from '../RecipeStackParam';
 
 function RecipePreviewWrapper({id, children}: PropsWithChildren<{id: string}>) {
@@ -98,7 +97,6 @@ export function RecipesScreen({
   navigation: NavigationProp<RecipeStackParamList, 'RecipesRoot'>;
 }) {
   const data = useRecipes();
-  const {createRecipe} = useCreateRecipe();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -108,65 +106,6 @@ export function RecipesScreen({
       ),
     });
   }, [navigation]);
-
-  const createTestRecipe = () => {
-    createRecipe({
-      name: 'Orange Rum Bundt Cake',
-      description:
-        "This Orange Rum Bundt Cake is a sweet, moist homemade cake flavored with dark spiced rum and bright, fresh orange zest. Dust the top with powdered sugar and it's the picture-perfect cake recipe for special occasions and sharing with friends.",
-      servings: 1,
-      prepTimeMinutes: 15,
-      cookTimeMinutes: 75,
-      ingredients: [
-        {type: 'parsed', quantity: 3, unit: 'cup', name: 'all-purpose flour'},
-        {type: 'parsed', quantity: 0.5, unit: 'tsp', name: 'baking soda'},
-        {type: 'parsed', quantity: 0.5, unit: 'tsp', name: 'salt'},
-        {type: 'parsed', quantity: 1, unit: 'cup', name: 'unsalted butter'},
-        {
-          type: 'parsed',
-          quantity: 2.75,
-          unit: 'cup',
-          name: 'extra fine granulated sugar',
-        },
-        {
-          type: 'parsed',
-          quantity: 4,
-          name: 'eggs',
-        },
-        {
-          type: 'parsed',
-          quantity: 1,
-          unit: 'tbsp',
-          name: 'vanilla extract',
-        },
-        {type: 'parsed', quantity: 2, unit: 'tbsp', name: 'orange zest'},
-        {type: 'raw', ingredient: '3/4 cup buttermilk'},
-        {type: 'parsed', quantity: 0.5, unit: 'cup', name: 'dark spiced rum'},
-      ],
-      method: [
-        {
-          type: 'raw',
-          step: 'Preheat oven to 325°F. Grease a 10-inch bundt pan with baking spray or butter and flour it. Set aside.',
-        },
-        {
-          type: 'raw',
-          step: 'In a medium bowl, whisk together flour, baking soda, and salt. Set aside.',
-        },
-        {
-          type: 'raw',
-          step: 'In large bowl of a stand mixer, cream butter and sugar until light and fluffy. Beat in eggs one at a time, then stir in vanilla and orange zest until well combined. Beat in flour mixture alternating with buttermilk and rum.',
-        },
-        {
-          type: 'raw',
-          step: 'Pour batter into prepared bundt pan. Bake for 55-65 minutes, until center is set and a toothpick inserted comes out clean.',
-        },
-        {
-          type: 'raw',
-          step: 'Allow cake to cool completely (in bundt pan) before inverting onto cake plate. Dust with powdered sugar before serving. Serve warm or room temperature.',
-        },
-      ],
-    }).catch(Alert.alert);
-  };
 
   switch (data.status) {
     case 'error':
@@ -181,7 +120,6 @@ export function RecipesScreen({
       return (
         <View style={{height: '100%'}}>
           <View style={{flex: 1}}>
-            <Button title="Create Test Recipe" onPress={createTestRecipe} />
             <FlatList
               style={{padding: 16}}
               ListEmptyComponent={<ListEmpty />}

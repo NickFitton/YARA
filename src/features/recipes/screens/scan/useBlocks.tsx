@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {OCRFrame} from 'vision-camera-ocr';
+import {ScanData} from './OcrCamera';
 
 export type TextBlock = OCRFrame['result']['blocks'][0];
 type SelectedBlock = {block: TextBlock; selected: boolean};
@@ -7,7 +8,8 @@ type SelectedBlock = {block: TextBlock; selected: boolean};
 export const useBlocks = () => {
   const [blockStash, setBlockStash] = useState<TextBlock[]>([]);
   const [blocks, setBlocks] = useState<SelectedBlock[]>();
-  const loadBlocks = (loadingBlocks?: TextBlock[]) => {
+  const loadBlocks = (data?: ScanData) => {
+    const loadingBlocks = data?.text;
     if (!loadingBlocks) {
       setBlocks(loadingBlocks);
       return;

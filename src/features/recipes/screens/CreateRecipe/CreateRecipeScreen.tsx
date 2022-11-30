@@ -1,4 +1,9 @@
-import {RouteProp} from '@react-navigation/native';
+import {
+  CommonActions,
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from '@react-navigation/native';
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {
   Button,
@@ -11,9 +16,11 @@ import {
 import {LabelledInput} from '../../../../components/LabelledInput/LabelledInput';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
+import {randomHex} from '../../../../utils/hex';
+import {useCreateRecipe} from '../../recipeHooks';
 
 import {RecipeStackParamList} from '../../RecipeStackParam';
-import {IngredientList} from './IngredientList';
+import {IngredientList, parseIngredient} from './IngredientList';
 import {MethodList} from './MethodList';
 
 const styles = StyleSheet.create({
@@ -88,6 +95,8 @@ interface RecipeForm
 }
 
 const useCreateForm = () => {
+  const {createRecipe: create} = useCreateRecipe();
+  const navigation = useNavigation<NavigationProp<RecipeStackParamList>>();
   const createRecipe = (recipe: RecipeForm) => {
     const {
       servings: servingsString,
@@ -109,14 +118,32 @@ const useCreateForm = () => {
       );
     }
 
-    // create({
-    //   ...recipe,
-    //   servings,
-    //   prepTimeMinutes,
-    //   cookTimeMinutes,
-    // }).then(recipeId => {
-    //   navigate('RecipesRoot');
-    // });
+    create({
+      ...recipe,
+      servings,
+      prepTimeMinutes,
+      cookTimeMinutes,
+    })
+      .then(recipeId => {
+        navigation.dispatch(state => {
+          console.log(JSON.stringify(state));
+          const newState = {
+            ...state,
+            routes: [
+              state.routes[0],
+              {
+                key: `View Recipe-${randomHex(8)}`,
+                name: 'View Recipe',
+              },
+            ],
+            index: 0,
+          };
+          return CommonActions.reset(newState);
+        });
+      })
+      .catch(e => {
+        Alert.alert(JSON.stringify(e));
+      });
   };
 
   return {createRecipe};
@@ -143,12 +170,23 @@ export function CreateRecipeScreen({
 
   useLayoutEffect(() => {
     const {name, description, ingredients, method} = route.params || {};
+    const parsedIngredients = (ingredients || []).map(ingredient =>
+      parseIngredient(ingredient.trim()),
+    );
+    const parsedMethod = (method || []).map(
+      step =>
+        ({
+          type: 'raw',
+          step: step.trim(),
+        } as MethodModel),
+    );
+
     setFormState(pFormState => ({
       ...pFormState,
       name: name || pFormState.name,
       description: description || pFormState.description,
-      ingredients: ingredients || pFormState.ingredients,
-      method: method || pFormState.method,
+      ingredients: parsedIngredients,
+      method: parsedMethod,
     }));
   }, [route]);
 
