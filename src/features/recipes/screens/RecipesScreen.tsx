@@ -8,10 +8,9 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import {Column} from '../../../components/Column/Column';
-import {useCreateRecipe, useRecipe, useRecipes} from '../recipeHooks';
+import {useRecipe, useRecipes} from '../recipeHooks';
 import {RecipeStackParamList} from '../RecipeStackParam';
 
 type Props = NativeStackScreenProps<RecipeStackParamList, 'RecipesRoot'>;

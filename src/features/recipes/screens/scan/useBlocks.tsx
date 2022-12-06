@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {OCRFrame} from 'vision-camera-ocr';
-import {ScanData} from './OcrCamera';
+import {ScanData} from '../../types';
 
 export type TextBlock = OCRFrame['result']['blocks'][0];
 type SelectedBlock = {block: TextBlock; selected: boolean};

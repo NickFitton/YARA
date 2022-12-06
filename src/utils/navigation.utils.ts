@@ -10,8 +10,9 @@ export const resetNavigationTo = <
   params?: ParamList[RouteName],
 ) => {
   const state = navigation.getState();
-  // @ts-ignore
-  const existingRoute = state?.routes?.find(({name}) => name === destination);
+  const existingRoute = state?.routes?.find(
+    ({name}) => (name as string) === destination,
+  );
 
   if (existingRoute) {
     navigation.dispatch(

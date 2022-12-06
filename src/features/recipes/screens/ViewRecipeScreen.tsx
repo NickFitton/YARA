@@ -5,7 +5,6 @@ import {Row} from '../../../components/Row/Row';
 import {IngredientModel} from '../../../db/models/Ingredient';
 import {MethodModel} from '../../../db/models/Method';
 import {toString} from '../../../utils/measurement';
-import {resetNavigationTo} from '../../../utils/navigation.utils';
 import {useDeleteRecipe, useRecipe} from '../recipeHooks';
 import {RecipeStackParamList} from '../RecipeStackParam';
 
