@@ -9,7 +9,7 @@ type RecipeData = Partial<{
 type ScanProps = {data: ScanData};
 
 export type RecipeStackParamList = {
-  RecipesRoot: undefined;
+  RecipesRoot?: {from: string; action: 'delete'};
   'Item Aggregator Test': undefined;
   'Create Recipe'?: RecipeData;
   'View Recipe': {

@@ -355,18 +355,22 @@ export function ItemAggregator({
         );
       },
     });
-  }, [aggregatedItem, onAdd, navigation, items.length, builtItems.length]);
+  }, [aggregatedItem, onAdd, navigation, items.length, builtItems, onSubmit]);
 
   return (
     <View style={{maxHeight: '100%'}}>
       <View style={styles.header}>
         {aggregatedItem.length > 0 ? (
           <View>
-            <Text style={{textAlign: 'center'}}>Your next {itemType}:</Text>
-            <Text style={{textAlign: 'center'}}>{aggregatedItem}</Text>
+            <Text style={{textAlign: 'center', color: '#111'}}>
+              Your next {itemType}:
+            </Text>
+            <Text style={{textAlign: 'center', color: '#111'}}>
+              {aggregatedItem}
+            </Text>
           </View>
         ) : (
-          <Text style={{textAlign: 'center'}}>
+          <Text style={{textAlign: 'center', color: '#111'}}>
             Tap an item to start building an {itemType}
           </Text>
         )}

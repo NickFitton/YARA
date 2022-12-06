@@ -1,4 +1,5 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {PropsWithChildren, useLayoutEffect} from 'react';
 import {
   Button,
@@ -7,10 +8,13 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {Column} from '../../../components/Column/Column';
-import {useRecipe, useRecipes} from '../recipeHooks';
+import {useCreateRecipe, useRecipe, useRecipes} from '../recipeHooks';
 import {RecipeStackParamList} from '../RecipeStackParam';
+
+type Props = NativeStackScreenProps<RecipeStackParamList, 'RecipesRoot'>;
 
 function RecipePreviewWrapper({id, children}: PropsWithChildren<{id: string}>) {
   const navigation =
@@ -91,11 +95,7 @@ function ListEmpty() {
   );
 }
 
-export function RecipesScreen({
-  navigation,
-}: {
-  navigation: NavigationProp<RecipeStackParamList, 'RecipesRoot'>;
-}) {
+export function RecipesScreen({navigation}: Props) {
   const data = useRecipes();
 
   useLayoutEffect(() => {

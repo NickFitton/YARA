@@ -104,9 +104,9 @@ const useCreateForm = () => {
       cookTimeMinutes: cookTimeMinutesString,
     } = recipe;
 
-    const servings = parseInt(servingsString, 10);
-    const prepTimeMinutes = parseInt(prepTimeMinutesString, 10);
-    const cookTimeMinutes = parseInt(cookTimeMinutesString, 10);
+    const servings = parseInt(servingsString, 10) || 0;
+    const prepTimeMinutes = parseInt(prepTimeMinutesString, 10) || 0;
+    const cookTimeMinutes = parseInt(cookTimeMinutesString, 10) || 0;
 
     if (
       Number.isNaN(servings) ||
@@ -126,19 +126,19 @@ const useCreateForm = () => {
     })
       .then(recipeId => {
         navigation.dispatch(state => {
-          console.log(JSON.stringify(state));
-          const newState = {
+          console.log(state.routes);
+          return CommonActions.reset({
             ...state,
             routes: [
               state.routes[0],
               {
                 key: `View Recipe-${randomHex(8)}`,
                 name: 'View Recipe',
+                params: {id: recipeId},
               },
             ],
             index: 0,
-          };
-          return CommonActions.reset(newState);
+          });
         });
       })
       .catch(e => {

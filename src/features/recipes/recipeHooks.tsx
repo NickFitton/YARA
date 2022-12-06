@@ -1,5 +1,4 @@
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {Alert} from 'react-native';
 import {Transaction} from 'react-native-sqlite-storage';
 import {v4} from 'uuid';
 import {
@@ -126,7 +125,7 @@ export const useCreateRecipe = () => {
                         ingredient.name,
                       ],
                     )
-                    .catch(Alert.alert);
+                    .catch(console.trace);
                   break;
                 case 'raw':
                   passedTransaction
@@ -134,7 +133,7 @@ export const useCreateRecipe = () => {
                       'INSERT INTO RawIngredient (id, recipeId, ingredient) VALUES (?, ?, ?)',
                       [ingredientId, recipeId, ingredient.ingredient],
                     )
-                    .catch(Alert.alert);
+                    .catch(console.trace);
                   break;
               }
             });
@@ -147,17 +146,17 @@ export const useCreateRecipe = () => {
                       'INSERT INTO RawMethod (id, recipeId, step, stepIndex) VALUES (?, ?, ?, ?)',
                       [stepId, recipeId, step.step, i],
                     )
-                    .catch(Alert.alert);
+                    .catch(console.trace);
               }
             });
             resolve(recipeId);
-            queryClient.invalidateQueries(['recipes']).catch(Alert.alert);
+            queryClient.invalidateQueries(['recipes']).catch(console.trace);
           },
           (_, err) => {
             reject(err);
           },
         );
-      }).catch(Alert.alert);
+      }).catch(console.trace);
     });
   return {createRecipe};
 };
@@ -169,9 +168,9 @@ export const useDeleteRecipe = (id: string) => {
   const deleteRecipe = () => {
     db.transaction(tx => {
       tx.executeSql('DELETE FROM Recipe WHERE id=?', [id], () => {
-        queryClient.invalidateQueries(['recipes']).catch(Alert.alert);
+        queryClient.invalidateQueries(['recipes']).catch(console.trace);
       });
-    }).catch(Alert.alert);
+    }).catch(console.trace);
   };
   return {deleteRecipe};
 };
@@ -224,8 +223,11 @@ export const useRecipe = (recipeId: string) => {
                 method,
               });
             })
-            .catch(Alert.alert);
-        }).catch(Alert.alert);
+            .catch(e => {
+              console.log(recipeId);
+              console.trace(e);
+            });
+        }).catch(console.trace);
       }),
   });
 };
@@ -255,7 +257,7 @@ export const useRecipes = () => {
               reject(error);
             },
           );
-        }).catch(Alert.alert);
+        }).catch(console.trace);
       }),
   });
 };
