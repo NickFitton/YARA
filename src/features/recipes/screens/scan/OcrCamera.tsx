@@ -85,7 +85,7 @@ export function OcrCamera({
   const {hasPermission, requestPermission, device} = useCamera(Prompt.AUTO);
 
   const onEnable = () => {
-    requestPermission().catch(Alert.alert);
+    requestPermission().then(Alert.alert).catch(Alert.alert);
   };
 
   const goToManual = () => {
