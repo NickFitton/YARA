@@ -4,6 +4,7 @@ import React, {useEffect, useState} from 'react';
 import SQLite, {SQLiteDatabase} from 'react-native-sqlite-storage';
 import {Alert, StyleSheet, Text, View} from 'react-native';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BooksStack} from './src/features/books/BooksStack';
 import {RecipesStack} from './src/features/recipes/RecipesStack';
 import {SearchStack} from './src/features/search/SearchStack';
@@ -42,10 +43,7 @@ const useDBSetup = ():
       location: 'Library',
       name: 'Test.db',
     })
-      .then(openedDb => {
-        setDb(openedDb);
-        return migrate(openedDb);
-      })
+      .then(openedDb => migrate(openedDb).then(() => setDb(openedDb)))
       .catch(err => {
         Alert.alert(JSON.stringify(err));
         setDb(null);
@@ -85,12 +83,14 @@ function App() {
         <DatabaseProvider {...dbSetup}>
           <NavigationContainer>
             <QueryClientProvider client={queryClient}>
-              <Tab.Navigator screenOptions={{headerShown: false}}>
-                <Tab.Screen name="Recipes" component={RecipesStack} />
-                <Tab.Screen name="Search" component={SearchStack} />
-                <Tab.Screen name="Books" component={BooksStack} />
-                <Tab.Screen name="Settings" component={SettingsScreen} />
-              </Tab.Navigator>
+              <GestureHandlerRootView style={{flex: 1}}>
+                <Tab.Navigator screenOptions={{headerShown: false}}>
+                  <Tab.Screen name="Recipes" component={RecipesStack} />
+                  <Tab.Screen name="Search" component={SearchStack} />
+                  <Tab.Screen name="Books" component={BooksStack} />
+                  <Tab.Screen name="Settings" component={SettingsScreen} />
+                </Tab.Navigator>
+              </GestureHandlerRootView>
             </QueryClientProvider>
           </NavigationContainer>
         </DatabaseProvider>

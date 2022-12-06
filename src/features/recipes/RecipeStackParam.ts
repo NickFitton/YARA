@@ -1,23 +1,30 @@
-import {IngredientModel} from '../../db/models/Ingredient';
-import {MethodModel} from '../../db/models/Method';
+import {ScanData} from './types';
+
+type RecipeData = Partial<{
+  name: string;
+  description: string;
+  ingredients: string[];
+  method: string[];
+}>;
+type ScanProps = {data: ScanData};
 
 export type RecipeStackParamList = {
-  RecipesRoot: undefined;
-  'Create Recipe'?: {
-    name?: string;
-    description?: string;
-    ingredients?: IngredientModel[];
-    method?: MethodModel[];
-  };
-  'Scan Name': undefined;
+  RecipesRoot?: {from: string; action: 'delete'};
+  'Item Aggregator Test': undefined;
+  'Create Recipe'?: RecipeData;
   'View Recipe': {
     id: string;
   };
-  'Scan Description': {name?: string};
-  'Scan Ingredient': {name?: string; description?: string};
-  'Scan Method': {
-    name?: string;
-    description?: string;
-    IngredientModel?: string[];
+  'Scan Name': undefined;
+  'Build Name': ScanProps;
+  'Scan Description': Pick<RecipeData, 'name'>;
+  'Build Description': ScanProps & {recipe: Pick<RecipeData, 'name'>};
+  'Scan Ingredients': Pick<RecipeData, 'name' | 'description'>;
+  'Build Ingredients': ScanProps & {
+    recipe: Pick<RecipeData, 'name' | 'description'>;
+  };
+  'Scan Methods': Pick<RecipeData, 'name' | 'description' | 'ingredients'>;
+  'Build Methods': ScanProps & {
+    recipe: Pick<RecipeData, 'name' | 'description' | 'ingredients'>;
   };
 };

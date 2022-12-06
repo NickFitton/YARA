@@ -7,27 +7,44 @@ import {
   CameraDevice,
   useFrameProcessor,
 } from 'react-native-vision-camera';
-import {OCRFrame, scanOCR} from 'vision-camera-ocr';
+import {v4} from 'uuid';
+import {scanOCR} from 'vision-camera-ocr';
 import {Permission, Prompt, useCamera} from '../../../../utils/hooks/useCamera';
 
 import {RecipeStackParamList} from '../../RecipeStackParam';
+import {ScanData, TextBlock} from '../../types';
 
-type TextBlock = OCRFrame['result']['blocks'][0];
+const loadFrameData = (
+  width: number,
+  height: number,
+  scannedBlocks: TextBlock[],
+  setFrame: React.Dispatch<React.SetStateAction<ScanData | undefined>>,
+) => {
+  setFrame({
+    frame: {width, height},
+    text: scannedBlocks.map(block => ({...block, id: v4()})),
+  });
+};
 
 function CameraComponent({
   device,
   onSelect,
 }: {
   device: CameraDevice;
-  onSelect: (name: TextBlock[]) => void;
+  onSelect: (data?: ScanData) => void;
 }) {
-  const [blocks, setBlocks] = React.useState<TextBlock[]>([]);
+  const [storedFrame, setFrame] = React.useState<ScanData>();
   const frameProcessor = useFrameProcessor(frame => {
     'worklet';
 
+    const {width, height} = frame;
     const scannedBlocks = scanOCR(frame).result.blocks;
-    runOnJS(setBlocks)(scannedBlocks);
+    runOnJS(loadFrameData)(width, height, scannedBlocks, setFrame);
   }, []);
+
+  const selectFrame = () => {
+    onSelect(storedFrame);
+  };
 
   return (
     <>
@@ -53,7 +70,7 @@ function CameraComponent({
           borderRadius: 32,
           backgroundColor: '#0000',
         }}
-        onPress={() => onSelect(blocks)}
+        onPress={selectFrame}
       />
     </>
   );
@@ -62,13 +79,17 @@ function CameraComponent({
 export function OcrCamera({
   onSelect,
 }: PropsWithChildren<{
-  onSelect: (name: TextBlock[]) => void;
+  onSelect: (data?: ScanData) => void;
 }>) {
   const {navigate} = useNavigation<NavigationProp<RecipeStackParamList>>();
   const {hasPermission, requestPermission, device} = useCamera(Prompt.AUTO);
 
   const onEnable = () => {
     requestPermission().catch(Alert.alert);
+  };
+
+  const goToManual = () => {
+    navigate('Create Recipe');
   };
 
   switch (hasPermission) {
@@ -80,7 +101,7 @@ export function OcrCamera({
             to scan recipes you will have to enable this.
           </Text>
           <Button title="Enable Camera Permissions" onPress={onEnable} />
-          <Button title="Skip to Manual Creation" />
+          <Button title="Skip to Manual Creation" onPress={goToManual} />
         </View>
       );
     case Permission.ENABLED:

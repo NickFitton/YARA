@@ -1,4 +1,9 @@
-import {RouteProp} from '@react-navigation/native';
+import {
+  CommonActions,
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from '@react-navigation/native';
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {
   Button,
@@ -8,13 +13,14 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {Validation} from '../../../../components/Input/Input';
 import {LabelledInput} from '../../../../components/LabelledInput/LabelledInput';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
+import {randomHex} from '../../../../utils/hex';
+import {useCreateRecipe} from '../../recipeHooks';
 
 import {RecipeStackParamList} from '../../RecipeStackParam';
-import {IngredientList} from './IngredientList';
+import {IngredientList, parseIngredient} from './IngredientList';
 import {MethodList} from './MethodList';
 
 const styles = StyleSheet.create({
@@ -77,7 +83,6 @@ interface RecipeFields {
 }
 
 type FieldName = keyof RecipeFields;
-type FieldValidation = Record<FieldName, boolean>;
 
 interface RecipeForm
   extends Omit<
@@ -90,20 +95,8 @@ interface RecipeForm
 }
 
 const useCreateForm = () => {
-  const [validation, setValidation] = useState<FieldValidation>({
-    name: false,
-    description: true,
-    servings: true,
-    prepTimeMinutes: true,
-    cookTimeMinutes: true,
-    ingredients: false,
-    method: false,
-  });
-
-  const checkValidation = (error: Validation | undefined, key: FieldName) => {
-    setValidation(pValidation => ({...pValidation, [key]: !error}));
-  };
-
+  const {createRecipe: create} = useCreateRecipe();
+  const navigation = useNavigation<NavigationProp<RecipeStackParamList>>();
   const createRecipe = (recipe: RecipeForm) => {
     const {
       servings: servingsString,
@@ -111,9 +104,9 @@ const useCreateForm = () => {
       cookTimeMinutes: cookTimeMinutesString,
     } = recipe;
 
-    const servings = parseInt(servingsString, 10);
-    const prepTimeMinutes = parseInt(prepTimeMinutesString, 10);
-    const cookTimeMinutes = parseInt(cookTimeMinutesString, 10);
+    const servings = parseInt(servingsString, 10) || 0;
+    const prepTimeMinutes = parseInt(prepTimeMinutesString, 10) || 0;
+    const cookTimeMinutes = parseInt(cookTimeMinutesString, 10) || 0;
 
     if (
       Number.isNaN(servings) ||
@@ -125,17 +118,35 @@ const useCreateForm = () => {
       );
     }
 
-    // create({
-    //   ...recipe,
-    //   servings,
-    //   prepTimeMinutes,
-    //   cookTimeMinutes,
-    // }).then(recipeId => {
-    //   navigate('RecipesRoot');
-    // });
+    create({
+      ...recipe,
+      servings,
+      prepTimeMinutes,
+      cookTimeMinutes,
+    })
+      .then(recipeId => {
+        navigation.dispatch(state => {
+          console.log(state.routes);
+          return CommonActions.reset({
+            ...state,
+            routes: [
+              state.routes[0],
+              {
+                key: `View Recipe-${randomHex(8)}`,
+                name: 'View Recipe',
+                params: {id: recipeId},
+              },
+            ],
+            index: 0,
+          });
+        });
+      })
+      .catch(e => {
+        Alert.alert(JSON.stringify(e));
+      });
   };
 
-  return {validFields: validation, check: checkValidation, createRecipe};
+  return {createRecipe};
 };
 
 export function CreateRecipeScreen({
@@ -144,7 +155,7 @@ export function CreateRecipeScreen({
   route: RouteProp<RecipeStackParamList, 'Create Recipe'>;
 }) {
   const scrollViewRef = useRef<ScrollView>(null);
-  const {validFields, check, createRecipe} = useCreateForm();
+  const {createRecipe} = useCreateForm();
   const [formState, setFormState] = useState<RecipeForm>({
     name: '',
     description: '',
@@ -159,12 +170,23 @@ export function CreateRecipeScreen({
 
   useLayoutEffect(() => {
     const {name, description, ingredients, method} = route.params || {};
+    const parsedIngredients = (ingredients || []).map(ingredient =>
+      parseIngredient(ingredient.trim()),
+    );
+    const parsedMethod = (method || []).map(
+      step =>
+        ({
+          type: 'raw',
+          step: step.trim(),
+        } as MethodModel),
+    );
+
     setFormState(pFormState => ({
       ...pFormState,
       name: name || pFormState.name,
       description: description || pFormState.description,
-      ingredients: ingredients || pFormState.ingredients,
-      method: method || pFormState.method,
+      ingredients: parsedIngredients,
+      method: parsedMethod,
     }));
   }, [route]);
 
@@ -186,7 +208,6 @@ export function CreateRecipeScreen({
               value={formState.name}
               onChangeText={updateForm('name')}
               placeholder="Beef Stew"
-              onIsValidChanged={error => check(error, 'name')}
             />
           </View>
           <View style={{paddingBottom: 8}}>
@@ -228,23 +249,15 @@ export function CreateRecipeScreen({
             scrollViewRef={scrollViewRef}
             value={formState.ingredients}
             onChange={updateForm('ingredients')}
-            onIsValidChanged={error => check(error, 'ingredients')}
           />
           <MethodList
             scrollViewRef={scrollViewRef}
             value={formState.method}
             onChange={updateForm('method')}
-            onIsValidChanged={error => check(error, 'method')}
           />
 
           <View style={{paddingTop: 8}}>
-            <Button
-              onPress={() => createRecipe(formState)}
-              title="Create"
-              disabled={Object.values(validFields).some(
-                valid => valid === false,
-              )}
-            />
+            <Button onPress={() => createRecipe(formState)} title="Create" />
           </View>
         </View>
       </ScrollView>
