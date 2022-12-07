@@ -1,0 +1,26 @@
+name: Pull request checks
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Run the linter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      - name: Install Yarn
+        run: npm install yarn --global --force
+
+      - name: Install Deps
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
