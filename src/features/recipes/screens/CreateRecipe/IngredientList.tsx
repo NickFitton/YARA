@@ -1,16 +1,13 @@
-import React, {RefObject, useRef, useState} from 'react';
-import {
-  Button,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-  ScrollView,
-  Text,
-} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, View, Text} from 'react-native';
+import {EditableItem} from '../../../../components/EditableItem/EditableItem';
 import {Input, Validation} from '../../../../components/Input/Input';
 import {requiredValidator} from '../../../../components/LabelledInput/LabelledInput';
-import {IngredientModel, Measurement} from '../../../../db/models/Ingredient';
+import {
+  IngredientModel,
+  Measurement,
+  RawIngredientModel,
+} from '../../../../db/models/Ingredient';
 
 const quantityUnitIngredientRegex = /([0-9.]+) ([\w]+)(?: of)? (\w+( \w+)*)/;
 const quantityIngredientRegex = /([0-9.]+) (\w+( \w+)*)/;
@@ -79,17 +76,14 @@ export const parseIngredient = (input: string): IngredientModel => {
 };
 
 export function IngredientList({
-  scrollViewRef,
   value,
   onChange,
 }: {
-  scrollViewRef: RefObject<ScrollView>;
   value: IngredientModel[];
   onChange: (newState: IngredientModel[]) => void;
 }) {
   const [input, setInput] = useState<string>('');
   const [errorHint, setErrorHint] = useState<string | undefined>();
-  const ref = useRef<TextInput>(null);
   const handleIsValidChanged = (error: Validation | undefined) => {
     setErrorHint(error?.errorHint);
   };
@@ -97,13 +91,6 @@ export function IngredientList({
     if (input.trim().length > 0) {
       const ingredient = parseIngredient(input.trim());
       onChange([...value, ingredient]);
-      setTimeout(
-        () =>
-          ref.current?.measure((x, y) =>
-            scrollViewRef.current?.scrollTo({x, y}),
-          ),
-        0,
-      );
     }
     setInput('');
   };
@@ -113,24 +100,34 @@ export function IngredientList({
       <Text style={{paddingTop: 8, paddingBottom: 8, color: '#111'}}>
         Ingredients*
       </Text>
-      {value.map((ingredient, i) => (
-        <View style={styles.input} key={ingredient.id}>
-          <TouchableOpacity style={{flexGrow: 1}}>
-            <Text
-              style={{
-                color: '#111',
-              }}>
-              {displayIngredient(ingredient)}
-            </Text>
-          </TouchableOpacity>
-          <Button
-            title="X"
-            onPress={() => onChange(value.filter((_, j) => i !== j))}
+      {value.map(ingredient => (
+        <View style={{paddingBottom: 8}}>
+          <EditableItem
+            onDelete={() => {
+              onChange(
+                value.filter(
+                  filterIngredient => filterIngredient.id !== ingredient.id,
+                ),
+              );
+            }}
+            onValueChange={newIngredient => {
+              const newIngredients = value.map(mapIngredient => {
+                if (mapIngredient.id === ingredient.id) {
+                  return {
+                    type: 'raw',
+                    ingredient: newIngredient,
+                  } as {type: 'raw'} & RawIngredientModel;
+                }
+                return mapIngredient;
+              });
+              onChange(newIngredients);
+            }}
+            value={displayIngredient(ingredient)}
+            key={ingredient.id}
           />
         </View>
       ))}
       <Input
-        ref={ref}
         placeholder="1 Carrot"
         returnKeyType="next"
         value={input}

@@ -125,9 +125,8 @@ const useCreateForm = () => {
       cookTimeMinutes,
     })
       .then(recipeId => {
-        navigation.dispatch(state => {
-          console.log(state.routes);
-          return CommonActions.reset({
+        navigation.dispatch(state =>
+          CommonActions.reset({
             ...state,
             routes: [
               state.routes[0],
@@ -138,8 +137,8 @@ const useCreateForm = () => {
               },
             ],
             index: 0,
-          });
-        });
+          }),
+        );
       })
       .catch(e => {
         Alert.alert(JSON.stringify(e));
@@ -246,12 +245,10 @@ export function CreateRecipeScreen({
             </View>
           </View>
           <IngredientList
-            scrollViewRef={scrollViewRef}
             value={formState.ingredients}
             onChange={updateForm('ingredients')}
           />
           <MethodList
-            scrollViewRef={scrollViewRef}
             value={formState.method}
             onChange={updateForm('method')}
           />
