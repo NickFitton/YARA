@@ -246,12 +246,10 @@ export function CreateRecipeScreen({
             </View>
           </View>
           <IngredientList
-            scrollViewRef={scrollViewRef}
             value={formState.ingredients}
             onChange={updateForm('ingredients')}
           />
           <MethodList
-            scrollViewRef={scrollViewRef}
             value={formState.method}
             onChange={updateForm('method')}
           />

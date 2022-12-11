@@ -1,13 +1,7 @@
-import React, {RefObject, useRef, useState} from 'react';
-import {
-  Button,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-  ScrollView,
-  Text,
-} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {StyleSheet, TextInput, View, Text} from 'react-native';
+
+import {EditableItem} from '../../../../components/EditableItem/EditableItem';
 import {Input, Validation} from '../../../../components/Input/Input';
 import {requiredValidator} from '../../../../components/LabelledInput/LabelledInput';
 import {MethodModel} from '../../../../db/models/Method';
@@ -38,11 +32,9 @@ const styles = StyleSheet.create({
 });
 
 export function MethodList({
-  scrollViewRef,
   value,
   onChange,
 }: {
-  scrollViewRef: RefObject<ScrollView>;
   value: MethodModel[];
   onChange: (newState: MethodModel[]) => void;
 }) {
@@ -56,29 +48,36 @@ export function MethodList({
   const submitText = () => {
     if (input.trim().length > 0) {
       onChange([...value, {type: 'raw', step: input}]);
-      setTimeout(
-        () =>
-          ref.current?.measure((x, y) =>
-            scrollViewRef.current?.scrollTo({x, y}),
-          ),
-        0,
-      );
     }
     setInput('');
   };
+
   return (
     <View>
       <Text style={{paddingTop: 8, paddingBottom: 8, color: '#000'}}>
         Method*
       </Text>
-      {value.map((step, i) => (
-        <View style={styles.input} key={step.id}>
-          <TouchableOpacity style={{flexGrow: 1}}>
-            <Text style={{color: '#000'}}>{step.step}</Text>
-          </TouchableOpacity>
-          <Button
-            title="X"
-            onPress={() => onChange(value.filter((_, j) => i !== j))}
+      {value.map((step, index) => (
+        <View style={{paddingBottom: 8}}>
+          <EditableItem
+            index={index + 1}
+            onDelete={() => {
+              onChange(value.filter(filterStep => filterStep.id !== step.id));
+            }}
+            onValueChange={newStep => {
+              const newMethod = value.map(mapIngredient => {
+                if (mapIngredient.id === step.id) {
+                  return {
+                    type: 'raw',
+                    step: newStep,
+                  } as MethodModel;
+                }
+                return mapIngredient;
+              });
+              onChange(newMethod);
+            }}
+            value={step.step}
+            key={step.id}
           />
         </View>
       ))}
