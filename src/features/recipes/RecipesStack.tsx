@@ -12,6 +12,7 @@ import {BuildNameScreen} from './screens/scan/BuildName';
 import {BuildDescriptionScreen} from './screens/scan/BuildDescription';
 import {BuildIngredientsScreen} from './screens/scan/BuildIngredients';
 import {BuildMethodsScreen} from './screens/scan/BuildMethods';
+import MyBottomSheet from './modals/ViewRecipeOptions';
 
 const Stack = createNativeStackNavigator<RecipeStackParamList>();
 
@@ -39,6 +40,15 @@ export function RecipesStack() {
       />
       <Stack.Screen name="Scan Methods" component={MethodScreen} />
       <Stack.Screen name="Build Methods" component={BuildMethodsScreen} />
+      <Stack.Screen
+        name="View Recipe Options"
+        component={MyBottomSheet}
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          animation: 'none',
+        }}
+      />
     </Stack.Navigator>
   );
 }

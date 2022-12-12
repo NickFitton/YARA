@@ -12,9 +12,7 @@ export type RecipeStackParamList = {
   RecipesRoot?: {from: string; action: 'delete'};
   'Item Aggregator Test': undefined;
   'Create Recipe'?: RecipeData;
-  'View Recipe': {
-    id: string;
-  };
+  'View Recipe': {id: string};
   'Scan Name': undefined;
   'Build Name': ScanProps;
   'Scan Description': Pick<RecipeData, 'name'>;
@@ -27,4 +25,5 @@ export type RecipeStackParamList = {
   'Build Methods': ScanProps & {
     recipe: Pick<RecipeData, 'name' | 'description' | 'ingredients'>;
   };
+  'View Recipe Options': {id: string};
 };
