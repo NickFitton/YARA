@@ -1,11 +1,11 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {PropsWithChildren} from 'react';
+import React, {PropsWithChildren, useLayoutEffect} from 'react';
 import {ActivityIndicator, Button, ScrollView, Text, View} from 'react-native';
 import {Row} from '../../../components/Row/Row';
 import {IngredientModel} from '../../../db/models/Ingredient';
 import {MethodModel} from '../../../db/models/Method';
 import {toString} from '../../../utils/measurement';
-import {useDeleteRecipe, useRecipe} from '../recipeHooks';
+import {useRecipe} from '../recipeHooks';
 import {RecipeStackParamList} from '../RecipeStackParam';
 
 type Props = NativeStackScreenProps<RecipeStackParamList, 'View Recipe'>;
@@ -81,7 +81,16 @@ function MethodCheckboxes({method}: {method: MethodModel[]}) {
 
 export function ViewRecipeScreen({route, navigation}: Props) {
   const recipe = useRecipe(route.params.id);
-  const {deleteRecipe} = useDeleteRecipe(route.params.id);
+
+  useLayoutEffect(() => {
+    const openBottomModal = () => {
+      navigation.navigate('View Recipe Options', {id: route.params.id});
+    };
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => <Button onPress={openBottomModal} title="More" />,
+    });
+  }, [navigation, route.params.id]);
 
   switch (recipe.status) {
     case 'loading':
@@ -159,14 +168,6 @@ export function ViewRecipeScreen({route, navigation}: Props) {
                 <IngredientCheckboxes ingredients={ingredients} />
               ) : null}
               {method ? <MethodCheckboxes method={method} /> : null}
-              <Button
-                title="Delete"
-                color="#ff3823"
-                onPress={() => {
-                  deleteRecipe();
-                  navigation.goBack();
-                }}
-              />
             </View>
           </ScrollView>
         </View>
