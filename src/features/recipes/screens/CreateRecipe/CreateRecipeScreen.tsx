@@ -13,6 +13,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import {v4} from 'uuid';
 import {LabelledInput} from '../../../../components/LabelledInput/LabelledInput';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
@@ -175,6 +176,7 @@ export function CreateRecipeScreen({
     const parsedMethod = (method || []).map(
       step =>
         ({
+          id: v4(),
           type: 'raw',
           step: step.trim(),
         } as MethodModel),
