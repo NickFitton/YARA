@@ -279,14 +279,37 @@ const useData = (data: string[]) => {
   };
 };
 
+const lowercaseWords = ['as', 'with', 'to', ''];
+
+const toTitleCase = (word: string): string => {
+  const [firstLetter, ...rest] = word;
+  return firstLetter.toLocaleUpperCase() + rest.join('');
+};
+
+const itemToTitleCase = (item: string): string =>
+  item
+    .split(' ')
+    .map(word => word.toLowerCase())
+    .map(word => (lowercaseWords.includes(word) ? word : toTitleCase(word)))
+    .join(' ');
+
+const itemToSentenceCase = (item: string): string => {
+  const [firstWord, ...restWords] = item
+    .split(' ')
+    .map(word => word.toLowerCase());
+  return [toTitleCase(firstWord), ...restWords].join(' ');
+};
+
 export function SingleItemAggregator({
   data,
   itemType,
   onSubmit,
+  casing = 'sentence',
 }: {
   data: string[];
   itemType: string;
   onSubmit: (item?: string) => void;
+  casing: 'title' | 'sentence';
 }) {
   const {items, aggregatedItem, breakItem, toggleItemSelect} = useData(data);
   const navigation = useNavigation<NavigationProp<RecipeStackParamList>>();
@@ -297,7 +320,16 @@ export function SingleItemAggregator({
       headerRight: () => {
         if (aggregatedItem.length > 0) {
           return (
-            <Button title="Next" onPress={() => onSubmit(aggregatedItem)} />
+            <Button
+              title="Next"
+              onPress={() =>
+                onSubmit(
+                  casing === 'title'
+                    ? itemToTitleCase(aggregatedItem)
+                    : itemToSentenceCase(aggregatedItem),
+                )
+              }
+            />
           );
         }
         return <Button title="Skip" onPress={() => onSubmit(undefined)} />;
@@ -314,7 +346,9 @@ export function SingleItemAggregator({
               Your recipes {itemType}:
             </Text>
             <Text style={{color: '#111', textAlign: 'center'}}>
-              {aggregatedItem}
+              {casing === 'title'
+                ? itemToTitleCase(aggregatedItem)
+                : itemToSentenceCase(aggregatedItem)}
             </Text>
           </View>
         ) : (

@@ -190,6 +190,18 @@ function ListItem({
   }
 }
 
+const toTitleCase = (word: string): string => {
+  const [firstLetter, ...rest] = word;
+  return firstLetter.toLocaleUpperCase() + rest.join('');
+};
+
+const itemToSentenceCase = (item: string): string => {
+  const [firstWord, ...restWords] = item
+    .split(' ')
+    .map(word => word.toLowerCase());
+  return [toTitleCase(firstWord), ...restWords].join(' ');
+};
+
 const useData = (data: string[]) => {
   const [builtItems, setBuiltItems] = useState<string[]>([]);
   const [items, setItems] = useState<Record<string, Item>>({});
@@ -290,7 +302,7 @@ const useData = (data: string[]) => {
   };
 
   const onAdd = () => {
-    setBuiltItems(pItems => [...pItems, aggregatedItem]);
+    setBuiltItems(pItems => [...pItems, itemToSentenceCase(aggregatedItem)]);
     removeSelected();
   };
 
@@ -366,7 +378,7 @@ export function ItemAggregator({
               Your next {itemType}:
             </Text>
             <Text style={{textAlign: 'center', color: '#111'}}>
-              {aggregatedItem}
+              {itemToSentenceCase(aggregatedItem)}
             </Text>
           </View>
         ) : (

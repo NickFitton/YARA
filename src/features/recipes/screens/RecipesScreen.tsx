@@ -9,9 +9,11 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
+import {v4} from 'uuid';
 import {Column} from '../../../components/Column/Column';
 import {useRecipe, useRecipes} from '../recipeHooks';
 import {RecipeStackParamList} from '../RecipeStackParam';
+import {IdTextBlock} from '../types';
 
 type Props = NativeStackScreenProps<RecipeStackParamList, 'RecipesRoot'>;
 
@@ -119,6 +121,28 @@ export function RecipesScreen({navigation}: Props) {
       return (
         <View style={{height: '100%'}}>
           <View style={{flex: 1}}>
+            <Button
+              title="To build Method"
+              onPress={() =>
+                navigation.navigate('Build Ingredients', {
+                  recipe: {
+                    name: 'Nivia Hand Cream',
+                    description: 'Concentrated care provitamin b5',
+                  },
+                  data: {
+                    frame: {width: 1, height: 1},
+                    text: [
+                      {text: 'NIVEA', id: v4()} as IdTextBlock,
+                      {text: 'HAND CREAM', id: v4()} as IdTextBlock,
+                      {text: 'repair', id: v4()} as IdTextBlock,
+                      {text: 'Concentrated Care', id: v4()} as IdTextBlock,
+                      {text: 'Provitamin B5', id: v4()} as IdTextBlock,
+                      {text: '100ml', id: v4()} as IdTextBlock,
+                    ],
+                  },
+                })
+              }
+            />
             <FlatList
               style={{padding: 16}}
               ListEmptyComponent={<ListEmpty />}
