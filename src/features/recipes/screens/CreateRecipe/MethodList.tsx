@@ -58,7 +58,7 @@ export function MethodList({
         Method*
       </Text>
       {value.map((step, index) => (
-        <View style={{paddingBottom: 8}}>
+        <View style={{paddingBottom: 8}} key={step.id}>
           <EditableItem
             index={index + 1}
             onDelete={() => {

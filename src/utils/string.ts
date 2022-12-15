@@ -1,4 +1,7 @@
 export const toTitleCase = (word: string): string => {
+  if (word.length === 0) {
+    return '';
+  }
   const [firstLetter, ...rest] = word;
   return firstLetter.toLocaleUpperCase() + rest.join('');
 };

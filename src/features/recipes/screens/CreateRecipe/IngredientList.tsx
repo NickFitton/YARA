@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {StyleSheet, View, Text} from 'react-native';
+import {v4} from 'uuid';
 import {EditableItem} from '../../../../components/EditableItem/EditableItem';
 import {Input, Validation} from '../../../../components/Input/Input';
 import {requiredValidator} from '../../../../components/LabelledInput/LabelledInput';
@@ -54,9 +55,11 @@ const displayIngredient = (ingredient: IngredientModel): string => {
 
 export const parseIngredient = (input: string): IngredientModel => {
   let match = input.match(quantityUnitIngredientRegex);
+  const id = v4();
   if (match) {
     const [, quantity, unit, name] = match;
     return {
+      id,
       type: 'parsed',
       quantity: parseFloat(quantity),
       unit: unit as Measurement,
@@ -67,12 +70,17 @@ export const parseIngredient = (input: string): IngredientModel => {
   if (match) {
     const [, quantity, name] = match;
     return {
+      id,
       type: 'parsed',
       quantity: parseFloat(quantity),
       name,
     };
   }
-  return {type: 'raw', ingredient: input};
+  return {
+    id,
+    type: 'raw',
+    ingredient: input,
+  };
 };
 
 export function IngredientList({
@@ -101,7 +109,7 @@ export function IngredientList({
         Ingredients*
       </Text>
       {value.map(ingredient => (
-        <View style={{paddingBottom: 8}}>
+        <View style={{paddingBottom: 8}} key={ingredient.id}>
           <EditableItem
             onDelete={() => {
               onChange(
