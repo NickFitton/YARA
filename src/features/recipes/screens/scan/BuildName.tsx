@@ -25,6 +25,7 @@ export function BuildNameScreen({
       itemType="name"
       data={dataset}
       onSubmit={navigateToScanDescription}
+      casing="title"
     />
   );
 }

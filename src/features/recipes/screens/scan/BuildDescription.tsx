@@ -29,6 +29,7 @@ export function BuildDescriptionScreen({
       itemType="name"
       data={dataset}
       onSubmit={navigateToScanDescription}
+      casing="sentence"
     />
   );
 }

@@ -11,6 +11,7 @@ import {
 import {RectButton, Swipeable} from 'react-native-gesture-handler';
 import {v4} from 'uuid';
 import {RecipeStackParamList} from '../../features/recipes/RecipeStackParam';
+import {itemToSentenceCase} from '../../utils/string';
 
 const styles = StyleSheet.create({
   rectButton: {
@@ -290,7 +291,7 @@ const useData = (data: string[]) => {
   };
 
   const onAdd = () => {
-    setBuiltItems(pItems => [...pItems, aggregatedItem]);
+    setBuiltItems(pItems => [...pItems, itemToSentenceCase(aggregatedItem)]);
     removeSelected();
   };
 
@@ -366,7 +367,7 @@ export function ItemAggregator({
               Your next {itemType}:
             </Text>
             <Text style={{textAlign: 'center', color: '#111'}}>
-              {aggregatedItem}
+              {itemToSentenceCase(aggregatedItem)}
             </Text>
           </View>
         ) : (

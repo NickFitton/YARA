@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {v4} from 'uuid';
 import {RecipeStackParamList} from '../../features/recipes/RecipeStackParam';
+import {itemToSentenceCase, toTitleCase} from '../../utils/string';
 
 const styles = StyleSheet.create({
   card: {
@@ -150,7 +151,16 @@ function ListItem({
   }
 }
 
-const useData = (data: string[]) => {
+const lowercaseWords = ['as', 'with', 'to', ''];
+
+const itemToTitleCase = (item: string): string =>
+  item
+    .split(' ')
+    .map(word => word.toLowerCase())
+    .map(word => (lowercaseWords.includes(word) ? word : toTitleCase(word)))
+    .join(' ');
+
+const useData = (data: string[], casing: 'title' | 'sentence') => {
   const [builtItems, setBuiltItems] = useState<string[]>([]);
   const [items, setItems] = useState<Record<string, Item>>({});
   useEffect(() => {
@@ -269,7 +279,10 @@ const useData = (data: string[]) => {
 
   return {
     items,
-    aggregatedItem,
+    aggregatedItem:
+      casing === 'title'
+        ? itemToTitleCase(aggregatedItem)
+        : itemToSentenceCase(aggregatedItem),
     breakItem,
     toggleItemSelect,
     builtItems,
@@ -283,12 +296,17 @@ export function SingleItemAggregator({
   data,
   itemType,
   onSubmit,
+  casing = 'sentence',
 }: {
   data: string[];
   itemType: string;
   onSubmit: (item?: string) => void;
+  casing: 'title' | 'sentence';
 }) {
-  const {items, aggregatedItem, breakItem, toggleItemSelect} = useData(data);
+  const {items, aggregatedItem, breakItem, toggleItemSelect} = useData(
+    data,
+    casing,
+  );
   const navigation = useNavigation<NavigationProp<RecipeStackParamList>>();
 
   useEffect(() => {
@@ -314,7 +332,9 @@ export function SingleItemAggregator({
               Your recipes {itemType}:
             </Text>
             <Text style={{color: '#111', textAlign: 'center'}}>
-              {aggregatedItem}
+              {casing === 'title'
+                ? itemToTitleCase(aggregatedItem)
+                : itemToSentenceCase(aggregatedItem)}
             </Text>
           </View>
         ) : (
