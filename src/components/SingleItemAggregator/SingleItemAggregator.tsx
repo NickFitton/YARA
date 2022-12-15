@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {v4} from 'uuid';
 import {RecipeStackParamList} from '../../features/recipes/RecipeStackParam';
+import {itemToSentenceCase, toTitleCase} from '../../utils/string';
 
 const styles = StyleSheet.create({
   card: {
@@ -150,7 +151,16 @@ function ListItem({
   }
 }
 
-const useData = (data: string[]) => {
+const lowercaseWords = ['as', 'with', 'to', ''];
+
+const itemToTitleCase = (item: string): string =>
+  item
+    .split(' ')
+    .map(word => word.toLowerCase())
+    .map(word => (lowercaseWords.includes(word) ? word : toTitleCase(word)))
+    .join(' ');
+
+const useData = (data: string[], casing: 'title' | 'sentence') => {
   const [builtItems, setBuiltItems] = useState<string[]>([]);
   const [items, setItems] = useState<Record<string, Item>>({});
   useEffect(() => {
@@ -269,7 +279,10 @@ const useData = (data: string[]) => {
 
   return {
     items,
-    aggregatedItem,
+    aggregatedItem:
+      casing === 'title'
+        ? itemToTitleCase(aggregatedItem)
+        : itemToSentenceCase(aggregatedItem),
     breakItem,
     toggleItemSelect,
     builtItems,
@@ -277,27 +290,6 @@ const useData = (data: string[]) => {
     removeItem,
     addItem,
   };
-};
-
-const lowercaseWords = ['as', 'with', 'to', ''];
-
-const toTitleCase = (word: string): string => {
-  const [firstLetter, ...rest] = word;
-  return firstLetter.toLocaleUpperCase() + rest.join('');
-};
-
-const itemToTitleCase = (item: string): string =>
-  item
-    .split(' ')
-    .map(word => word.toLowerCase())
-    .map(word => (lowercaseWords.includes(word) ? word : toTitleCase(word)))
-    .join(' ');
-
-const itemToSentenceCase = (item: string): string => {
-  const [firstWord, ...restWords] = item
-    .split(' ')
-    .map(word => word.toLowerCase());
-  return [toTitleCase(firstWord), ...restWords].join(' ');
 };
 
 export function SingleItemAggregator({
@@ -311,7 +303,10 @@ export function SingleItemAggregator({
   onSubmit: (item?: string) => void;
   casing: 'title' | 'sentence';
 }) {
-  const {items, aggregatedItem, breakItem, toggleItemSelect} = useData(data);
+  const {items, aggregatedItem, breakItem, toggleItemSelect} = useData(
+    data,
+    casing,
+  );
   const navigation = useNavigation<NavigationProp<RecipeStackParamList>>();
 
   useEffect(() => {
@@ -320,16 +315,7 @@ export function SingleItemAggregator({
       headerRight: () => {
         if (aggregatedItem.length > 0) {
           return (
-            <Button
-              title="Next"
-              onPress={() =>
-                onSubmit(
-                  casing === 'title'
-                    ? itemToTitleCase(aggregatedItem)
-                    : itemToSentenceCase(aggregatedItem),
-                )
-              }
-            />
+            <Button title="Next" onPress={() => onSubmit(aggregatedItem)} />
           );
         }
         return <Button title="Skip" onPress={() => onSubmit(undefined)} />;

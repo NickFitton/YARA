@@ -11,6 +11,7 @@ import {
 import {RectButton, Swipeable} from 'react-native-gesture-handler';
 import {v4} from 'uuid';
 import {RecipeStackParamList} from '../../features/recipes/RecipeStackParam';
+import {itemToSentenceCase} from '../../utils/string';
 
 const styles = StyleSheet.create({
   rectButton: {
@@ -189,18 +190,6 @@ function ListItem({
     }
   }
 }
-
-const toTitleCase = (word: string): string => {
-  const [firstLetter, ...rest] = word;
-  return firstLetter.toLocaleUpperCase() + rest.join('');
-};
-
-const itemToSentenceCase = (item: string): string => {
-  const [firstWord, ...restWords] = item
-    .split(' ')
-    .map(word => word.toLowerCase());
-  return [toTitleCase(firstWord), ...restWords].join(' ');
-};
 
 const useData = (data: string[]) => {
   const [builtItems, setBuiltItems] = useState<string[]>([]);
