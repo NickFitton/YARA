@@ -1,5 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
+import {HeightDependentHeader} from '../components/HeightDependentHeader';
 import {OcrCamera} from '../components/OcrCamera';
 import {CreateRecipeProps, ScanData} from '../types';
 
@@ -18,8 +19,10 @@ export function IngredientsScreen({
   };
 
   return (
-    <View style={{flex: 1}}>
-      <OcrCamera onSelect={loadBlocks} />
-    </View>
+    <HeightDependentHeader minHeight={600}>
+      <View style={{flex: 1}}>
+        <OcrCamera onSelect={loadBlocks} />
+      </View>
+    </HeightDependentHeader>
   );
 }
