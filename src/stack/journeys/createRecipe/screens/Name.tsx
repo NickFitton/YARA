@@ -1,17 +1,16 @@
-import {
-  NavigationProp,
-  useFocusEffect,
-  useNavigation,
-} from '@react-navigation/native';
-import React from 'react';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import React, {useEffect} from 'react';
 import {Button, View} from 'react-native';
 import {SuperStackParamList} from '../../../RootStackParam';
+import {useHeightDependentHeader} from '../components/HeightDependentHeader';
 import {OcrCamera} from '../components/OcrCamera';
 import {CreateRecipeNavigation, ScanData} from '../types';
 
 export function NameScreen({navigation}: CreateRecipeNavigation<'Build Name'>) {
   const superNavigation = useNavigation<NavigationProp<SuperStackParamList>>();
-  useFocusEffect(() => {
+  useHeightDependentHeader(600);
+
+  useEffect(() => {
     navigation.setOptions({
       // eslint-disable-next-line react/no-unstable-nested-components
       headerLeft: () => (
@@ -26,14 +25,15 @@ export function NameScreen({navigation}: CreateRecipeNavigation<'Build Name'>) {
         />
       ),
     });
-  });
+  }, [navigation, superNavigation]);
+
   const loadBlocks = (data: ScanData | undefined) => {
     if (data) {
       navigation.navigate('Build Name', {data});
     }
   };
   return (
-    <View style={{flex: 1, flexDirection: 'column', height: '100%'}}>
+    <View style={{flex: 1}}>
       <OcrCamera onSelect={loadBlocks} />
     </View>
   );

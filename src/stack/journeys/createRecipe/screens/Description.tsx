@@ -1,5 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
+import {useHeightDependentHeader} from '../components/HeightDependentHeader';
 import {OcrCamera} from '../components/OcrCamera';
 import {CreateRecipeProps, ScanData} from '../types';
 
@@ -7,6 +8,7 @@ export function DescriptionScreen({
   navigation,
   route,
 }: CreateRecipeProps<'Scan Description'>) {
+  useHeightDependentHeader(600);
   const loadBlocks = (data: ScanData | undefined) => {
     if (data) {
       const recipe = route.params;
@@ -15,7 +17,7 @@ export function DescriptionScreen({
   };
 
   return (
-    <View style={{flex: 1, flexDirection: 'column', height: '100%'}}>
+    <View style={{flex: 1}}>
       <OcrCamera onSelect={loadBlocks} />
     </View>
   );
