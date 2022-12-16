@@ -2,12 +2,13 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {Button, View} from 'react-native';
 import {SuperStackParamList} from '../../../RootStackParam';
-import {HeightDependentHeader} from '../components/HeightDependentHeader';
+import {useHeightDependentHeader} from '../components/HeightDependentHeader';
 import {OcrCamera} from '../components/OcrCamera';
 import {CreateRecipeNavigation, ScanData} from '../types';
 
 export function NameScreen({navigation}: CreateRecipeNavigation<'Build Name'>) {
   const superNavigation = useNavigation<NavigationProp<SuperStackParamList>>();
+  useHeightDependentHeader(600);
 
   useEffect(() => {
     navigation.setOptions({
@@ -32,10 +33,8 @@ export function NameScreen({navigation}: CreateRecipeNavigation<'Build Name'>) {
     }
   };
   return (
-    <View style={{flex: 1, flexDirection: 'column', height: '100%'}}>
-      <HeightDependentHeader minHeight={600}>
-        <OcrCamera onSelect={loadBlocks} />
-      </HeightDependentHeader>
+    <View style={{flex: 1}}>
+      <OcrCamera onSelect={loadBlocks} />
     </View>
   );
 }
