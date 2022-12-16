@@ -1,16 +1,13 @@
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import SQLite, {SQLiteDatabase} from 'react-native-sqlite-storage';
 import {Alert, StyleSheet, Text, View} from 'react-native';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {BooksStack} from './src/features/books/BooksStack';
-import {RecipesStack} from './src/features/recipes/RecipesStack';
-import {SearchStack} from './src/features/search/SearchStack';
+
 import {DatabaseProvider} from './src/providers/database/Provider';
-import {SettingsScreen} from './src/features/settings/SettingsScreen';
 import {migrate} from './src/db/migrate';
+import {Stack} from './src/stack/Stack';
 
 const styles = StyleSheet.create({
   page: {
@@ -21,16 +18,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export type TabParamList = {
-  Recipes: undefined;
-  Search: undefined;
-  Books: undefined;
-  Settings: undefined;
-};
-
 SQLite.enablePromise(true);
-
-const Tab = createBottomTabNavigator<TabParamList>();
 
 const queryClient = new QueryClient();
 const useDBSetup = ():
@@ -84,12 +72,7 @@ function App() {
           <NavigationContainer>
             <QueryClientProvider client={queryClient}>
               <GestureHandlerRootView style={{flex: 1}}>
-                <Tab.Navigator screenOptions={{headerShown: false}}>
-                  <Tab.Screen name="Recipes" component={RecipesStack} />
-                  <Tab.Screen name="Search" component={SearchStack} />
-                  <Tab.Screen name="Books" component={BooksStack} />
-                  <Tab.Screen name="Settings" component={SettingsScreen} />
-                </Tab.Navigator>
+                <Stack />
               </GestureHandlerRootView>
             </QueryClientProvider>
           </NavigationContainer>
