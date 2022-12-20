@@ -1,33 +1,47 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 
-import {SingleItemAggregator} from '../components/SingleItemAggregator';
+import {Alert} from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import TextRecognitionManager, {
+  TextData,
+} from '../../../../native/textRecognition';
 import {CreateRecipeProps} from '../types';
+import {NewSingleItemAggregator} from '../components/NewSingleItemAggregator';
+
+const simplifyScan = (data: TextData[]): string[] => data.map(({text}) => text);
 
 export function DescriptionScreen({
   navigation,
   route,
 }: CreateRecipeProps<'Description'>) {
-  const [dataset, setDataset] = useState<string[]>([]);
-  // useEffect(() => {
-  //   route.params.recipe.name;
-  //   const newLocal = route.params.data.text.map(value => value.text);
-  //   setDataset(newLocal);
-  // }, [setDataset, route]);
+  const [scanData, setScanData] = useState<string[]>([]);
 
   const navigateToScanDescription = (description?: string) => {
-    // const {recipe} = route.params;
-    // navigation.navigate('Ingredients', {
-    //   ...recipe,
-    //   description,
-    // });
+    const {recipe} = route.params;
+    navigation.navigate('Ingredients', {
+      recipe: {...recipe, description},
+    });
+  };
+
+  const scanNewImage = () => {
+    ImagePicker.openCamera({
+      freeStyleCropEnabled: true,
+      cropping: true,
+      showCropFrame: false,
+    })
+      .then(image => TextRecognitionManager.parseTextInImage(image.path))
+      .then(simplifyScan)
+      .then(setScanData)
+      .catch(Alert.alert);
   };
 
   return (
-    <SingleItemAggregator
+    <NewSingleItemAggregator
       itemType="name"
-      data={dataset}
+      data={scanData}
       onSubmit={navigateToScanDescription}
-      casing="sentence"
+      onRetry={scanNewImage}
+      casing="title"
     />
   );
 }
