@@ -1,7 +1,8 @@
 import {useFocusEffect} from '@react-navigation/native';
 import React, {useRef} from 'react';
-import {TextInput, View, Button} from 'react-native';
+import {TextInput, View, Button, Alert} from 'react-native';
 import {CreateRecipeProps} from '../types';
+import ImagePicker from 'react-native-image-crop-picker';
 
 export function NameScreen({navigation}: CreateRecipeProps<'Name'>) {
   // const [dataset, setDataset] = useState<string[]>([]);
@@ -30,7 +31,18 @@ export function NameScreen({navigation}: CreateRecipeProps<'Name'>) {
   return (
     <View>
       <TextInput placeholder="Recipe name here" ref={ref} />
-      <Button title="Scan again" />
+      <Button
+        title="Scan again"
+        onPress={() => {
+          ImagePicker.openCamera({
+            cropping: true,
+          })
+            .then(image => {
+              console.log(image);
+            })
+            .catch(Alert.alert);
+        }}
+      />
     </View>
   );
   // return (
