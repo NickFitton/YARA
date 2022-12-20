@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
 
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -251,6 +252,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    // Used to scan text
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:18.0.2'
+    // Needed to integrate with ML Kit
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10"
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules

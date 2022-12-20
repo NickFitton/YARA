@@ -1,8 +1,15 @@
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {TextInput, View, Button, Alert} from 'react-native';
-import {CreateRecipeProps} from '../types';
 import ImagePicker from 'react-native-image-crop-picker';
+import TextRecognitionManager, {
+  TextData,
+} from '../../../../native/textRecognition';
+import {NewSingleItemAggregator} from '../components/NewSingleItemAggregator';
+
+import {CreateRecipeProps} from '../types';
+
+const simplifyScan = (data: TextData[]): string[] => data.map(({text}) => text);
 
 export function NameScreen({navigation}: CreateRecipeProps<'Name'>) {
   // const [dataset, setDataset] = useState<string[]>([]);
@@ -12,6 +19,7 @@ export function NameScreen({navigation}: CreateRecipeProps<'Name'>) {
   // }, [setDataset, route]);
 
   const ref = useRef<TextInput>(null);
+  const [scanData, setScanData] = useState<string[]>([]);
 
   const navigateToScanDescription = () => {
     navigation.navigate('Description', {
@@ -28,29 +36,50 @@ export function NameScreen({navigation}: CreateRecipeProps<'Name'>) {
     });
   });
 
-  return (
-    <View>
-      <TextInput placeholder="Recipe name here" ref={ref} />
-      <Button
-        title="Scan again"
-        onPress={() => {
-          ImagePicker.openCamera({
-            cropping: true,
-          })
-            .then(image => {
-              console.log(image);
-            })
-            .catch(Alert.alert);
-        }}
-      />
-    </View>
-  );
+  const scanNewImage = () => {
+    ImagePicker.openCamera({
+      cropping: true,
+    })
+      .then(image => {
+        console.log(image);
+        return TextRecognitionManager.parseTextInImage(image.path);
+      })
+      .then(simplifyScan)
+      .then(setScanData)
+      .catch(Alert.alert);
+  };
+
   // return (
-  //   <SingleItemAggregator
-  //     itemType="name"
-  //     data={dataset}
-  //     onSubmit={navigateToScanDescription}
-  //     casing="title"
-  //   />
+  //   <View>
+  //     <TextInput placeholder="Recipe name here" ref={ref} />
+  //     <Button
+  //       title={`Scan${scanData.length !== 0 ? ' Again' : ''}`}
+  //       onPress={() => {
+  //         ImagePicker.openCamera({
+  //           cropping: true,
+  //         })
+  //           .then(image => {
+  //             console.log(image);
+  //             return TextRecognitionManager.parseTextInImage(image.path);
+  //           })
+  //           .then(setScanData)
+  //           .catch(Alert.alert);
+  //       }}
+  //     />
+  //     <FlatList
+  //       data={scanData}
+  //       renderItem={renderItem}
+  //       keyExtractor={extractKey}
+  //     />
+  //   </View>
   // );
+  return (
+    <NewSingleItemAggregator
+      itemType="name"
+      data={scanData}
+      onSubmit={navigateToScanDescription}
+      onRetry={scanNewImage}
+      casing="title"
+    />
+  );
 }
