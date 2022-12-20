@@ -4,7 +4,7 @@ import {Alert} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 
-import {NewItemAggregator} from '../components/NewItemAggregator';
+import {ItemAggregator} from '../components/ItemAggregator';
 import TextRecognitionManager, {
   TextData,
 } from '../../../../native/textRecognition';
@@ -50,7 +50,7 @@ export function MethodsScreen({
     setSavedMethod(pData => [...pData, ingredient]);
 
   return (
-    <NewItemAggregator
+    <ItemAggregator
       itemType="methods"
       data={scanData}
       savedIngredients={savedMethod}

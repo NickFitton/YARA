@@ -4,7 +4,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import TextRecognitionManager, {
   TextData,
 } from '../../../../native/textRecognition';
-import {NewSingleItemAggregator} from '../components/NewSingleItemAggregator';
+import {SingleItemAggregator} from '../components/SingleItemAggregator';
 
 import {CreateRecipeProps} from '../types';
 
@@ -32,7 +32,7 @@ export function NameScreen({navigation}: CreateRecipeProps<'Name'>) {
   };
 
   return (
-    <NewSingleItemAggregator
+    <SingleItemAggregator
       itemType="name"
       data={scanData}
       onSubmit={navigateToScanDescription}

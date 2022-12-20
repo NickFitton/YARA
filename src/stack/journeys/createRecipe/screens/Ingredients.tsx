@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {Alert} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 
-import {NewItemAggregator} from '../components/NewItemAggregator';
+import {ItemAggregator} from '../components/ItemAggregator';
 import TextRecognitionManager, {
   TextData,
 } from '../../../../native/textRecognition';
@@ -41,7 +41,7 @@ export function IngredientsScreen({
     setSavedIngredients(pData => [...pData, ingredient]);
 
   return (
-    <NewItemAggregator
+    <ItemAggregator
       itemType="ingredients"
       data={scanData}
       savedIngredients={savedIngredients}

@@ -6,7 +6,7 @@ import TextRecognitionManager, {
   TextData,
 } from '../../../../native/textRecognition';
 import {CreateRecipeProps} from '../types';
-import {NewSingleItemAggregator} from '../components/NewSingleItemAggregator';
+import {SingleItemAggregator} from '../components/SingleItemAggregator';
 
 const simplifyScan = (data: TextData[]): string[] => data.map(({text}) => text);
 
@@ -36,7 +36,7 @@ export function DescriptionScreen({
   };
 
   return (
-    <NewSingleItemAggregator
+    <SingleItemAggregator
       itemType="name"
       data={scanData}
       onSubmit={navigateToScanDescription}
