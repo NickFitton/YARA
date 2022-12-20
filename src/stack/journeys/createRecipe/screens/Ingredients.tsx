@@ -1,27 +1,27 @@
-import React from 'react';
-import {View} from 'react-native';
-import {useHeightDependentHeader} from '../components/HeightDependentHeader';
-import {OcrCamera} from '../components/OcrCamera';
-import {CreateRecipeProps, ScanData} from '../types';
+import React, {useEffect, useState} from 'react';
+
+import {ItemAggregator} from '../components/ItemAggregator';
+import {CreateRecipeProps} from '../types';
 
 export function IngredientsScreen({
   navigation,
   route,
-}: CreateRecipeProps<'Scan Ingredients'>) {
-  useHeightDependentHeader(600);
-  const loadBlocks = (data: ScanData | undefined) => {
-    if (data) {
-      const routeRecipe = route.params;
-      navigation.navigate('Build Ingredients', {
-        data,
-        recipe: routeRecipe,
-      });
-    }
+}: CreateRecipeProps<'Ingredients'>) {
+  const [dataset, setDataset] = useState<string[]>([]);
+  // useEffect(() => {
+  //   const newLocal = route.params.data.text.map(value => value.text);
+  //   setDataset(newLocal);
+  // }, [setDataset, route]);
+
+  const onSubmit = (ingredients: string[]) => {
+    // const {recipe} = route.params;
+    // navigation.navigate('Scan Methods', {
+    //   ...recipe,
+    //   ingredients,
+    // });
   };
 
   return (
-    <View style={{flex: 1}}>
-      <OcrCamera onSelect={loadBlocks} />
-    </View>
+    <ItemAggregator itemType="ingredients" data={dataset} onSubmit={onSubmit} />
   );
 }

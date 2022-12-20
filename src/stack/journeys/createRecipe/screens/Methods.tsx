@@ -5,25 +5,25 @@ import {ItemAggregator} from '../components/ItemAggregator';
 import {CreateRecipeStackParamList} from '../types';
 import {SuperStackParamList} from '../../../RootStackParam';
 
-export function BuildMethodsScreen({
+export function MethodsScreen({
   navigation,
   route,
 }: {
   navigation: NavigationProp<SuperStackParamList>;
-  route: RouteProp<CreateRecipeStackParamList, 'Build Methods'>;
+  route: RouteProp<CreateRecipeStackParamList, 'Methods'>;
 }) {
   const [dataset, setDataset] = useState<string[]>([]);
-  useEffect(() => {
-    const newLocal = route.params.data.text.map(value => value.text);
-    setDataset(newLocal);
-  }, [setDataset, route]);
+  // useEffect(() => {
+  //   const newLocal = route.params.data.text.map(value => value.text);
+  //   setDataset(newLocal);
+  // }, [setDataset, route]);
 
   const onSubmit = (method: string[]) => {
-    const {recipe} = route.params;
-    navigation.navigate('Tabs', {
-      screen: 'Recipes',
-      params: {screen: 'Create Recipe', params: {...recipe, method}},
-    });
+    // const {recipe} = route.params;
+    // navigation.navigate('Tabs', {
+    //   screen: 'Recipes',
+    //   params: {screen: 'Create Recipe', params: {...recipe, method}},
+    // });
   };
 
   return (

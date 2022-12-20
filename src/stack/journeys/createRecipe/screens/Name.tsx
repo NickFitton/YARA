@@ -1,40 +1,44 @@
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import React, {useEffect} from 'react';
-import {Button, View} from 'react-native';
-import {SuperStackParamList} from '../../../RootStackParam';
-import {useHeightDependentHeader} from '../components/HeightDependentHeader';
-import {OcrCamera} from '../components/OcrCamera';
-import {CreateRecipeNavigation, ScanData} from '../types';
+import {useFocusEffect} from '@react-navigation/native';
+import React, {useRef} from 'react';
+import {TextInput, View, Button} from 'react-native';
+import {CreateRecipeProps} from '../types';
 
-export function NameScreen({navigation}: CreateRecipeNavigation<'Build Name'>) {
-  const superNavigation = useNavigation<NavigationProp<SuperStackParamList>>();
-  useHeightDependentHeader(600);
+export function NameScreen({navigation}: CreateRecipeProps<'Name'>) {
+  // const [dataset, setDataset] = useState<string[]>([]);
+  // useEffect(() => {
+  //   const newLocal = route.params.data.text.map(value => value.text);
+  //   setDataset(newLocal);
+  // }, [setDataset, route]);
 
-  useEffect(() => {
+  const ref = useRef<TextInput>(null);
+
+  const navigateToScanDescription = () => {
+    navigation.navigate('Description', {
+      recipe: {name: ref.current?.props.value},
+    });
+  };
+
+  useFocusEffect(() => {
     navigation.setOptions({
       // eslint-disable-next-line react/no-unstable-nested-components
-      headerLeft: () => (
-        <Button
-          title="Cancel"
-          onPress={() =>
-            superNavigation.navigate('Tabs', {
-              screen: 'Recipes',
-              params: {screen: 'RecipesRoot'},
-            })
-          }
-        />
+      headerRight: () => (
+        <Button title="Next" onPress={() => navigateToScanDescription()} />
       ),
     });
-  }, [navigation, superNavigation]);
+  });
 
-  const loadBlocks = (data: ScanData | undefined) => {
-    if (data) {
-      navigation.navigate('Build Name', {data});
-    }
-  };
   return (
-    <View style={{flex: 1}}>
-      <OcrCamera onSelect={loadBlocks} />
+    <View>
+      <TextInput placeholder="Recipe name here" ref={ref} />
+      <Button title="Scan again" />
     </View>
   );
+  // return (
+  //   <SingleItemAggregator
+  //     itemType="name"
+  //     data={dataset}
+  //     onSubmit={navigateToScanDescription}
+  //     casing="title"
+  //   />
+  // );
 }
