@@ -8,7 +8,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import {RectButton, Swipeable} from 'react-native-gesture-handler';
 import {v4} from 'uuid';
 
 import {itemToSentenceCase} from '../../../../utils/string';
@@ -90,15 +89,11 @@ function ListItem({
   id,
   toggleSelect,
   breakItem,
-  addItem,
-  removeItem,
 }: {
   id: string;
   item: Item;
   toggleSelect: (id: string, index?: number) => void;
   breakItem: (id: string) => void;
-  addItem: (id: string) => void;
-  removeItem: (id: string) => void;
 }) {
   switch (item.type) {
     case 'split':
@@ -140,55 +135,38 @@ function ListItem({
         </View>
       );
     case 'raw':
-    default: {
-      const renderRightActions = () => (
-        <RectButton style={[styles.rectButton, styles.redRectButton]}>
-          <Text style={styles.rectButtonText}>Remove</Text>
-        </RectButton>
-      );
-      const renderLeftActions = () => (
-        <RectButton style={[styles.rectButton, styles.greenRectButton]}>
-          <Text style={styles.rectButtonText}>Add</Text>
-        </RectButton>
-      );
+    default:
       return (
-        <Swipeable
-          renderLeftActions={renderLeftActions}
-          renderRightActions={renderRightActions}
-          onSwipeableLeftOpen={() => addItem(id)}
-          onSwipeableRightOpen={() => removeItem(id)}>
-          <Pressable
-            key={id}
-            onPress={() => toggleSelect(id)}
-            onLongPress={() => breakItem(id)}
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'nowrap',
-              backgroundColor: '#fff',
-              borderBottomColor: '#ddd',
-              borderBottomWidth: 1,
-            }}>
-            <Text style={{fontSize: 16, flex: 1, padding: 16, color: '#111'}}>
-              {item.value}
-            </Text>
-            {item.selected ? (
-              <View
-                style={[
-                  styles.selected,
-                  {
-                    aspectRatio: 1,
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  },
-                ]}>
-                <Text style={{color: '#111'}}>✓</Text>
-              </View>
-            ) : null}
-          </Pressable>
-        </Swipeable>
+        <Pressable
+          key={id}
+          onPress={() => toggleSelect(id)}
+          onLongPress={() => breakItem(id)}
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'nowrap',
+            backgroundColor: '#fff',
+            borderBottomColor: '#ddd',
+            borderBottomWidth: 1,
+          }}>
+          <Text style={{fontSize: 16, flex: 1, padding: 16, color: '#111'}}>
+            {item.value}
+          </Text>
+          {item.selected ? (
+            <View
+              style={[
+                styles.selected,
+                {
+                  aspectRatio: 1,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}>
+              <Text style={{color: '#111'}}>✓</Text>
+            </View>
+          ) : null}
+        </Pressable>
       );
-    }
   }
 }
 
@@ -330,7 +308,6 @@ export function ItemAggregator({
     breakItem,
     toggleItemSelect: toggleInQueue,
     consumeQueue,
-    removeItem,
   } = useData(data);
   const navigation =
     useNavigation<NavigationProp<CreateRecipeStackParamList>>();
@@ -362,15 +339,6 @@ export function ItemAggregator({
     ingredientCount,
   ]);
 
-  const saveIngredient = (ingredientId: string) => {
-    const item = items[ingredientId];
-    if (item.type !== 'raw') {
-      throw new Error('tried to add a split item');
-    }
-    onSaveIngredient(item.value);
-    removeItem(ingredientId);
-  };
-
   return (
     <View style={{maxHeight: '100%'}}>
       <View style={styles.header}>
@@ -398,8 +366,6 @@ export function ItemAggregator({
             id={key}
             toggleSelect={toggleInQueue}
             breakItem={breakItem}
-            addItem={saveIngredient}
-            removeItem={removeItem}
           />
         )}
       />
