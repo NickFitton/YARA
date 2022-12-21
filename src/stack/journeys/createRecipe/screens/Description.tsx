@@ -1,20 +1,14 @@
-import React, {useState} from 'react';
+import React from 'react';
 
-import {Alert} from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
-import TextRecognitionManager, {
-  TextData,
-} from '../../../../native/textRecognition';
 import {CreateRecipeProps} from '../types';
 import {SingleItemAggregator} from '../components/SingleItemAggregator';
-
-const simplifyScan = (data: TextData[]): string[] => data.map(({text}) => text);
+import {useOcrImage} from '../hooks/useOcrImage';
 
 export function DescriptionScreen({
   navigation,
   route,
 }: CreateRecipeProps<'Description'>) {
-  const [scanData, setScanData] = useState<string[]>([]);
+  const {simpleData, scanImage} = useOcrImage();
 
   const navigateToScanDescription = (description?: string) => {
     const {recipe} = route.params;
@@ -23,24 +17,12 @@ export function DescriptionScreen({
     });
   };
 
-  const scanNewImage = () => {
-    ImagePicker.openCamera({
-      freeStyleCropEnabled: true,
-      cropping: true,
-      showCropFrame: false,
-    })
-      .then(image => TextRecognitionManager.parseTextInImage(image.path))
-      .then(simplifyScan)
-      .then(setScanData)
-      .catch(Alert.alert);
-  };
-
   return (
     <SingleItemAggregator
       itemType="name"
-      data={scanData}
+      data={simpleData}
       onSubmit={navigateToScanDescription}
-      onRetry={scanNewImage}
+      onRetry={scanImage}
       casing="title"
     />
   );
