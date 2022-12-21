@@ -1,40 +1,43 @@
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import React, {useEffect} from 'react';
-import {Button, View} from 'react-native';
-import {SuperStackParamList} from '../../../RootStackParam';
-import {useHeightDependentHeader} from '../components/HeightDependentHeader';
-import {OcrCamera} from '../components/OcrCamera';
-import {CreateRecipeNavigation, ScanData} from '../types';
+import React, {useState} from 'react';
+import {Alert} from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import TextRecognitionManager, {
+  TextData,
+} from '../../../../native/textRecognition';
+import {SingleItemAggregator} from '../components/SingleItemAggregator';
 
-export function NameScreen({navigation}: CreateRecipeNavigation<'Build Name'>) {
-  const superNavigation = useNavigation<NavigationProp<SuperStackParamList>>();
-  useHeightDependentHeader(600);
+import {CreateRecipeProps} from '../types';
 
-  useEffect(() => {
-    navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerLeft: () => (
-        <Button
-          title="Cancel"
-          onPress={() =>
-            superNavigation.navigate('Tabs', {
-              screen: 'Recipes',
-              params: {screen: 'RecipesRoot'},
-            })
-          }
-        />
-      ),
+const simplifyScan = (data: TextData[]): string[] => data.map(({text}) => text);
+
+export function NameScreen({navigation}: CreateRecipeProps<'Name'>) {
+  const [scanData, setScanData] = useState<string[]>([]);
+
+  const navigateToScanDescription = (name: string | undefined) => {
+    navigation.navigate('Description', {
+      recipe: {name},
     });
-  }, [navigation, superNavigation]);
-
-  const loadBlocks = (data: ScanData | undefined) => {
-    if (data) {
-      navigation.navigate('Build Name', {data});
-    }
   };
+
+  const scanNewImage = () => {
+    ImagePicker.openCamera({
+      freeStyleCropEnabled: true,
+      cropping: true,
+      showCropFrame: false,
+    })
+      .then(image => TextRecognitionManager.parseTextInImage(image.path))
+      .then(simplifyScan)
+      .then(setScanData)
+      .catch(Alert.alert);
+  };
+
   return (
-    <View style={{flex: 1}}>
-      <OcrCamera onSelect={loadBlocks} />
-    </View>
+    <SingleItemAggregator
+      itemType="name"
+      data={scanData}
+      onSubmit={navigateToScanDescription}
+      onRetry={scanNewImage}
+      casing="title"
+    />
   );
 }

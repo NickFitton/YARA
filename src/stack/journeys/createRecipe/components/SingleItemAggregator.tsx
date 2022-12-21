@@ -297,11 +297,13 @@ export function SingleItemAggregator({
   data,
   itemType,
   onSubmit,
+  onRetry,
   casing = 'sentence',
 }: {
   data: string[];
   itemType: string;
   onSubmit: (item?: string) => void;
+  onRetry: () => void;
   casing: 'title' | 'sentence';
 }) {
   const {items, aggregatedItem, breakItem, toggleItemSelect} = useData(
@@ -356,6 +358,10 @@ export function SingleItemAggregator({
             breakItem={breakItem}
           />
         )}
+      />
+      <Button
+        title={`Scan${data.length > 0 ? ' Again' : ''}`}
+        onPress={onRetry}
       />
     </View>
   );

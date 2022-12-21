@@ -193,7 +193,6 @@ function ListItem({
 }
 
 const useData = (data: string[]) => {
-  const [builtItems, setBuiltItems] = useState<string[]>([]);
   const [items, setItems] = useState<Record<string, Item>>({});
   useEffect(() => {
     setItems(
@@ -291,22 +290,13 @@ const useData = (data: string[]) => {
     );
   };
 
-  const onAdd = () => {
-    setBuiltItems(pItems => [...pItems, itemToSentenceCase(aggregatedItem)]);
+  const consumeQueue = () => {
     removeSelected();
+    return itemToSentenceCase(aggregatedItem);
   };
 
   const removeItem = (id: string) => {
     setItems(pItems => removeByKey(pItems, id));
-  };
-
-  const addItem = (id: string) => {
-    const item = items[id];
-    if (item.type !== 'raw') {
-      throw new Error('tried to add a split item');
-    }
-    setBuiltItems(pItems => [...pItems, item.value]);
-    removeItem(id);
   };
 
   return {
@@ -314,10 +304,8 @@ const useData = (data: string[]) => {
     aggregatedItem,
     breakItem,
     toggleItemSelect,
-    builtItems,
-    onAdd,
+    consumeQueue,
     removeItem,
-    addItem,
   };
 };
 
@@ -325,51 +313,74 @@ export function ItemAggregator({
   data,
   itemType,
   onSubmit,
+  onScan,
+  onSaveIngredient,
+  savedIngredients,
 }: {
   data: string[];
   itemType: string;
-  onSubmit: (items: string[]) => void;
+  onSubmit: () => void;
+  onScan: () => void;
+  onSaveIngredient: (ingredient: string) => void;
+  savedIngredients: string[];
 }) {
   const {
     items,
-    aggregatedItem,
+    aggregatedItem: queue,
     breakItem,
-    toggleItemSelect,
-    onAdd,
-    builtItems,
-    addItem,
+    toggleItemSelect: toggleInQueue,
+    consumeQueue,
     removeItem,
   } = useData(data);
   const navigation =
     useNavigation<NavigationProp<CreateRecipeStackParamList>>();
 
+  const ingredientCount = savedIngredients.length;
   useEffect(() => {
     navigation.setOptions({
       // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => {
-        if (aggregatedItem.length > 0) {
-          return <Button title="Add" onPress={onAdd} />;
+        if (queue.length > 0) {
+          return (
+            <Button
+              title="Add"
+              onPress={() => onSaveIngredient(consumeQueue())}
+            />
+          );
         }
         return (
-          <Button
-            title={`Done (${builtItems.length})`}
-            onPress={() => onSubmit(builtItems)}
-          />
+          <Button title={`Done (${ingredientCount})`} onPress={onSubmit} />
         );
       },
     });
-  }, [aggregatedItem, onAdd, navigation, items.length, builtItems, onSubmit]);
+  }, [
+    queue,
+    consumeQueue,
+    navigation,
+    onSubmit,
+    onSaveIngredient,
+    ingredientCount,
+  ]);
+
+  const saveIngredient = (ingredientId: string) => {
+    const item = items[ingredientId];
+    if (item.type !== 'raw') {
+      throw new Error('tried to add a split item');
+    }
+    onSaveIngredient(item.value);
+    removeItem(ingredientId);
+  };
 
   return (
     <View style={{maxHeight: '100%'}}>
       <View style={styles.header}>
-        {aggregatedItem.length > 0 ? (
+        {queue.length > 0 ? (
           <View>
             <Text style={{textAlign: 'center', color: '#111'}}>
               Your next {itemType}:
             </Text>
             <Text style={{textAlign: 'center', color: '#111'}}>
-              {itemToSentenceCase(aggregatedItem)}
+              {itemToSentenceCase(queue)}
             </Text>
           </View>
         ) : (
@@ -385,12 +396,16 @@ export function ItemAggregator({
           <ListItem
             item={value}
             id={key}
-            toggleSelect={toggleItemSelect}
+            toggleSelect={toggleInQueue}
             breakItem={breakItem}
-            addItem={addItem}
+            addItem={saveIngredient}
             removeItem={removeItem}
           />
         )}
+      />
+      <Button
+        title={`Scan${data.length > 0 ? ' Again' : ''}`}
+        onPress={onScan}
       />
     </View>
   );
