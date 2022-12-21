@@ -7,7 +7,8 @@ import TextRecognitionManager, {
   TextData,
 } from '../../../../native/textRecognition';
 
-const simplifyScan = (data: TextData[]): string[] => data.map(({text}) => text);
+const simplifyScan = (data: TextData[]): string[] =>
+  data.flatMap(({text}) => text.split('\n'));
 
 export const useOcrImage = () => {
   const [scanData, setScanData] = useState<TextData[]>([]);
