@@ -1,21 +1,14 @@
 import React, {useState} from 'react';
 
-import {Alert} from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
-
 import {ItemAggregator} from '../components/ItemAggregator';
-import TextRecognitionManager, {
-  TextData,
-} from '../../../../native/textRecognition';
 import {CreateRecipeProps} from '../types';
-
-const simplifyScan = (data: TextData[]): string[] => data.map(({text}) => text);
+import {useOcrImage} from '../hooks/useOcrImage';
 
 export function IngredientsScreen({
   navigation,
   route,
 }: CreateRecipeProps<'Ingredients'>) {
-  const [scanData, setScanData] = useState<string[]>([]);
+  const {simpleData, scanImage} = useOcrImage();
   const [savedIngredients, setSavedIngredients] = useState<string[]>([]);
 
   const onSubmit = () => {
@@ -24,29 +17,16 @@ export function IngredientsScreen({
       recipe: {...recipe, ingredients: savedIngredients},
     });
   };
-
-  const scanNewImage = () => {
-    ImagePicker.openCamera({
-      freeStyleCropEnabled: true,
-      cropping: true,
-      showCropFrame: false,
-    })
-      .then(image => TextRecognitionManager.parseTextInImage(image.path))
-      .then(simplifyScan)
-      .then(setScanData)
-      .catch(Alert.alert);
-  };
-
   const onSaveIngredient = (ingredient: string) =>
     setSavedIngredients(pData => [...pData, ingredient]);
 
   return (
     <ItemAggregator
       itemType="ingredients"
-      data={scanData}
+      data={simpleData}
       savedIngredients={savedIngredients}
       onSaveIngredient={onSaveIngredient}
-      onScan={scanNewImage}
+      onScan={scanImage}
       onSubmit={onSubmit}
     />
   );

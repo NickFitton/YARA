@@ -1,17 +1,10 @@
 import React, {useState} from 'react';
-
-import {Alert} from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 
 import {ItemAggregator} from '../components/ItemAggregator';
-import TextRecognitionManager, {
-  TextData,
-} from '../../../../native/textRecognition';
 import {CreateRecipeStackParamList} from '../types';
 import {SuperStackParamList} from '../../../RootStackParam';
-
-const simplifyScan = (data: TextData[]): string[] => data.map(({text}) => text);
+import {useOcrImage} from '../hooks/useOcrImage';
 
 export function MethodsScreen({
   navigation,
@@ -20,7 +13,7 @@ export function MethodsScreen({
   navigation: NavigationProp<SuperStackParamList>;
   route: RouteProp<CreateRecipeStackParamList, 'Methods'>;
 }) {
-  const [scanData, setScanData] = useState<string[]>([]);
+  const {simpleData, scanImage} = useOcrImage();
   const [savedMethod, setSavedMethod] = useState<string[]>([]);
 
   const onSubmit = () => {
@@ -34,28 +27,16 @@ export function MethodsScreen({
     });
   };
 
-  const scanNewImage = () => {
-    ImagePicker.openCamera({
-      freeStyleCropEnabled: true,
-      cropping: true,
-      showCropFrame: false,
-    })
-      .then(image => TextRecognitionManager.parseTextInImage(image.path))
-      .then(simplifyScan)
-      .then(setScanData)
-      .catch(Alert.alert);
-  };
-
   const onSaveIngredient = (ingredient: string) =>
     setSavedMethod(pData => [...pData, ingredient]);
 
   return (
     <ItemAggregator
       itemType="methods"
-      data={scanData}
+      data={simpleData}
       savedIngredients={savedMethod}
       onSaveIngredient={onSaveIngredient}
-      onScan={scanNewImage}
+      onScan={scanImage}
       onSubmit={onSubmit}
     />
   );
