@@ -17,17 +17,17 @@ export function IngredientsScreen({
       recipe: {...recipe, ingredients: savedIngredients},
     });
   };
+
   const onSaveIngredient = (ingredient: string) =>
     setSavedIngredients(pData => [...pData, ingredient]);
 
   return (
     <ItemAggregator
-      itemType="ingredients"
-      data={simpleData}
-      savedIngredients={savedIngredients}
-      onSaveIngredient={onSaveIngredient}
+      text={simpleData}
+      savedItems={savedIngredients}
+      onSaveItem={onSaveIngredient}
       onScan={scanImage}
-      onSubmit={onSubmit}
+      onDone={onSubmit}
     />
   );
 }

@@ -1,19 +1,17 @@
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {
-  Button,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
+import {RectButton, Swipeable} from 'react-native-gesture-handler';
 import {v4} from 'uuid';
-
+import {Input} from '../../../../components/Input/Input';
 import {itemToSentenceCase} from '../../../../utils/string';
-import {CreateRecipeStackParamList} from '../types';
 
 const styles = StyleSheet.create({
+  item: {
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    backgroundColor: '#fff',
+  },
   rectButton: {
     flex: 1,
     paddingVertical: 10,
@@ -33,346 +31,260 @@ const styles = StyleSheet.create({
     color: '#111',
     backgroundColor: 'transparent',
   },
-  card: {
-    backgroundColor: '#fff',
-    opacity: 1,
-    borderRadius: 4,
-    padding: 8,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
   selected: {
+    aspectRatio: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#7f7',
-  },
-  header: {
-    backgroundColor: '#fff',
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    padding: 16,
-    marginBottom: 4,
   },
 });
 
-type RawItem = {
-  type: 'raw';
-  value: string;
-  selected: boolean;
-};
-
-type SplitItem = {
-  type: 'split';
-  values: {value: string; selected: boolean}[];
-};
-
-type Item = RawItem | SplitItem;
-
-const removeByKey = <T,>(record: Record<string, T>, removedKey: string) =>
-  Object.entries(record).reduce(
-    (agg, [key, value]) => (key === removedKey ? agg : {...agg, [key]: value}),
-    {},
-  );
-
-function ListItem({
-  item,
-  id,
-  toggleSelect,
-  breakItem,
-}: {
+type ItemData = {
   id: string;
-  item: Item;
-  toggleSelect: (id: string, index?: number) => void;
-  breakItem: (id: string) => void;
-}) {
-  switch (item.type) {
-    case 'split':
-      return (
-        <View style={{flexDirection: 'row', margin: 8}}>
-          {item.values.map(({value, selected}, i) => (
-            <Pressable
-              onPress={() => toggleSelect(id, i)}
-              key={`${id}-${value}`}
-              style={[
-                styles.card,
-                {
-                  padding: 0,
-                  marginRight: 8,
-                  flexDirection: 'row',
-                  flexWrap: 'nowrap',
-                },
-              ]}>
-              <Text style={{fontSize: 16, padding: 8, color: '#111'}}>
-                {value}
-              </Text>
-              {selected ? (
-                <View
-                  style={[
-                    styles.selected,
-                    {
-                      aspectRatio: 1,
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      padding: 8,
-                    },
-                  ]}>
-                  <Text style={{color: '#111'}}>✓</Text>
-                </View>
-              ) : null}
-            </Pressable>
-          ))}
-        </View>
-      );
-    case 'raw':
-    default:
-      return (
-        <Pressable
-          key={id}
-          onPress={() => toggleSelect(id)}
-          onLongPress={() => breakItem(id)}
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'nowrap',
-            backgroundColor: '#fff',
-            borderBottomColor: '#ddd',
-            borderBottomWidth: 1,
-          }}>
-          <Text style={{fontSize: 16, flex: 1, padding: 16, color: '#111'}}>
-            {item.value}
-          </Text>
-          {item.selected ? (
-            <View
-              style={[
-                styles.selected,
-                {
-                  aspectRatio: 1,
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                },
-              ]}>
-              <Text style={{color: '#111'}}>✓</Text>
-            </View>
-          ) : null}
-        </Pressable>
-      );
-  }
+  value: string;
+};
+
+type ItemState = {
+  id: string;
+  selected: boolean;
+  used: boolean;
+};
+
+type Item = ItemData & ItemState;
+
+function Separator() {
+  return <View style={{borderBottomColor: '#ddd', borderBottomWidth: 1}} />;
 }
 
-const useData = (data: string[]) => {
-  const [items, setItems] = useState<Record<string, Item>>({});
-  useEffect(() => {
-    setItems(
-      data
-        .flatMap(item => item.split('\n'))
-        .map(value => ({value, type: 'raw', id: v4()}))
-        .reduce(
-          (acc, {id, ...rest}) => ({...acc, [id]: {...rest, selected: false}}),
-          {},
-        ),
-    );
-  }, [setItems, data]);
+function SwipeItem({
+  item,
+  changeToSelect: toggleSelect,
+  addItem,
+  removeItem,
+}: {
+  item: ItemData;
+  changeToSelect: (id: string, index?: number) => void;
+  addItem: (id: string) => void;
+  removeItem: (id: string) => void;
+}) {
+  const renderRightActions = () => (
+    <RectButton style={[styles.rectButton, styles.redRectButton]}>
+      <Text style={styles.rectButtonText}>Remove</Text>
+    </RectButton>
+  );
+  const renderLeftActions = () => (
+    <RectButton style={[styles.rectButton, styles.greenRectButton]}>
+      <Text style={styles.rectButtonText}>Add</Text>
+    </RectButton>
+  );
+  return (
+    <Swipeable
+      renderLeftActions={renderLeftActions}
+      renderRightActions={renderRightActions}
+      onSwipeableLeftOpen={() => addItem(item.id)}
+      onSwipeableRightOpen={() => removeItem(item.id)}>
+      <RectButton
+        onLongPress={() => toggleSelect(item.id)}
+        style={[
+          styles.item,
+          {
+            borderBottomColor: '#ddd',
+            borderBottomWidth: 1,
+          },
+        ]}>
+        <Text style={{fontSize: 16, flex: 1, padding: 16, color: '#111'}}>
+          {item.value}
+        </Text>
+      </RectButton>
+    </Swipeable>
+  );
+}
 
-  const breakItem = (id: keyof typeof items) => {
-    const item = items[id];
-    if (item.type === 'split') {
-      return;
-    }
+function SelectItem({
+  item,
+  toggleSelected,
+}: {
+  item: Item;
+  toggleSelected: (id: string) => void;
+}) {
+  return (
+    <RectButton onPress={() => toggleSelected(item.id)} style={styles.item}>
+      <Text style={{fontSize: 16, flex: 1, padding: 16, color: '#111'}}>
+        {item.value}
+      </Text>
+      {item.selected ? (
+        <View style={[styles.selected]}>
+          <Text style={{color: '#111'}}>✓</Text>
+        </View>
+      ) : null}
+    </RectButton>
+  );
+}
 
-    const values = item.value
-      .split(/[ .,]/g)
-      .filter(part => part.length > 0)
-      .map(value => ({value, enabled: false, selected: item.selected}));
-    setItems(pItems => ({
-      ...pItems,
-      [id]: {type: 'split', values},
-    }));
-  };
-
-  const mergeItem = (item: SplitItem): RawItem => ({
-    type: 'raw',
-    value: item.values.map(({value}) => value).join(' '),
-    selected: item.values[0].selected,
-  });
-
-  const toggleItemSelect = (id: keyof typeof items, splitIndex?: number) => {
-    let pItem = items[id];
-    if (pItem.type === 'raw') {
-      pItem.selected = !pItem.selected;
-    } else if (pItem.type === 'split') {
-      if (typeof splitIndex !== 'number') {
-        throw new Error(
-          "Tried to toggle a word in a split item, but didn't provide an index.",
-        );
-      }
-      pItem.values[splitIndex].selected = !pItem.values[splitIndex].selected;
-      if (
-        pItem.values.every(value => value.selected === true) ||
-        pItem.values.every(value => value.selected === false)
-      ) {
-        pItem = mergeItem(pItem);
-      }
-    }
-    setItems(pItems => ({...pItems, [id]: pItem}));
-  };
-
-  const aggregatedItem = Object.values(items).reduce((agg, item) => {
-    switch (item.type) {
-      case 'raw':
-        if (item.selected) {
-          return `${agg} ${item.value}`.trim();
-        }
-        break;
-      case 'split': {
-        const aggVal = item.values.reduce(
-          (valAgg, {value, selected}) =>
-            selected ? `${valAgg} ${value}` : valAgg,
-          '',
-        );
-        if (aggVal.length > 0) {
-          return `${agg} ${aggVal}`.trim();
-        }
-        break;
-      }
-    }
-    return agg;
-  }, '');
-
-  const removeSelected = () => {
-    setItems(pItems =>
-      Object.entries(pItems).reduce((agg, [entryKey, entryValue]) => {
-        if (entryValue.type === 'raw') {
-          return entryValue.selected ? agg : {...agg, [entryKey]: entryValue};
-        }
-        const remainingValues = entryValue.values.filter(
-          value => !value.selected,
-        );
-        return remainingValues.length === 0
-          ? agg
-          : {
-              ...agg,
-              [entryKey]: {...entryValue, values: remainingValues},
-            };
-      }, {}),
-    );
-  };
-
-  const consumeQueue = () => {
-    removeSelected();
-    return itemToSentenceCase(aggregatedItem);
-  };
-
-  const removeItem = (id: string) => {
-    setItems(pItems => removeByKey(pItems, id));
-  };
-
-  return {
-    items,
-    aggregatedItem,
-    breakItem,
-    toggleItemSelect,
-    consumeQueue,
-    removeItem,
-  };
-};
+function SelectHeaderButton({
+  onPress,
+  state,
+}: {
+  onPress: () => void;
+  state: ItemState[];
+}) {
+  const count = state.filter(({selected}) => selected).length;
+  return (
+    <Button onPress={onPress} title={count > 0 ? `Add (${count})` : 'Cancel'} />
+  );
+}
+function SwipeHeaderButton({
+  onPress,
+  count,
+}: {
+  onPress: () => void;
+  count: number;
+}) {
+  return <Button onPress={onPress} title={`Done (${count})`} />;
+}
 
 export function ItemAggregator({
-  data,
-  itemType,
-  onSubmit,
+  text,
   onScan,
-  onSaveIngredient,
-  savedIngredients,
+  onSaveItem,
+  savedItems,
+  onDone,
 }: {
-  data: string[];
-  itemType: string;
-  onSubmit: () => void;
+  text: string[];
   onScan: () => void;
-  onSaveIngredient: (ingredient: string) => void;
-  savedIngredients: string[];
+  onSaveItem: (item: string) => void;
+  savedItems: string[];
+  onDone: () => void;
 }) {
-  const {
-    items,
-    aggregatedItem: queue,
-    breakItem,
-    toggleItemSelect: toggleInQueue,
-    consumeQueue,
-  } = useData(data);
-  const navigation =
-    useNavigation<NavigationProp<CreateRecipeStackParamList>>();
+  const navigation = useNavigation();
+  const [data, setData] = useState<ItemData[]>([]);
+  const [state, setState] = useState<ItemState[]>([]);
+  const [mode, setMode] = useState<'swipe' | 'select'>('swipe');
 
-  const ingredientCount = savedIngredients.length;
   useEffect(() => {
-    navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerRight: () => {
-        if (queue.length > 0) {
-          return (
-            <Button
-              title="Add"
-              onPress={() => onSaveIngredient(consumeQueue())}
-            />
-          );
-        }
-        return (
-          <Button title={`Done (${ingredientCount})`} onPress={onSubmit} />
-        );
-      },
+    const newData: ItemData[] = [];
+    const newState: ItemState[] = [];
+
+    text.forEach(value => {
+      const id = v4();
+      newData.push({id, value});
+      newState.push({id, selected: false, used: false});
     });
-  }, [
-    queue,
-    consumeQueue,
-    navigation,
-    onSubmit,
-    onSaveIngredient,
-    ingredientCount,
-  ]);
+    setData(newData);
+    setState(newState);
+  }, [setData, text]);
+
+  const consumeSelected = () => {
+    const newState: ItemState[] = [];
+    const itemParts: string[] = [];
+    state.forEach(itemState => {
+      if (!itemState.selected) {
+        newState.push(itemState);
+      }
+
+      const itemData = data.find(({id}) => id === itemState.id);
+      if (!itemData) {
+        throw new Error('Failed to find an item with the given ID.');
+      }
+      itemParts.push(itemData.value);
+      newState.push({used: true, selected: false, id: itemState.id});
+    });
+    onSaveItem(itemToSentenceCase(itemParts.join(' ')));
+    setState(newState);
+    setMode('swipe');
+  };
+
+  useEffect(() => {
+    const onPress = () => (mode === 'select' ? consumeSelected() : onDone());
+
+    const headerRight = () =>
+      mode === 'select' ? (
+        <SelectHeaderButton state={state} onPress={onPress} />
+      ) : (
+        <SwipeHeaderButton count={savedItems.length} onPress={onPress} />
+      );
+    navigation.setOptions({
+      headerRight,
+    });
+  }, [mode, state, navigation, savedItems.length]);
+
+  const removeItem = (id: string) => {
+    setState(pState =>
+      pState.map(itemState =>
+        itemState.id !== id ? itemState : {id, selected: false, used: true},
+      ),
+    );
+  };
+
+  const selectItem = (id: string) =>
+    setState(pState =>
+      pState.map(itemState =>
+        itemState.id !== id
+          ? itemState
+          : {id, selected: true, used: itemState.used},
+      ),
+    );
+
+  const addItem = (id: string) => {
+    const itemData = data.find(({id: itemId}) => itemId === id);
+    if (!itemData) {
+      throw new Error('Failed to find an item with the given ID.');
+    }
+    onSaveItem(itemData.value);
+    removeItem(id);
+  };
+
+  const toggleSelected = (id: string) =>
+    setState(pState =>
+      pState.map(itemState =>
+        itemState.id !== id
+          ? itemState
+          : {id, selected: !itemState.selected, used: itemState.used},
+      ),
+    );
+
+  const keyExtractor = ({id}: ItemData): string => id;
+  const renderItem = ({item: itemData}: {item: ItemData}) => {
+    const itemState = state.find(({id, used}) => !used && id === itemData.id);
+    if (!itemState) {
+      return null;
+    }
+
+    if (mode === 'swipe') {
+      return (
+        <SwipeItem
+          item={itemData}
+          changeToSelect={() => {
+            setMode('select');
+            selectItem(itemData.id);
+          }}
+          addItem={addItem}
+          removeItem={removeItem}
+        />
+      );
+    }
+    const item: Item = {...itemData, ...itemState};
+    return <SelectItem item={item} toggleSelected={toggleSelected} />;
+  };
 
   return (
     <View style={{maxHeight: '100%'}}>
-      <View style={styles.header}>
-        {queue.length > 0 ? (
-          <View>
-            <Text style={{textAlign: 'center', color: '#111'}}>
-              Your next {itemType}:
-            </Text>
-            <Text style={{textAlign: 'center', color: '#111'}}>
-              {itemToSentenceCase(queue)}
-            </Text>
-          </View>
-        ) : (
-          <Text style={{textAlign: 'center', color: '#111'}}>
-            Tap an item to start building an {itemType}
-          </Text>
-        )}
+      <View style={{padding: 8}}>
+        <Input placeholder="Dummy manual input" />
       </View>
       <FlatList
-        data={Object.entries(items)}
-        keyExtractor={([key]) => key}
-        renderItem={({item: [key, value]}) => (
-          <ListItem
-            item={value}
-            id={key}
-            toggleSelect={toggleInQueue}
-            breakItem={breakItem}
-          />
-        )}
+        data={data}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        ItemSeparatorComponent={Separator}
       />
-      <Button
-        title={`Scan${data.length > 0 ? ' Again' : ''}`}
-        onPress={onScan}
-      />
+      <View style={{padding: 8}}>
+        <Button
+          title={`Scan${text.length > 0 ? ' Again' : ''}`}
+          onPress={onScan}
+        />
+      </View>
     </View>
   );
 }

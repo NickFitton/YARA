@@ -27,17 +27,16 @@ export function MethodsScreen({
     });
   };
 
-  const onSaveIngredient = (ingredient: string) =>
-    setSavedMethod(pData => [...pData, ingredient]);
+  const onSaveMethod = (step: string) =>
+    setSavedMethod(pData => [...pData, step]);
 
   return (
     <ItemAggregator
-      itemType="methods"
-      data={simpleData}
-      savedIngredients={savedMethod}
-      onSaveIngredient={onSaveIngredient}
+      text={simpleData}
+      savedItems={savedMethod}
+      onSaveItem={onSaveMethod}
       onScan={scanImage}
-      onSubmit={onSubmit}
+      onDone={onSubmit}
     />
   );
 }
