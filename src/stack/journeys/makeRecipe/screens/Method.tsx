@@ -1,16 +1,12 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {
-  Button,
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
 import {MethodModel} from '../../../../db/models/Method';
 import {useRecipe} from '../../../../db/recipeHooks';
+import {SuperStackParamList} from '../../../RootStackParam';
 import {LoadingSpinner} from '../components/LoadingSpinner';
-import {MakeRecipeProps} from '../types';
+import {useMeasuredView} from '../hooks';
+import {MakeRecipeStackParamList} from '../types';
 
 const styles = StyleSheet.create({
   text: {
@@ -35,35 +31,29 @@ const styles = StyleSheet.create({
   },
 });
 
-export function MethodScreen({route, navigation}: MakeRecipeProps<'Method'>) {
+export type FinalMakeRecipeProps = {
+  route: RouteProp<MakeRecipeStackParamList, 'Method'>;
+  navigation: NavigationProp<SuperStackParamList>;
+};
+
+export function MethodScreen({route, navigation}: FinalMakeRecipeProps) {
   const recipeData = useRecipe(route.params.id);
-  const [{width, height}, setDimensions] = useState<{
-    width: number;
-    height: number;
-  }>({width: -1, height: -1});
-  const ref = useRef<View>(null);
+  const {width, height, ref} = useMeasuredView();
 
   useEffect(() => {
-    const refreshSlideSize = () =>
-      setTimeout(
-        () =>
-          ref.current?.measureInWindow((_x, _y, refWidth, refHeight) =>
-            setDimensions({width: refWidth, height: refHeight}),
-          ),
-        100,
-      );
-    refreshSlideSize();
-    const subscription = Dimensions.addEventListener(
-      'change',
-      refreshSlideSize,
+    const headerRight = () => (
+      <Button
+        title="Next"
+        onPress={() =>
+          navigation.navigate('Tabs', {
+            screen: 'Recipes',
+            params: {screen: 'View Recipe', params: {id: route.params.id}},
+          })
+        }
+      />
     );
-    return () => subscription?.remove();
-  }, []);
-
-  useEffect(() => {
-    const headerRight = () => <Button title="Next" />;
     navigation.setOptions({headerRight});
-  }, [navigation]);
+  }, [navigation, route.params.id]);
 
   if (recipeData.status === 'loading') {
     return <LoadingSpinner message="Loading recipe ingredients" />;

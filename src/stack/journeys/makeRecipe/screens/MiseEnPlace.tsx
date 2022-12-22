@@ -1,16 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {
-  Button,
-  Dimensions,
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {Button, FlatList, Image, StyleSheet, Text, View} from 'react-native';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {useRecipe} from '../../../../db/recipeHooks';
 import {LoadingSpinner} from '../components/LoadingSpinner';
+import {useMeasuredView} from '../hooks';
 import {MakeRecipeProps} from '../types';
 
 const styles = StyleSheet.create({
@@ -41,28 +34,7 @@ export function MiseEnPlaceScreen({
   navigation,
 }: MakeRecipeProps<'MiseEnPlace'>) {
   const recipeData = useRecipe(route.params.id);
-  const [{width, height}, setDimensions] = useState<{
-    width: number;
-    height: number;
-  }>({width: -1, height: -1});
-  const ref = useRef<View>(null);
-
-  useEffect(() => {
-    const refreshSlideSize = () =>
-      setTimeout(
-        () =>
-          ref.current?.measureInWindow((_x, _y, refWidth, refHeight) =>
-            setDimensions({width: refWidth, height: refHeight}),
-          ),
-        100,
-      );
-    refreshSlideSize();
-    const subscription = Dimensions.addEventListener(
-      'change',
-      refreshSlideSize,
-    );
-    return () => subscription?.remove();
-  }, []);
+  const {width, height, ref} = useMeasuredView();
 
   useEffect(() => {
     const headerRight = () => (
