@@ -17,6 +17,7 @@ export const useOcrImage = () => {
     ImagePicker.openCamera({
       freeStyleCropEnabled: true,
       cropping: true,
+      useFrontCamera: true,
       showCropFrame: false,
     })
       .then(image => TextRecognitionManager.parseTextInImage(image.path))
