@@ -6,12 +6,8 @@ import {Input, Validation} from '../../../../components/Input/Input';
 import {requiredValidator} from '../../../../components/LabelledInput/LabelledInput';
 import {
   IngredientModel,
-  Measurement,
   RawIngredientModel,
 } from '../../../../db/models/Ingredient';
-
-const quantityUnitIngredientRegex = /([0-9.]+) ([\w]+)(?: of)? (\w+( \w+)*)/;
-const quantityIngredientRegex = /([0-9.]+) (\w+( \w+)*)/;
 
 const styles = StyleSheet.create({
   input: {
@@ -54,28 +50,33 @@ const displayIngredient = (ingredient: IngredientModel): string => {
 };
 
 export const parseIngredient = (input: string): IngredientModel => {
-  let match = input.match(quantityUnitIngredientRegex);
   const id = v4();
-  if (match) {
-    const [, quantity, unit, name] = match;
-    return {
-      id,
-      type: 'parsed',
-      quantity: parseFloat(quantity),
-      unit: unit as Measurement,
-      name,
-    };
-  }
-  match = input.match(quantityIngredientRegex);
-  if (match) {
-    const [, quantity, name] = match;
-    return {
-      id,
-      type: 'parsed',
-      quantity: parseFloat(quantity),
-      name,
-    };
-  }
+  /*
+    // TODO: Rebuild this parser, some things aren't right
+    const quantityUnitIngredientRegex = /([0-9.]+) ([\w]+)(?: of)? (\w+( \w+)*)/;
+    const quantityIngredientRegex = /([0-9.]+) (\w+( \w+)*)/;
+    let match = input.match(quantityUnitIngredientRegex);
+    if (match) {
+      const [, quantity, unit, name] = match;
+      return {
+        id,
+        type: 'parsed',
+        quantity: parseFloat(quantity),
+        unit: unit as Measurement,
+        name,
+      };
+    }
+    match = input.match(quantityIngredientRegex);
+    if (match) {
+      const [, quantity, name] = match;
+      return {
+        id,
+        type: 'parsed',
+        quantity: parseFloat(quantity),
+        name,
+      };
+    }
+  */
   return {
     id,
     type: 'raw',
