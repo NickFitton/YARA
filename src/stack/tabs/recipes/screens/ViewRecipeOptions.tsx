@@ -53,14 +53,16 @@ function MyBottomSheet({navigation, route}: Props) {
       useNativeDriver: true,
     }).start();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unnecessary-type-assertion
     bottomSheetRef.current!.close();
   };
 
   const onDelete = () => {
     close();
     deleteRecipe();
-    navigation.popToTop();
+    navigation.navigate('Tabs', {
+      screen: 'Recipes',
+      params: {screen: 'RecipesRoot'},
+    });
   };
 
   return (
