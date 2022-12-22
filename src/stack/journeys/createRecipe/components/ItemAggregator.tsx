@@ -269,17 +269,16 @@ export function ItemAggregator({
     return <SelectItem item={item} toggleSelected={toggleSelected} />;
   };
 
+  const aggregatedItem = state
+    .filter(({selected}) => selected)
+    .map(({id}) => data.find(({id: dataId}) => id === dataId)!)
+    .map(itemData => itemData?.value)
+    .join(' ');
+
   return (
     <View style={{maxHeight: '100%'}}>
       <View style={{padding: 8}}>
-        <Input placeholder="Dummy manual input" />
-        <Text style={{color: '#111'}}>
-          {state
-            .filter(({selected}) => selected)
-            .map(({id}) => data.find(({id: dataId}) => id === dataId)!)
-            .map(itemData => itemData?.value)
-            .join(' ')}
-        </Text>
+        <Input placeholder="Dummy manual input" value={aggregatedItem} />
       </View>
       <FlatList
         data={data}
