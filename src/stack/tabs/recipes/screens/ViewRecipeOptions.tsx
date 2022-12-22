@@ -1,20 +1,32 @@
 import React, {useCallback, useRef} from 'react';
 import {View, StyleSheet, Pressable, Button, Animated} from 'react-native';
 import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useFocusEffect} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useFocusEffect,
+} from '@react-navigation/native';
 
 import {RecipeStackParamList} from '../RecipeStackParam';
+import {SuperStackParamList} from '../../../RootStackParam';
 import {useDeleteRecipe} from '../../../../db/recipeHooks';
 
-type Props = NativeStackScreenProps<
-  RecipeStackParamList,
-  'View Recipe Options'
->;
+type Props = {
+  route: RouteProp<RecipeStackParamList, 'View Recipe Options'>;
+  navigation: NavigationProp<SuperStackParamList>;
+};
 
 function MyBottomSheet({navigation, route}: Props) {
   const {deleteRecipe} = useDeleteRecipe(route.params.id);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const goToMake = () =>
+    navigation.navigate('Journeys', {
+      screen: 'Make Recipe Journey',
+      params: {
+        screen: 'MiseEnPlace',
+        params: {id: route.params.id},
+      },
+    });
   useFocusEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 0.5,
@@ -72,6 +84,7 @@ function MyBottomSheet({navigation, route}: Props) {
         <BottomSheetView>
           <Button title="Add Photo" disabled />
           <Button title="Edit" />
+          <Button title="Make This" onPress={goToMake} />
           <Button title="Delete" color="#ff3823" onPress={onDelete} />
           <Button title="Cancel" onPress={close} />
         </BottomSheetView>
