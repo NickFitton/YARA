@@ -175,27 +175,28 @@ export function ItemAggregator({
     setState(newState);
   }, [setData, text]);
 
-  const consumeSelected = () => {
-    const newState: ItemState[] = [];
-    const itemParts: string[] = [];
-    state.forEach(itemState => {
-      if (!itemState.selected) {
-        newState.push(itemState);
-      }
-
-      const itemData = data.find(({id}) => id === itemState.id);
-      if (!itemData) {
-        throw new Error('Failed to find an item with the given ID.');
-      }
-      itemParts.push(itemData.value);
-      newState.push({used: true, selected: false, id: itemState.id});
-    });
-    onSaveItem(itemToSentenceCase(itemParts.join(' ')));
-    setState(newState);
-    setMode('swipe');
-  };
-
   useEffect(() => {
+    const consumeSelected = () => {
+      const newState: ItemState[] = [];
+      const itemParts: string[] = [];
+      state.forEach(itemState => {
+        if (!itemState.selected) {
+          newState.push(itemState);
+          return;
+        }
+
+        const itemData = data.find(({id}) => id === itemState.id);
+        if (!itemData) {
+          throw new Error('Failed to find an item with the given ID.');
+        }
+        itemParts.push(itemData.value);
+        newState.push({used: true, selected: false, id: itemState.id});
+      });
+      onSaveItem(itemToSentenceCase(itemParts.join(' ')));
+      setState(newState);
+      setMode('swipe');
+    };
+
     const onPress = () => (mode === 'select' ? consumeSelected() : onDone());
 
     const headerRight = () =>
@@ -207,7 +208,7 @@ export function ItemAggregator({
     navigation.setOptions({
       headerRight,
     });
-  }, [mode, state, navigation, savedItems.length]);
+  }, [mode, state, navigation, savedItems.length, onDone, onSaveItem, data]);
 
   const removeItem = (id: string) => {
     setState(pState =>
@@ -272,6 +273,13 @@ export function ItemAggregator({
     <View style={{maxHeight: '100%'}}>
       <View style={{padding: 8}}>
         <Input placeholder="Dummy manual input" />
+        <Text style={{color: '#111'}}>
+          {state
+            .filter(({selected}) => selected)
+            .map(({id}) => data.find(({id: dataId}) => id === dataId)!)
+            .map(itemData => itemData?.value)
+            .join(' ')}
+        </Text>
       </View>
       <FlatList
         data={data}
