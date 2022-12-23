@@ -2,6 +2,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import SQLite, {SQLiteDatabase} from 'react-native-sqlite-storage';
 import {Alert, StyleSheet, Text, View} from 'react-native';
+import {Provider as PaperProvider} from 'react-native-paper';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
@@ -72,7 +73,9 @@ function App() {
           <NavigationContainer>
             <QueryClientProvider client={queryClient}>
               <GestureHandlerRootView style={{flex: 1}}>
-                <Stack />
+                <PaperProvider>
+                  <Stack />
+                </PaperProvider>
               </GestureHandlerRootView>
             </QueryClientProvider>
           </NavigationContainer>

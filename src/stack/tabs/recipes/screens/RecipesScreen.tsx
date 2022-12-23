@@ -1,14 +1,18 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {PropsWithChildren, useLayoutEffect} from 'react';
 import {
-  Button,
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
+  NativeStackHeaderProps,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import React, {PropsWithChildren, useLayoutEffect} from 'react';
+import {Button, View, Text, TouchableOpacity, FlatList} from 'react-native';
+import {
+  Card,
+  Paragraph,
   ActivityIndicator,
-} from 'react-native';
+  useTheme,
+  Appbar,
+} from 'react-native-paper';
+
 import {Column} from '../../../../components/Column/Column';
 import {useRecipe, useRecipes} from '../../../../db/recipeHooks';
 import {useCreateRecipeJourney} from '../../../journeys/createRecipe/utils';
@@ -22,21 +26,8 @@ function RecipePreviewWrapper({id, children}: PropsWithChildren<{id: string}>) {
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate({name: 'View Recipe', params: {id}})}
-      style={{
-        backgroundColor: '#fff',
-        borderRadius: 4,
-        shadowOffset: {
-          width: 0,
-          height: 0,
-        },
-        elevation: 5,
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        padding: 8,
-        marginBottom: 16,
-      }}>
-      {children}
+      onPress={() => navigation.navigate({name: 'View Recipe', params: {id}})}>
+      <Card>{children}</Card>
     </TouchableOpacity>
   );
 }
@@ -54,10 +45,12 @@ function RecipePreview({id}: {id: string}) {
     case 'success':
       return (
         <RecipePreviewWrapper id={id}>
-          <>
-            <Text style={{color: '#000'}}>{data.data.name}</Text>
-            <Text style={{color: '#000'}}>{data.data.description}</Text>
-          </>
+          <Card.Title title={data.data.name} />
+          {data.data.description ? (
+            <Card.Content>
+              <Paragraph>{data.data.description}</Paragraph>
+            </Card.Content>
+          ) : null}
         </RecipePreviewWrapper>
       );
     case 'loading':
@@ -68,6 +61,10 @@ function RecipePreview({id}: {id: string}) {
         </RecipePreviewWrapper>
       );
   }
+}
+
+function Seperator() {
+  return <View style={{height: 8}} />;
 }
 
 function ListEmpty() {
@@ -91,6 +88,15 @@ function ListEmpty() {
   );
 }
 
+function Screen({children}: PropsWithChildren<unknown>) {
+  const theme = useTheme();
+  return (
+    <View style={{backgroundColor: theme.colors.background, height: '100%'}}>
+      {children}
+    </View>
+  );
+}
+
 export function RecipesScreen({navigation}: Props) {
   const startCreateRecipeJourney = useCreateRecipeJourney();
   const data = useRecipes();
@@ -98,42 +104,41 @@ export function RecipesScreen({navigation}: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       // eslint-disable-next-line react/no-unstable-nested-components
-      headerRight: () => (
-        <Button onPress={startCreateRecipeJourney} title="New" />
-      ),
+      // header: () => <Header />,
     });
   }, [navigation, startCreateRecipeJourney]);
 
   switch (data.status) {
     case 'error':
       return (
-        <View style={{height: '100%'}}>
+        <Screen>
           <View>
             <Text>Something went wrong</Text>
           </View>
-        </View>
+        </Screen>
       );
     case 'success':
       return (
-        <View style={{height: '100%'}}>
+        <Screen>
           <View style={{flex: 1}}>
             <FlatList
               style={{padding: 16}}
+              ItemSeparatorComponent={Seperator}
               ListEmptyComponent={<ListEmpty />}
               data={data.data}
               renderItem={({item: {id}}) => <RecipePreview id={id} />}
             />
           </View>
-        </View>
+        </Screen>
       );
     case 'loading':
     default:
       return (
-        <View style={{height: '100%'}}>
+        <Screen>
           <View>
             <Text>Loading your recipes</Text>
           </View>
-        </View>
+        </Screen>
       );
   }
 }
