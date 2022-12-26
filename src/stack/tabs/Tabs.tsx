@@ -17,12 +17,16 @@ const renderIcon = (iconName: string) =>
   };
 
 export function Tabs() {
+  const theme = useTheme();
   return (
-    <Tab.Navigator>
+    <Tab.Navigator barStyle={{backgroundColor: theme.colors.elevation.level1}}>
       <Tab.Screen
         name="Recipes"
         component={RecipesStack}
-        options={{tabBarIcon: renderIcon('chef-hat')}}
+        options={{
+          tabBarIcon: renderIcon('chef-hat'),
+          tabBarColor: theme.colors.error,
+        }}
       />
       <Tab.Screen
         name="Search"

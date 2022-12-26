@@ -1,8 +1,5 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {
-  NativeStackHeaderProps,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {PropsWithChildren, useLayoutEffect} from 'react';
 import {Button, View, Text, TouchableOpacity, FlatList} from 'react-native';
 import {
@@ -91,7 +88,7 @@ function ListEmpty() {
 function Screen({children}: PropsWithChildren<unknown>) {
   const theme = useTheme();
   return (
-    <View style={{backgroundColor: theme.colors.background, height: '100%'}}>
+    <View style={{backgroundColor: theme.colors.background, minHeight: '100%'}}>
       {children}
     </View>
   );
@@ -102,10 +99,15 @@ export function RecipesScreen({navigation}: Props) {
   const data = useRecipes();
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      // header: () => <Header />,
-    });
+    const headerRight = () => (
+      <Appbar.Action
+        icon="plus"
+        onPress={() => {
+          startCreateRecipeJourney();
+        }}
+      />
+    );
+    navigation.setOptions({headerRight});
   }, [navigation, startCreateRecipeJourney]);
 
   switch (data.status) {
