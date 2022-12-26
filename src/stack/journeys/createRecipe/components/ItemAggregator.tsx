@@ -1,10 +1,9 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, Text, View} from 'react-native';
 import {RectButton, Swipeable} from 'react-native-gesture-handler';
 import {Appbar, FAB, List, TextInput, useTheme} from 'react-native-paper';
 import {v4} from 'uuid';
-import {Input} from '../../../../components/Input/Input';
 import {Screen} from '../../../../components/Screen/Screen';
 import {itemToSentenceCase} from '../../../../utils/string';
 

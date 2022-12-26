@@ -17,10 +17,12 @@ export function ScrollScreen({children}: PropsWithChildren<unknown>) {
   return <ScrollView style={styles.screen}>{children}</ScrollView>;
 }
 
+const defaultStyle = StyleSheet.create({});
+
 export function Screen({
   children,
-  style,
-}: PropsWithChildren<{style?: ViewStyle}>) {
+  style = defaultStyle,
+}: PropsWithChildren<{style: ViewStyle}>) {
   const theme = useTheme();
   const styles = useStyles(theme);
   return <View style={[styles.screen, style]}>{children}</View>;
