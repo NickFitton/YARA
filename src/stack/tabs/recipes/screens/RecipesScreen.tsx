@@ -5,7 +5,7 @@ import {Button, View, Text, TouchableOpacity, FlatList} from 'react-native';
 import {Card, Paragraph, ActivityIndicator, Appbar} from 'react-native-paper';
 
 import {Column} from '../../../../components/Column/Column';
-import {Screen} from '../../../../components/Screen/Screen';
+import {Screen, ScrollScreen} from '../../../../components/Screen/Screen';
 import {useRecipe, useRecipes} from '../../../../db/recipeHooks';
 import {useCreateRecipeJourney} from '../../../journeys/createRecipe/utils';
 import {RecipeStackParamList} from '../RecipeStackParam';
@@ -99,11 +99,11 @@ export function RecipesScreen({navigation}: Props) {
   switch (data.status) {
     case 'error':
       return (
-        <Screen>
+        <ScrollScreen>
           <View>
             <Text>Something went wrong</Text>
           </View>
-        </Screen>
+        </ScrollScreen>
       );
     case 'success':
       return (
@@ -119,11 +119,11 @@ export function RecipesScreen({navigation}: Props) {
     case 'loading':
     default:
       return (
-        <Screen>
+        <ScrollScreen>
           <View>
             <Text>Loading your recipes</Text>
           </View>
-        </Screen>
+        </ScrollScreen>
       );
   }
 }

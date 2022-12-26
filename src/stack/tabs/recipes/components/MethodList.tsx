@@ -1,35 +1,9 @@
-import React, {useRef, useState} from 'react';
-import {StyleSheet, TextInput, View, Text} from 'react-native';
+import React, {useState} from 'react';
+import {View} from 'react-native';
+import {Text, TextInput} from 'react-native-paper';
 
 import {EditableItem} from '../../../../components/EditableItem/EditableItem';
-import {Input, Validation} from '../../../../components/Input/Input';
-import {requiredValidator} from '../../../../components/LabelledInput/LabelledInput';
 import {MethodModel} from '../../../../db/models/Method';
-
-const styles = StyleSheet.create({
-  input: {
-    flex: 1,
-    color: '#000',
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    padding: 8,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-    marginBottom: 8,
-  },
-  hint: {
-    color: '#e55',
-    fontSize: 12,
-  },
-});
 
 export function MethodList({
   value,
@@ -39,11 +13,6 @@ export function MethodList({
   onChange: (newState: MethodModel[]) => void;
 }) {
   const [input, setInput] = useState<string>('');
-  const [errorHint, setErrorHint] = useState<string | undefined>();
-  const ref = useRef<TextInput>(null);
-  const handleIsValidChanged = (error: Validation | undefined) => {
-    setErrorHint(error?.errorHint);
-  };
 
   const submitText = () => {
     if (input.trim().length > 0) {
@@ -54,11 +23,9 @@ export function MethodList({
 
   return (
     <View>
-      <Text style={{paddingTop: 8, paddingBottom: 8, color: '#000'}}>
-        Method*
-      </Text>
+      <Text variant="bodyLarge">Method*</Text>
       {value.map((step, index) => (
-        <View style={{paddingBottom: 8}} key={step.id}>
+        <View key={step.id}>
           <EditableItem
             index={index + 1}
             onDelete={() => {
@@ -81,19 +48,16 @@ export function MethodList({
           />
         </View>
       ))}
-      <Input
-        ref={ref}
+      <TextInput
+        mode="outlined"
         placeholder="Put the lime in the coconut"
         returnKeyType="next"
         value={input}
         onChangeText={setInput}
         blurOnSubmit={false}
         onBlur={submitText}
-        validation={value.length === 0 ? [requiredValidator] : []}
-        onIsValidChanged={handleIsValidChanged}
         onSubmitEditing={submitText}
       />
-      {errorHint ? <Text style={styles.hint}>{errorHint}</Text> : null}
     </View>
   );
 }

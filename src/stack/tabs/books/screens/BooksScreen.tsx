@@ -1,11 +1,11 @@
 import React from 'react';
 import {Text} from 'react-native';
-import {Screen} from '../../../../components/Screen/Screen';
+import {ScrollScreen} from '../../../../components/Screen/Screen';
 
 export function BooksScreen() {
   return (
-    <Screen>
+    <ScrollScreen>
       <Text>Books</Text>
-    </Screen>
+    </ScrollScreen>
   );
 }

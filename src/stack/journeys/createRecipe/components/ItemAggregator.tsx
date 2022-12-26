@@ -2,8 +2,10 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Button, FlatList, StyleSheet, Text, View} from 'react-native';
 import {RectButton, Swipeable} from 'react-native-gesture-handler';
+import {Appbar, FAB, List, TextInput, useTheme} from 'react-native-paper';
 import {v4} from 'uuid';
 import {Input} from '../../../../components/Input/Input';
+import {Screen} from '../../../../components/Screen/Screen';
 import {itemToSentenceCase} from '../../../../utils/string';
 
 const styles = StyleSheet.create({
@@ -59,7 +61,7 @@ function Separator() {
 
 function SwipeItem({
   item,
-  changeToSelect: toggleSelect,
+  changeToSelect,
   addItem,
   removeItem,
 }: {
@@ -68,6 +70,7 @@ function SwipeItem({
   addItem: (id: string) => void;
   removeItem: (id: string) => void;
 }) {
+  const theme = useTheme();
   const renderRightActions = () => (
     <RectButton style={[styles.rectButton, styles.redRectButton]}>
       <Text style={styles.rectButtonText}>Remove</Text>
@@ -84,19 +87,15 @@ function SwipeItem({
       renderRightActions={renderRightActions}
       onSwipeableLeftOpen={() => addItem(item.id)}
       onSwipeableRightOpen={() => removeItem(item.id)}>
-      <RectButton
-        onLongPress={() => toggleSelect(item.id)}
-        style={[
-          styles.item,
-          {
-            borderBottomColor: '#ddd',
-            borderBottomWidth: 1,
-          },
-        ]}>
-        <Text style={{fontSize: 16, flex: 1, padding: 16, color: '#111'}}>
-          {item.value}
-        </Text>
-      </RectButton>
+      <List.Item
+        onPress={() => changeToSelect(item.id)}
+        style={{backgroundColor: theme.colors.background}}
+        onLongPress={() => {
+          console.log('onLongPress');
+          changeToSelect(item.id);
+        }}
+        title={item.value}
+      />
     </Swipeable>
   );
 }
@@ -108,40 +107,18 @@ function SelectItem({
   item: Item;
   toggleSelected: (id: string) => void;
 }) {
-  return (
-    <RectButton onPress={() => toggleSelected(item.id)} style={styles.item}>
-      <Text style={{fontSize: 16, flex: 1, padding: 16, color: '#111'}}>
-        {item.value}
-      </Text>
-      {item.selected ? (
-        <View style={[styles.selected]}>
-          <Text style={{color: '#111'}}>✓</Text>
-        </View>
-      ) : null}
-    </RectButton>
+  const right = () => (
+    <List.Icon
+      icon={`checkbox-${item.selected ? 'marked' : 'blank'}-outline`}
+    />
   );
-}
-
-function SelectHeaderButton({
-  onPress,
-  state,
-}: {
-  onPress: () => void;
-  state: ItemState[];
-}) {
-  const count = state.filter(({selected}) => selected).length;
   return (
-    <Button onPress={onPress} title={count > 0 ? `Add (${count})` : 'Cancel'} />
+    <List.Item
+      onPress={() => toggleSelected(item.id)}
+      title={item.value}
+      right={right}
+    />
   );
-}
-function SwipeHeaderButton({
-  onPress,
-  count,
-}: {
-  onPress: () => void;
-  count: number;
-}) {
-  return <Button onPress={onPress} title={`Done (${count})`} />;
 }
 
 export function ItemAggregator({
@@ -201,9 +178,9 @@ export function ItemAggregator({
 
     const headerRight = () =>
       mode === 'select' ? (
-        <SelectHeaderButton state={state} onPress={onPress} />
+        <Appbar.Action icon="check" onPress={onPress} />
       ) : (
-        <SwipeHeaderButton count={savedItems.length} onPress={onPress} />
+        <Appbar.Action icon="arrow-right" onPress={onPress} />
       );
     navigation.setOptions({
       headerRight,
@@ -276,22 +253,31 @@ export function ItemAggregator({
     .join(' ');
 
   return (
-    <View style={{maxHeight: '100%'}}>
-      <View style={{padding: 8}}>
-        <Input placeholder="Dummy manual input" value={aggregatedItem} />
-      </View>
-      <FlatList
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        ItemSeparatorComponent={Separator}
-      />
-      <View style={{padding: 8}}>
-        <Button
-          title={`Scan${text.length > 0 ? ' Again' : ''}`}
-          onPress={onScan}
+    <>
+      <Screen style={{maxHeight: '100%'}}>
+        <TextInput
+          mode="outlined"
+          placeholder="Dummy manual input"
+          value={aggregatedItem}
         />
-      </View>
-    </View>
+        <FlatList
+          data={data}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          ItemSeparatorComponent={Separator}
+        />
+      </Screen>
+      <FAB
+        style={{
+          position: 'absolute',
+          margin: 16,
+          right: 0,
+          bottom: 0,
+        }}
+        label={`Scan${data.length > 0 ? ' Again' : ''}`}
+        icon="camera"
+        onPress={onScan}
+      />
+    </>
   );
 }

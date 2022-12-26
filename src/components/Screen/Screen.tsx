@@ -1,5 +1,5 @@
 import React, {PropsWithChildren} from 'react';
-import {StyleSheet, ScrollView} from 'react-native';
+import {StyleSheet, ScrollView, View, ViewStyle} from 'react-native';
 import {MD3Theme, useTheme} from 'react-native-paper';
 
 const useStyles = (theme: MD3Theme) =>
@@ -11,8 +11,17 @@ const useStyles = (theme: MD3Theme) =>
     },
   });
 
-export function Screen({children}: PropsWithChildren<unknown>) {
+export function ScrollScreen({children}: PropsWithChildren<unknown>) {
   const theme = useTheme();
   const styles = useStyles(theme);
   return <ScrollView style={styles.screen}>{children}</ScrollView>;
+}
+
+export function Screen({
+  children,
+  style,
+}: PropsWithChildren<{style?: ViewStyle}>) {
+  const theme = useTheme();
+  const styles = useStyles(theme);
+  return <View style={[styles.screen, style]}>{children}</View>;
 }

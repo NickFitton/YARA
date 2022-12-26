@@ -2,10 +2,10 @@ import {useNavigation, NavigationProp} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useLayoutEffect, useState} from 'react';
 import {ActivityIndicator, ScrollView, View} from 'react-native';
-import {Card, FAB, Text, useTheme} from 'react-native-paper';
+import {Card, FAB, Text} from 'react-native-paper';
 
 import {Row} from '../../../../components/Row/Row';
-import {Screen} from '../../../../components/Screen/Screen';
+import {ScrollScreen} from '../../../../components/Screen/Screen';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
 import {useDeleteRecipe, useRecipe} from '../../../../db/recipeHooks';
@@ -132,7 +132,7 @@ export function ViewRecipeScreen({route, navigation}: Props) {
   switch (recipe.status) {
     case 'loading':
       return (
-        <Screen>
+        <ScrollScreen>
           <View
             style={{
               height: '100%',
@@ -146,11 +146,11 @@ export function ViewRecipeScreen({route, navigation}: Props) {
               <Text style={{color: '#111'}}>Loading your recipe</Text>
             </View>
           </View>
-        </Screen>
+        </ScrollScreen>
       );
     case 'error':
       return (
-        <Screen>
+        <ScrollScreen>
           <View
             style={{
               height: '100%',
@@ -170,7 +170,7 @@ export function ViewRecipeScreen({route, navigation}: Props) {
               </Text>
             </View>
           </View>
-        </Screen>
+        </ScrollScreen>
       );
     case 'success': {
       const {
@@ -184,7 +184,7 @@ export function ViewRecipeScreen({route, navigation}: Props) {
       } = recipe.data;
       return (
         <>
-          <Screen>
+          <ScrollScreen>
             <Text variant="titleLarge">{name}</Text>
             <Text variant="bodyLarge">{description}</Text>
             <ScrollView horizontal style={{marginHorizontal: -16}}>
@@ -210,7 +210,7 @@ export function ViewRecipeScreen({route, navigation}: Props) {
               <IngredientCheckboxes ingredients={ingredients} />
             ) : null}
             {method ? <MethodCheckboxes method={method} /> : null}
-          </Screen>
+          </ScrollScreen>
           <Fab id={route.params.id} />
         </>
       );
