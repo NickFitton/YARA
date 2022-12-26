@@ -5,9 +5,10 @@ import {ActivityIndicator, ScrollView, View} from 'react-native';
 import {Card, FAB, Text, useTheme} from 'react-native-paper';
 
 import {Row} from '../../../../components/Row/Row';
+import {Screen} from '../../../../components/Screen/Screen';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
-import {useRecipe} from '../../../../db/recipeHooks';
+import {useDeleteRecipe, useRecipe} from '../../../../db/recipeHooks';
 import {toString} from '../../../../utils/measurement';
 import {SuperStackParamList} from '../../../RootStackParam';
 import {RecipeStackParamList} from '../RecipeStackParam';
@@ -63,103 +64,6 @@ function MethodCheckboxes({method}: {method: MethodModel[]}) {
   );
 }
 
-export function ViewRecipeScreen({route, navigation}: Props) {
-  const recipe = useRecipe(route.params.id);
-  const theme = useTheme();
-
-  useLayoutEffect(() => {
-    navigation.setOptions({headerShown: false});
-  });
-
-  switch (recipe.status) {
-    case 'loading':
-      return (
-        <View
-          style={{
-            height: '100%',
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <View>
-            <ActivityIndicator size="large" />
-            <Text style={{color: '#111'}}>Loading your recipe</Text>
-          </View>
-        </View>
-      );
-    case 'error':
-      return (
-        <View
-          style={{
-            height: '100%',
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <View>
-            <Text style={{color: '#111'}}>Something went wrong</Text>
-            <Text style={{color: '#111'}}>
-              We couldn&apos;t retrieve your recipe, you can go back and try
-              again.
-            </Text>
-            <Text style={{color: '#111'}}>{JSON.stringify(recipe.error)}</Text>
-          </View>
-        </View>
-      );
-    case 'success': {
-      const {
-        name,
-        description,
-        servings,
-        prepTimeMinutes,
-        cookTimeMinutes,
-        ingredients,
-        method,
-      } = recipe.data;
-      return (
-        <>
-          <View
-            style={{backgroundColor: theme.colors.background, height: '100%'}}>
-            <ScrollView>
-              <View style={{padding: 16}}>
-                <Text variant="titleLarge">{name}</Text>
-                <Text variant="bodyLarge">{description}</Text>
-                <ScrollView horizontal style={{marginHorizontal: -16}}>
-                  <View style={{padding: 16}}>
-                    <Row space={8}>
-                      <Card style={{padding: 8}}>
-                        <Text variant="bodyMedium">Serves: {servings}</Text>
-                      </Card>
-                      <Card style={{padding: 8}}>
-                        <Text variant="bodyMedium">
-                          Prep Time: {minutesToHumanReadable(prepTimeMinutes)}
-                        </Text>
-                      </Card>
-                      <Card style={{padding: 8}}>
-                        <Text variant="bodyMedium">
-                          Cook Time: {minutesToHumanReadable(cookTimeMinutes)}
-                        </Text>
-                      </Card>
-                    </Row>
-                  </View>
-                </ScrollView>
-                {ingredients ? (
-                  <IngredientCheckboxes ingredients={ingredients} />
-                ) : null}
-                {method ? <MethodCheckboxes method={method} /> : null}
-              </View>
-            </ScrollView>
-          </View>
-          <Fab id={route.params.id} />
-        </>
-      );
-    }
-    default:
-      <Text>Unexpected status: {JSON.stringify(recipe)}</Text>;
-  }
-}
 function Fab({id}: {id: string}) {
   const navigation = useNavigation<NavigationProp<SuperStackParamList>>();
   const goToMake = () =>
@@ -172,6 +76,7 @@ function Fab({id}: {id: string}) {
     });
 
   const [fabOpen, setFabOpen] = useState(false);
+  const {deleteRecipe} = useDeleteRecipe(id);
   return (
     <FAB.Group
       open={fabOpen}
@@ -186,7 +91,10 @@ function Fab({id}: {id: string}) {
         {
           icon: 'delete',
           label: 'Delete',
-          onPress: () => console.log('Pressed add'),
+          onPress: () => {
+            deleteRecipe();
+            navigation.goBack();
+          },
         },
         {
           icon: 'star',
@@ -212,4 +120,102 @@ function Fab({id}: {id: string}) {
       }}
     />
   );
+}
+
+export function ViewRecipeScreen({route, navigation}: Props) {
+  const recipe = useRecipe(route.params.id);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({headerShown: false});
+  });
+
+  switch (recipe.status) {
+    case 'loading':
+      return (
+        <Screen>
+          <View
+            style={{
+              height: '100%',
+              flex: 1,
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <View>
+              <ActivityIndicator size="large" />
+              <Text style={{color: '#111'}}>Loading your recipe</Text>
+            </View>
+          </View>
+        </Screen>
+      );
+    case 'error':
+      return (
+        <Screen>
+          <View
+            style={{
+              height: '100%',
+              flex: 1,
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <View>
+              <Text style={{color: '#111'}}>Something went wrong</Text>
+              <Text style={{color: '#111'}}>
+                We couldn&apos;t retrieve your recipe, you can go back and try
+                again.
+              </Text>
+              <Text style={{color: '#111'}}>
+                {JSON.stringify(recipe.error)}
+              </Text>
+            </View>
+          </View>
+        </Screen>
+      );
+    case 'success': {
+      const {
+        name,
+        description,
+        servings,
+        prepTimeMinutes,
+        cookTimeMinutes,
+        ingredients,
+        method,
+      } = recipe.data;
+      return (
+        <>
+          <Screen>
+            <Text variant="titleLarge">{name}</Text>
+            <Text variant="bodyLarge">{description}</Text>
+            <ScrollView horizontal style={{marginHorizontal: -16}}>
+              <View style={{padding: 16}}>
+                <Row space={8}>
+                  <Card style={{padding: 8}}>
+                    <Text variant="bodyMedium">Serves: {servings}</Text>
+                  </Card>
+                  <Card style={{padding: 8}}>
+                    <Text variant="bodyMedium">
+                      Prep Time: {minutesToHumanReadable(prepTimeMinutes)}
+                    </Text>
+                  </Card>
+                  <Card style={{padding: 8}}>
+                    <Text variant="bodyMedium">
+                      Cook Time: {minutesToHumanReadable(cookTimeMinutes)}
+                    </Text>
+                  </Card>
+                </Row>
+              </View>
+            </ScrollView>
+            {ingredients ? (
+              <IngredientCheckboxes ingredients={ingredients} />
+            ) : null}
+            {method ? <MethodCheckboxes method={method} /> : null}
+          </Screen>
+          <Fab id={route.params.id} />
+        </>
+      );
+    }
+    default:
+      <Text>Unexpected status: {JSON.stringify(recipe)}</Text>;
+  }
 }

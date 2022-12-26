@@ -2,15 +2,10 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {PropsWithChildren, useLayoutEffect} from 'react';
 import {Button, View, Text, TouchableOpacity, FlatList} from 'react-native';
-import {
-  Card,
-  Paragraph,
-  ActivityIndicator,
-  useTheme,
-  Appbar,
-} from 'react-native-paper';
+import {Card, Paragraph, ActivityIndicator, Appbar} from 'react-native-paper';
 
 import {Column} from '../../../../components/Column/Column';
+import {Screen} from '../../../../components/Screen/Screen';
 import {useRecipe, useRecipes} from '../../../../db/recipeHooks';
 import {useCreateRecipeJourney} from '../../../journeys/createRecipe/utils';
 import {RecipeStackParamList} from '../RecipeStackParam';
@@ -85,15 +80,6 @@ function ListEmpty() {
   );
 }
 
-function Screen({children}: PropsWithChildren<unknown>) {
-  const theme = useTheme();
-  return (
-    <View style={{backgroundColor: theme.colors.background, minHeight: '100%'}}>
-      {children}
-    </View>
-  );
-}
-
 export function RecipesScreen({navigation}: Props) {
   const startCreateRecipeJourney = useCreateRecipeJourney();
   const data = useRecipes();
@@ -122,15 +108,12 @@ export function RecipesScreen({navigation}: Props) {
     case 'success':
       return (
         <Screen>
-          <View style={{flex: 1}}>
-            <FlatList
-              style={{padding: 16}}
-              ItemSeparatorComponent={Seperator}
-              ListEmptyComponent={<ListEmpty />}
-              data={data.data}
-              renderItem={({item: {id}}) => <RecipePreview id={id} />}
-            />
-          </View>
+          <FlatList
+            ItemSeparatorComponent={Seperator}
+            ListEmptyComponent={<ListEmpty />}
+            data={data.data}
+            renderItem={({item: {id}}) => <RecipePreview id={id} />}
+          />
         </Screen>
       );
     case 'loading':
