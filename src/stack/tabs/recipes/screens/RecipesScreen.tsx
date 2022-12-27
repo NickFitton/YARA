@@ -1,8 +1,15 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {PropsWithChildren, useLayoutEffect} from 'react';
-import {Button, View, Text, TouchableOpacity, FlatList} from 'react-native';
-import {Card, Paragraph, ActivityIndicator, Appbar} from 'react-native-paper';
+import {Button, View, TouchableOpacity, FlatList} from 'react-native';
+import {
+  Card,
+  Paragraph,
+  ActivityIndicator,
+  Appbar,
+  Text,
+  FAB,
+} from 'react-native-paper';
 
 import {Column} from '../../../../components/Column/Column';
 import {Screen, ScrollScreen} from '../../../../components/Screen/Screen';
@@ -60,70 +67,57 @@ function Seperator() {
 }
 
 function ListEmpty() {
-  const startCreateRecipeJourney = useCreateRecipeJourney();
-  return (
-    <Column
-      style={{
-        height: '100%',
-        padding: 24,
-        flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      space={8}>
-      <Text style={{color: '#000', textAlign: 'center'}}>
-        You don&apos;t have any recipes yet
-      </Text>
-      <Button title="Create a Recipe" onPress={startCreateRecipeJourney} />
-    </Column>
-  );
+  return <Text variant="bodyLarge">You don&apos;t have any recipes yet</Text>;
 }
 
-export function RecipesScreen({navigation}: Props) {
+export function RecipesScreen() {
   const startCreateRecipeJourney = useCreateRecipeJourney();
   const data = useRecipes();
-
-  useLayoutEffect(() => {
-    const headerRight = () => (
-      <Appbar.Action
-        icon="plus"
-        onPress={() => {
-          startCreateRecipeJourney();
-        }}
-      />
-    );
-    navigation.setOptions({headerRight});
-  }, [navigation, startCreateRecipeJourney]);
 
   switch (data.status) {
     case 'error':
       return (
-        <ScrollScreen>
-          <View>
-            <Text>Something went wrong</Text>
-          </View>
-        </ScrollScreen>
+        <Screen
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text variant="bodyLarge">Something went wrong</Text>
+        </Screen>
       );
     case 'success':
       return (
-        <Screen>
-          <FlatList
-            ItemSeparatorComponent={Seperator}
-            ListEmptyComponent={<ListEmpty />}
-            data={data.data}
-            renderItem={({item: {id}}) => <RecipePreview id={id} />}
+        <>
+          <Screen>
+            <FlatList
+              ItemSeparatorComponent={Seperator}
+              ListEmptyComponent={ListEmpty}
+              data={data.data}
+              renderItem={({item: {id}}) => <RecipePreview id={id} />}
+            />
+          </Screen>
+          <FAB
+            icon="plus"
+            style={{position: 'absolute', bottom: 16, right: 16}}
+            onPress={startCreateRecipeJourney}
           />
-        </Screen>
+        </>
       );
     case 'loading':
     default:
       return (
-        <ScrollScreen>
-          <View>
-            <Text>Loading your recipes</Text>
-          </View>
-        </ScrollScreen>
+        <Screen
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" />
+          <Text variant="bodyLarge">Loading your recipes</Text>
+        </Screen>
       );
   }
 }
