@@ -1,20 +1,18 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {PropsWithChildren, useLayoutEffect} from 'react';
+import React, {PropsWithChildren} from 'react';
+import {View, TouchableOpacity, FlatList} from 'react-native';
 import {
-  Button,
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
+  Card,
+  Paragraph,
   ActivityIndicator,
-} from 'react-native';
-import {Column} from '../../../../components/Column/Column';
+  Text,
+  FAB,
+} from 'react-native-paper';
+
+import {Screen} from '../../../../components/Screen/Screen';
 import {useRecipe, useRecipes} from '../../../../db/recipeHooks';
 import {useCreateRecipeJourney} from '../../../journeys/createRecipe/utils';
 import {RecipeStackParamList} from '../RecipeStackParam';
-
-type Props = NativeStackScreenProps<RecipeStackParamList, 'RecipesRoot'>;
 
 function RecipePreviewWrapper({id, children}: PropsWithChildren<{id: string}>) {
   const navigation =
@@ -22,21 +20,8 @@ function RecipePreviewWrapper({id, children}: PropsWithChildren<{id: string}>) {
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate({name: 'View Recipe', params: {id}})}
-      style={{
-        backgroundColor: '#fff',
-        borderRadius: 4,
-        shadowOffset: {
-          width: 0,
-          height: 0,
-        },
-        elevation: 5,
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        padding: 8,
-        marginBottom: 16,
-      }}>
-      {children}
+      onPress={() => navigation.navigate({name: 'View Recipe', params: {id}})}>
+      <Card>{children}</Card>
     </TouchableOpacity>
   );
 }
@@ -54,10 +39,12 @@ function RecipePreview({id}: {id: string}) {
     case 'success':
       return (
         <RecipePreviewWrapper id={id}>
-          <>
-            <Text style={{color: '#000'}}>{data.data.name}</Text>
-            <Text style={{color: '#000'}}>{data.data.description}</Text>
-          </>
+          <Card.Title title={data.data.name} />
+          {data.data.description ? (
+            <Card.Content>
+              <Paragraph>{data.data.description}</Paragraph>
+            </Card.Content>
+          ) : null}
         </RecipePreviewWrapper>
       );
     case 'loading':
@@ -70,70 +57,62 @@ function RecipePreview({id}: {id: string}) {
   }
 }
 
-function ListEmpty() {
-  const startCreateRecipeJourney = useCreateRecipeJourney();
-  return (
-    <Column
-      style={{
-        height: '100%',
-        padding: 24,
-        flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      space={8}>
-      <Text style={{color: '#000', textAlign: 'center'}}>
-        You don&apos;t have any recipes yet
-      </Text>
-      <Button title="Create a Recipe" onPress={startCreateRecipeJourney} />
-    </Column>
-  );
+function Seperator() {
+  return <View style={{height: 8}} />;
 }
 
-export function RecipesScreen({navigation}: Props) {
+function ListEmpty() {
+  return <Text variant="bodyLarge">You don&apos;t have any recipes yet</Text>;
+}
+
+export function RecipesScreen() {
   const startCreateRecipeJourney = useCreateRecipeJourney();
   const data = useRecipes();
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerRight: () => (
-        <Button onPress={startCreateRecipeJourney} title="New" />
-      ),
-    });
-  }, [navigation, startCreateRecipeJourney]);
 
   switch (data.status) {
     case 'error':
       return (
-        <View style={{height: '100%'}}>
-          <View>
-            <Text>Something went wrong</Text>
-          </View>
-        </View>
+        <Screen
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text variant="bodyLarge">Something went wrong</Text>
+        </Screen>
       );
     case 'success':
       return (
-        <View style={{height: '100%'}}>
-          <View style={{flex: 1}}>
+        <>
+          <Screen>
             <FlatList
-              style={{padding: 16}}
-              ListEmptyComponent={<ListEmpty />}
+              ItemSeparatorComponent={Seperator}
+              ListEmptyComponent={ListEmpty}
               data={data.data}
               renderItem={({item: {id}}) => <RecipePreview id={id} />}
             />
-          </View>
-        </View>
+          </Screen>
+          <FAB
+            icon="plus"
+            style={{position: 'absolute', bottom: 16, right: 16}}
+            onPress={startCreateRecipeJourney}
+          />
+        </>
       );
     case 'loading':
     default:
       return (
-        <View style={{height: '100%'}}>
-          <View>
-            <Text>Loading your recipes</Text>
-          </View>
-        </View>
+        <Screen
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" />
+          <Text variant="bodyLarge">Loading your recipes</Text>
+        </Screen>
       );
   }
 }

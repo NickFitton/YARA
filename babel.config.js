@@ -4,12 +4,5 @@ module.exports = {
     ['@babel/preset-env', {targets: {node: 'current'}}],
     '@babel/preset-typescript',
   ],
-  plugins: [
-    [
-      'react-native-reanimated/plugin',
-      {
-        globals: ['__scanOCR'],
-      },
-    ],
-  ],
+  plugins: [['react-native-reanimated/plugin']],
 };

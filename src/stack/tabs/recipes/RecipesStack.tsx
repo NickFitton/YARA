@@ -1,16 +1,22 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {
+  createNativeStackNavigator,
+  NativeStackHeaderProps,
+} from '@react-navigation/native-stack';
 import React from 'react';
+
 import {CreateRecipeScreen} from './screens/CreateRecipeScreen';
 import {RecipesScreen} from './screens/RecipesScreen';
 import {ViewRecipeScreen} from './screens/ViewRecipeScreen';
 import {RecipeStackParamList} from './RecipeStackParam';
 import MyBottomSheet from './screens/ViewRecipeOptions';
+import {Header} from '../../../components/Header/Header';
 
 const Stack = createNativeStackNavigator<RecipeStackParamList>();
 
 export function RecipesStack() {
+  const header = (props: NativeStackHeaderProps) => <Header {...props} />;
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{header}}>
       <Stack.Screen
         name="RecipesRoot"
         options={{title: 'Recipes'}}

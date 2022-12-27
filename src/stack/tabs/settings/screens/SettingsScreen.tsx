@@ -1,5 +1,7 @@
 import React from 'react';
-import {Alert, Button, SafeAreaView, ScrollView} from 'react-native';
+import {Alert} from 'react-native';
+import {Button} from 'react-native-paper';
+import {ScrollScreen} from '../../../../components/Screen/Screen';
 import {migrate, teardown} from '../../../../db/migrate';
 import {useDatabase} from '../../../../providers/database/Provider';
 
@@ -23,11 +25,13 @@ export function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={{height: '100%'}}>
-      <ScrollView style={{flex: 1}}>
-        <Button title="DROP TABLES" onPress={dropTables} />
-        <Button title="Restart migration" onPress={migrateDatabase} />
-      </ScrollView>
-    </SafeAreaView>
+    <ScrollScreen>
+      <Button mode="contained" onPress={dropTables}>
+        DROP TABLES
+      </Button>
+      <Button mode="contained" onPress={migrateDatabase}>
+        Restart migration
+      </Button>
+    </ScrollScreen>
   );
 }

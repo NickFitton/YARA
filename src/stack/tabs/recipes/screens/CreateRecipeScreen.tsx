@@ -4,17 +4,11 @@ import {
   RouteProp,
   useNavigation,
 } from '@react-navigation/native';
-import React, {useLayoutEffect, useRef, useState} from 'react';
-import {
-  Button,
-  KeyboardAvoidingView,
-  StyleSheet,
-  View,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import React, {useLayoutEffect, useState} from 'react';
+import {KeyboardAvoidingView, View, Alert, StyleSheet} from 'react-native';
+import {Button, TextInput} from 'react-native-paper';
 import {v4} from 'uuid';
-import {LabelledInput} from '../../../../components/LabelledInput/LabelledInput';
+
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
 import {randomHex} from '../../../../utils/hex';
@@ -23,6 +17,7 @@ import {useCreateRecipe} from '../../../../db/recipeHooks';
 import {RecipeStackParamList} from '../RecipeStackParam';
 import {IngredientList, parseIngredient} from '../components/IngredientList';
 import {MethodList} from '../components/MethodList';
+import {ScrollScreen} from '../../../../components/Screen/Screen';
 
 const styles = StyleSheet.create({
   row: {
@@ -154,7 +149,6 @@ export function CreateRecipeScreen({
 }: {
   route: RouteProp<RecipeStackParamList, 'Create Recipe'>;
 }) {
-  const scrollViewRef = useRef<ScrollView>(null);
   const {createRecipe} = useCreateForm();
   const [formState, setFormState] = useState<RecipeForm>({
     name: '',
@@ -196,55 +190,47 @@ export function CreateRecipeScreen({
       style={{flex: 1}}
       behavior="padding"
       keyboardVerticalOffset={100}>
-      <ScrollView ref={scrollViewRef}>
-        <View
-          style={{
-            padding: 16,
-            paddingTop: 32,
-          }}>
-          <View style={{paddingBottom: 8}}>
-            <LabelledInput
-              label="Name"
-              required
-              value={formState.name}
-              onChangeText={updateForm('name')}
-              placeholder="Beef Stew"
-            />
-          </View>
-          <View style={{paddingBottom: 8}}>
-            <LabelledInput
-              label="Description"
-              multiline
-              value={formState.description}
-              onChangeText={updateForm('description')}
-            />
-          </View>
-          <View style={{paddingBottom: 8}}>
-            <LabelledInput
-              label="Servings"
-              required
-              value={formState.servings}
-              onChangeText={updateForm('servings')}
+      <ScrollScreen>
+        <View>
+          <TextInput
+            mode="outlined"
+            label="Name"
+            value={formState.name}
+            onChangeText={updateForm('name')}
+            placeholder="Beef Stew"
+          />
+          <TextInput
+            mode="outlined"
+            label="Description"
+            multiline
+            value={formState.description}
+            onChangeText={updateForm('description')}
+          />
+          <TextInput
+            mode="outlined"
+            label="Servings"
+            required
+            value={formState.servings}
+            onChangeText={updateForm('servings')}
+            keyboardType="number-pad"
+          />
+          <View style={[styles.row]}>
+            <TextInput
+              style={styles.rowItem}
+              mode="outlined"
+              label="Prep Time"
               keyboardType="number-pad"
+              value={formState.prepTimeMinutes}
+              onChangeText={updateForm('prepTimeMinutes')}
             />
-          </View>
-          <View style={styles.row}>
-            <View style={[styles.rowItem]}>
-              <LabelledInput
-                label="Prep Time"
-                keyboardType="number-pad"
-                value={formState.prepTimeMinutes}
-                onChangeText={updateForm('prepTimeMinutes')}
-              />
-            </View>
-            <View style={[styles.rowItem, {paddingLeft: 8}]}>
-              <LabelledInput
-                label="Cook Time"
-                keyboardType="number-pad"
-                value={formState.cookTimeMinutes}
-                onChangeText={updateForm('cookTimeMinutes')}
-              />
-            </View>
+            <TextInput
+              style={styles.rowItem}
+              mode="outlined"
+              label="Cook Time"
+              keyboardType="number-pad"
+              value={formState.cookTimeMinutes}
+              onChangeText={updateForm('cookTimeMinutes')}
+            />
           </View>
           <IngredientList
             value={formState.ingredients}
@@ -256,10 +242,12 @@ export function CreateRecipeScreen({
           />
 
           <View style={{paddingTop: 8}}>
-            <Button onPress={() => createRecipe(formState)} title="Create" />
+            <Button onPress={() => createRecipe(formState)} mode="contained">
+              Create
+            </Button>
           </View>
         </View>
-      </ScrollView>
+      </ScrollScreen>
     </KeyboardAvoidingView>
   );
 }

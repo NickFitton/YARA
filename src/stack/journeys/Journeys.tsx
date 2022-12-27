@@ -2,8 +2,8 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import {JourneyStackParamList} from './types';
-import {CreateRecipeStack} from './createRecipe/createRecipeStack';
 import {MakeRecipeStack} from './makeRecipe/makeRecipeStack';
+import {CreateRecipeStack} from './createRecipe/createRecipeStack';
 
 const Journey = createNativeStackNavigator<JourneyStackParamList>();
 

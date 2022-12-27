@@ -19,11 +19,11 @@ export function DescriptionScreen({
 
   return (
     <SingleItemAggregator
-      itemType="name"
+      itemType="description"
       data={simpleData}
       onSubmit={navigateToScanDescription}
       onRetry={scanImage}
-      casing="title"
+      casing="sentence"
     />
   );
 }

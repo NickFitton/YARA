@@ -1,10 +1,11 @@
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 import React from 'react';
+import {ScrollScreen} from '../../../../components/Screen/Screen';
 
 export function SearchScreen() {
   return (
-    <View>
+    <ScrollScreen>
       <Text>This is the search screen.</Text>
-    </View>
+    </ScrollScreen>
   );
 }
