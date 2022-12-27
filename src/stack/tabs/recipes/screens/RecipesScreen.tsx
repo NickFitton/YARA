@@ -1,23 +1,18 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {PropsWithChildren, useLayoutEffect} from 'react';
-import {Button, View, TouchableOpacity, FlatList} from 'react-native';
+import React, {PropsWithChildren} from 'react';
+import {View, TouchableOpacity, FlatList} from 'react-native';
 import {
   Card,
   Paragraph,
   ActivityIndicator,
-  Appbar,
   Text,
   FAB,
 } from 'react-native-paper';
 
-import {Column} from '../../../../components/Column/Column';
-import {Screen, ScrollScreen} from '../../../../components/Screen/Screen';
+import {Screen} from '../../../../components/Screen/Screen';
 import {useRecipe, useRecipes} from '../../../../db/recipeHooks';
 import {useCreateRecipeJourney} from '../../../journeys/createRecipe/utils';
 import {RecipeStackParamList} from '../RecipeStackParam';
-
-type Props = NativeStackScreenProps<RecipeStackParamList, 'RecipesRoot'>;
 
 function RecipePreviewWrapper({id, children}: PropsWithChildren<{id: string}>) {
   const navigation =

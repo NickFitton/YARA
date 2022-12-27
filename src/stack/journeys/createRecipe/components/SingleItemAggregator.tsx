@@ -144,9 +144,7 @@ export function SingleItemAggregator({
     const headerRight = () => (
       <Appbar.Action
         icon="arrow-right"
-        onPress={() => {
-          onSubmit(aggregatedItem);
-        }}
+        onPress={() => onSubmit(aggregatedItem)}
       />
     );
 

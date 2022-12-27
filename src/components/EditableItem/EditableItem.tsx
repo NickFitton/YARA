@@ -10,7 +10,6 @@ export function EditableItem({
   value: string;
   onValueChange: (newValue: string) => void;
   onDelete: () => void;
-  // eslint-disable-next-line react/require-default-props
   index?: number;
 }) {
   const [input, setInput] = useState<string>(value);
