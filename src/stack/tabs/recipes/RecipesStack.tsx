@@ -8,7 +8,7 @@ import {CreateRecipeScreen} from './screens/CreateRecipeScreen';
 import {RecipesScreen} from './screens/RecipesScreen';
 import {ViewRecipeScreen} from './screens/ViewRecipeScreen';
 import {RecipeStackParamList} from './RecipeStackParam';
-import MyBottomSheet from './screens/ViewRecipeOptions';
+import RecipeRatingsBottomSheet from './screens/RecipeRatingsBottomSheet';
 import {Header} from '../../../components/Header/Header';
 
 const Stack = createNativeStackNavigator<RecipeStackParamList>();
@@ -25,8 +25,8 @@ export function RecipesStack() {
       <Stack.Screen name="Create Recipe" component={CreateRecipeScreen} />
       <Stack.Screen name="View Recipe" component={ViewRecipeScreen} />
       <Stack.Screen
-        name="View Recipe Options"
-        component={MyBottomSheet}
+        name="Recipe Ratings"
+        component={RecipeRatingsBottomSheet}
         options={{
           headerShown: false,
           presentation: 'transparentModal',

@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 
 export type FinalMakeRecipeProps = {
   route: RouteProp<MakeRecipeStackParamList, 'Method'>;
-  navigation: NavigationProp<SuperStackParamList>;
+  navigation: NavigationProp<MakeRecipeStackParamList, 'Method'>;
 };
 
 export function MethodScreen({route, navigation}: FinalMakeRecipeProps) {
@@ -46,12 +46,7 @@ export function MethodScreen({route, navigation}: FinalMakeRecipeProps) {
     const headerRight = () => (
       <Appbar.Action
         icon="arrow-right"
-        onPress={() =>
-          navigation.navigate('Tabs', {
-            screen: 'Recipes',
-            params: {screen: 'View Recipe', params: {id: route.params.id}},
-          })
-        }
+        onPress={() => navigation.navigate('Rate', {id: route.params.id})}
       />
     );
     navigation.setOptions({headerRight});
