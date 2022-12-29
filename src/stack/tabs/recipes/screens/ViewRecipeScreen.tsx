@@ -4,8 +4,8 @@ import {
   RouteProp,
 } from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, ScrollView, View} from 'react-native';
-import {Appbar, Card, Chip, FAB, Text} from 'react-native-paper';
+import {ActivityIndicator, View} from 'react-native';
+import {Appbar, Chip, FAB, Text} from 'react-native-paper';
 
 import {Row} from '../../../../components/Row/Row';
 import {ScrollScreen} from '../../../../components/Screen/Screen';
