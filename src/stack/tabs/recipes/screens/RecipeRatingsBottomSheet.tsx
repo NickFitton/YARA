@@ -164,7 +164,7 @@ function RecipeRatingsBottomSheet({navigation, route}: Props) {
             <View>
               <Text variant="headlineMedium">Raters</Text>
               {Object.entries(raterAggregate).map(([rater, ratings]) => (
-                <View style={{paddingTop: 4}}>
+                <View style={{paddingTop: 4}} key={rater}>
                   <Text variant="headlineSmall">{rater}</Text>
                   <Text variant="bodyMedium">
                     Has reviewed this recipe {ratings.length} times, with an
