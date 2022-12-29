@@ -1,8 +1,11 @@
-import {useNavigation, NavigationProp} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useLayoutEffect, useState} from 'react';
+import {
+  useNavigation,
+  NavigationProp,
+  RouteProp,
+} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, ScrollView, View} from 'react-native';
-import {Card, FAB, Text} from 'react-native-paper';
+import {Appbar, Card, Chip, FAB, Text} from 'react-native-paper';
 
 import {Row} from '../../../../components/Row/Row';
 import {ScrollScreen} from '../../../../components/Screen/Screen';
@@ -13,7 +16,10 @@ import {toString} from '../../../../utils/measurement';
 import {SuperStackParamList} from '../../../RootStackParam';
 import {RecipeStackParamList} from '../RecipeStackParam';
 
-type Props = NativeStackScreenProps<RecipeStackParamList, 'View Recipe'>;
+type Props = {
+  route: RouteProp<RecipeStackParamList, 'View Recipe'>;
+  navigation: NavigationProp<SuperStackParamList>;
+};
 
 const minutesToHumanReadable = (minutes: number): string => {
   if (minutes < 60) {
@@ -29,7 +35,7 @@ const minutesToHumanReadable = (minutes: number): string => {
 function IngredientCheckboxes({ingredients}: {ingredients: IngredientModel[]}) {
   return (
     <View>
-      <Text variant="titleMedium">Ingredients</Text>
+      <Text variant="headlineSmall">Ingredients</Text>
       {ingredients.map(ingredient => {
         switch (ingredient.type) {
           case 'parsed':
@@ -54,7 +60,7 @@ function IngredientCheckboxes({ingredients}: {ingredients: IngredientModel[]}) {
 function MethodCheckboxes({method}: {method: MethodModel[]}) {
   return (
     <View>
-      <Text variant="titleMedium">Method</Text>
+      <Text variant="headlineSmall">Method</Text>
       {method.map(({step}) => (
         <Text variant="bodyMedium" key={step}>
           {step}
@@ -66,21 +72,6 @@ function MethodCheckboxes({method}: {method: MethodModel[]}) {
 
 function Fab({id}: {id: string}) {
   const navigation = useNavigation<NavigationProp<SuperStackParamList>>();
-  const goToMake = () =>
-    navigation.navigate('Journeys', {
-      screen: 'Make Recipe Journey',
-      params: {
-        screen: 'MiseEnPlace',
-        params: {id},
-      },
-    });
-
-  const goToRatings = () =>
-    navigation.navigate('Tabs', {
-      screen: 'Recipes',
-      params: {screen: 'Recipe Ratings', params: {id}},
-    });
-
   const [fabOpen, setFabOpen] = useState(false);
   const {deleteRecipe} = useDeleteRecipe(id);
   return (
@@ -103,19 +94,9 @@ function Fab({id}: {id: string}) {
           },
         },
         {
-          icon: 'star',
-          label: 'Ratings',
-          onPress: goToRatings,
-        },
-        {
           icon: 'pencil',
           label: 'Edit',
           onPress: () => console.log('Pressed email'),
-        },
-        {
-          icon: 'chef-hat',
-          label: 'Cook',
-          onPress: goToMake,
         },
       ]}
       onStateChange={({open}) => setFabOpen(open)}
@@ -131,9 +112,34 @@ function Fab({id}: {id: string}) {
 export function ViewRecipeScreen({route, navigation}: Props) {
   const recipe = useRecipe(route.params.id);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({headerShown: false});
-  });
+  useEffect(() => {
+    const goToMake = () =>
+      navigation.navigate('Journeys', {
+        screen: 'Make Recipe Journey',
+        params: {
+          screen: 'MiseEnPlace',
+          params: {id: route.params.id},
+        },
+      });
+
+    const goToRatings = () =>
+      navigation.navigate('Tabs', {
+        screen: 'Recipes',
+        params: {screen: 'Recipe Ratings', params: {id: route.params.id}},
+      });
+
+    const header = () => (
+      <Appbar.Header>
+        {navigation.canGoBack() ? (
+          <Appbar.BackAction onPress={navigation.goBack} />
+        ) : null}
+        <Appbar.Content />
+        <Appbar.Action icon="star" onPress={goToRatings} />
+        <Appbar.Action icon="chef-hat" onPress={goToMake} />
+      </Appbar.Header>
+    );
+    navigation.setOptions({header});
+  }, [navigation, recipe, route.params.id]);
 
   switch (recipe.status) {
     case 'loading':
@@ -191,31 +197,25 @@ export function ViewRecipeScreen({route, navigation}: Props) {
       return (
         <>
           <ScrollScreen>
-            <Text variant="titleLarge">{name}</Text>
+            <Text variant="headlineMedium">{name}</Text>
             <Text variant="bodyLarge">{description}</Text>
-            <ScrollView horizontal style={{marginHorizontal: -16}}>
-              <View style={{padding: 16}}>
-                <Row space={8}>
-                  <Card style={{padding: 8}}>
-                    <Text variant="bodyMedium">Serves: {servings}</Text>
-                  </Card>
-                  <Card style={{padding: 8}}>
-                    <Text variant="bodyMedium">
-                      Prep Time: {minutesToHumanReadable(prepTimeMinutes)}
-                    </Text>
-                  </Card>
-                  <Card style={{padding: 8}}>
-                    <Text variant="bodyMedium">
-                      Cook Time: {minutesToHumanReadable(cookTimeMinutes)}
-                    </Text>
-                  </Card>
-                </Row>
-              </View>
-            </ScrollView>
+            <View style={{paddingVertical: 8}} />
+            <Row space={8}>
+              <Chip>Serves: {servings}</Chip>
+              <Chip icon="knife">
+                {minutesToHumanReadable(prepTimeMinutes)}
+              </Chip>
+              <Chip icon="chef-hat">
+                {minutesToHumanReadable(cookTimeMinutes)}
+              </Chip>
+            </Row>
+            <View style={{paddingVertical: 8}} />
             {ingredients ? (
               <IngredientCheckboxes ingredients={ingredients} />
             ) : null}
+            <View style={{paddingVertical: 8}} />
             {method ? <MethodCheckboxes method={method} /> : null}
+            <View style={{paddingVertical: 64}} />
           </ScrollScreen>
           <Fab id={route.params.id} />
         </>
