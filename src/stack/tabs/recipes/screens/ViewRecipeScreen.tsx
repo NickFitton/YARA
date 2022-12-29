@@ -61,10 +61,11 @@ function MethodCheckboxes({method}: {method: MethodModel[]}) {
   return (
     <View>
       <Text variant="headlineSmall">Method</Text>
-      {method.map(({step}) => (
-        <Text variant="bodyMedium" key={step}>
-          {step}
-        </Text>
+      {method.map(({step}, i) => (
+        <View style={{flexDirection: 'row', paddingBottom: 4}} key={step}>
+          <Text variant="bodyMedium">{i + 1}.</Text>
+          <Text variant="bodyMedium">{step}</Text>
+        </View>
       ))}
     </View>
   );
