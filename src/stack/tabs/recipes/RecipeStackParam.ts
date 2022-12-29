@@ -9,5 +9,5 @@ export type RecipeStackParamList = {
   RecipesRoot?: {from: string; action: 'delete'};
   'Create Recipe'?: RecipeData;
   'View Recipe': {id: string};
-  'View Recipe Options': {id: string};
+  'Recipe Ratings': {id: string};
 };

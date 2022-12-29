@@ -7,6 +7,7 @@ import {MethodScreen} from './screens/Method';
 import {MiseEnPlaceScreen} from './screens/MiseEnPlace';
 import {MakeRecipeStackParamList} from './types';
 import {Header} from '../../../components/Header/Header';
+import {RatingScreen} from './screens/Rating';
 
 const MakeRecipe = createNativeStackNavigator<MakeRecipeStackParamList>();
 
@@ -24,7 +25,11 @@ export function MakeRecipeStack() {
         component={MethodScreen}
         options={{title: 'Method'}}
       />
-      {/* TODO: Enjoyment ratings */}
+      <MakeRecipe.Screen
+        name="Rate"
+        component={RatingScreen}
+        options={{title: 'Rate your Meal'}}
+      />
     </MakeRecipe.Navigator>
   );
 }

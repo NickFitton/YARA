@@ -5,7 +5,6 @@ import {Appbar, Text} from 'react-native-paper';
 import {Screen} from '../../../../components/Screen/Screen';
 import {MethodModel} from '../../../../db/models/Method';
 import {useRecipe} from '../../../../db/recipeHooks';
-import {SuperStackParamList} from '../../../RootStackParam';
 import {LoadingSpinner} from '../components/LoadingSpinner';
 import {useMeasuredView} from '../hooks';
 import {MakeRecipeStackParamList} from '../types';
@@ -35,7 +34,7 @@ const styles = StyleSheet.create({
 
 export type FinalMakeRecipeProps = {
   route: RouteProp<MakeRecipeStackParamList, 'Method'>;
-  navigation: NavigationProp<SuperStackParamList>;
+  navigation: NavigationProp<MakeRecipeStackParamList, 'Method'>;
 };
 
 export function MethodScreen({route, navigation}: FinalMakeRecipeProps) {
@@ -46,12 +45,7 @@ export function MethodScreen({route, navigation}: FinalMakeRecipeProps) {
     const headerRight = () => (
       <Appbar.Action
         icon="arrow-right"
-        onPress={() =>
-          navigation.navigate('Tabs', {
-            screen: 'Recipes',
-            params: {screen: 'View Recipe', params: {id: route.params.id}},
-          })
-        }
+        onPress={() => navigation.navigate('Rate', {id: route.params.id})}
       />
     );
     navigation.setOptions({headerRight});

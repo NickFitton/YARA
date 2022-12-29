@@ -75,6 +75,12 @@ function Fab({id}: {id: string}) {
       },
     });
 
+  const goToRatings = () =>
+    navigation.navigate('Tabs', {
+      screen: 'Recipes',
+      params: {screen: 'Recipe Ratings', params: {id}},
+    });
+
   const [fabOpen, setFabOpen] = useState(false);
   const {deleteRecipe} = useDeleteRecipe(id);
   return (
@@ -98,8 +104,8 @@ function Fab({id}: {id: string}) {
         },
         {
           icon: 'star',
-          label: 'Favourite',
-          onPress: () => console.log('Pressed star'),
+          label: 'Ratings',
+          onPress: goToRatings,
         },
         {
           icon: 'pencil',

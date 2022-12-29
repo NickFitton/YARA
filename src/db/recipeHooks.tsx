@@ -9,8 +9,26 @@ import {
 import {MethodModel, RawMethodModel} from './models/Method';
 import {RecipeModel} from './models/Recipe';
 import {useDatabase} from '../providers/database/Provider';
+import {RatingModel} from './models/Rating';
+import {DBRecord} from './models/shared';
 
 type BaseRecipe = Omit<RecipeModel, 'ingredients' | 'method'>;
+
+const getRecipeRatingsByRecipeId = (tx: Transaction, recipeId: string) =>
+  new Promise<RatingModel[]>((resolve, reject) => {
+    tx.executeSql(
+      'SELECT * FROM Rating WHERE recipeId=?;',
+      [recipeId],
+      (_, results) => {
+        const rows: RatingModel[] = [];
+        for (let i = 0; i < results.rows.length; i++) {
+          rows.push(results.rows.item(i) as RatingModel);
+        }
+        resolve(rows);
+      },
+      (_, error) => reject(error),
+    );
+  });
 
 const getRecipeByRecipeId = (
   tx: Transaction,
@@ -227,6 +245,69 @@ export const useRecipe = (recipeId: string) => {
               console.log(recipeId);
               console.trace(e);
             });
+        }).catch(console.trace);
+      }),
+  });
+};
+
+export type Rating = Omit<RatingModel, keyof DBRecord | 'recipeId'>;
+
+/**
+ * id, recipeId, rater, value, scaleFrom, scaleTo
+ * @param recipeId
+ * @param rating
+ * @returns
+ */
+const flattenRating = (
+  recipeId: string,
+  rating: Rating,
+): [string, string, string, number, number, number] => [
+  v4(),
+  recipeId,
+  rating.rater,
+  rating.value,
+  rating.scaleFrom,
+  rating.scaleTo,
+];
+
+const genValueTemplate = (
+  variableCount: number,
+  valueCount: number,
+): string => {
+  const variableTemplate = `(${new Array(variableCount).fill('?').join(', ')})`;
+  return new Array(valueCount).fill(variableTemplate).join(', ');
+};
+
+export const useRateRecipe = (id: string) => {
+  const db = useDatabase();
+  const queryClient = useQueryClient();
+
+  const rateRecipe = (ratings: Rating[]) =>
+    db.transaction(tx => {
+      console.log(ratings);
+      tx.executeSql(
+        `INSERT INTO Rating (id, recipeId, rater, value, scaleFrom, scaleTo) VALUES ${genValueTemplate(
+          6,
+          ratings.length,
+        )}`,
+        ratings.flatMap(rating => flattenRating(id, rating)),
+      )
+        .then(() => queryClient.invalidateQueries(['recipes', id, 'ratings']))
+        .catch(console.trace);
+    });
+  return {rateRecipe};
+};
+
+export const useRecipeRatings = (recipeId: string) => {
+  const db = useDatabase();
+
+  return useQuery<RatingModel[]>({
+    queryKey: ['recipes', recipeId, 'ratings'],
+    queryFn: () =>
+      new Promise(resolve => {
+        db.readTransaction(tx => {
+          const ratingsPromise = getRecipeRatingsByRecipeId(tx, recipeId);
+          resolve(ratingsPromise);
         }).catch(console.trace);
       }),
   });

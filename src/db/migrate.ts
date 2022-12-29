@@ -35,6 +35,16 @@ export const manifest = [
   createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );`,
+  `create TABLE IF NOT EXISTS Rating(
+  id TEXT PRIMARY KEY NOT NULL,
+  recipeId INTEGER NOT NULL,
+  rater TEXT NOT NULL,
+  value INT NOT NULL,
+  scaleFrom INT NOT NULL,
+  scaleTo INT NOT NULL,
+  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);`,
 ];
 
 export const teardown = [
@@ -42,6 +52,7 @@ export const teardown = [
   'DROP TABLE IF EXISTS ParsedIngredient;',
   'DROP TABLE IF EXISTS RawMethod;',
   'DROP TABLE IF EXISTS Recipe;',
+  'DROP TABLE IF EXISTS Rating;',
 ];
 
 export const migrate = (db: SQLiteDatabase): Promise<void> =>
