@@ -1,4 +1,4 @@
-import {MD3Colors} from 'react-native-paper/lib/typescript/types';
+import {MD3Theme} from 'react-native-paper';
 
 const colors = [
   '#252525',
@@ -45,7 +45,7 @@ const strokeLinecap = 'round';
 const strokeLinejoin = 'round';
 
 // Put it all together...
-export const chartTheme = (mdColors: MD3Colors) => ({
+export const chartTheme = (mdColors: MD3Theme['colors']) => ({
   area: {
     style: {
       data: {

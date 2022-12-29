@@ -5,7 +5,6 @@ import {Appbar, Text} from 'react-native-paper';
 import {Screen} from '../../../../components/Screen/Screen';
 import {MethodModel} from '../../../../db/models/Method';
 import {useRecipe} from '../../../../db/recipeHooks';
-import {SuperStackParamList} from '../../../RootStackParam';
 import {LoadingSpinner} from '../components/LoadingSpinner';
 import {useMeasuredView} from '../hooks';
 import {MakeRecipeStackParamList} from '../types';

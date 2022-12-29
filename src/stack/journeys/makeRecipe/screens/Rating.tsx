@@ -55,17 +55,20 @@ export function RatingScreen({route}: Params) {
   const theme = useTheme();
   useEffect(() => {
     const onPress = async () => {
-      try {
-        await rateRecipe(ratings);
-        navigation.navigate('Tabs', {
-          screen: 'Recipes',
-          params: {screen: 'View Recipe', params: {id: route.params.id}},
-        });
-      } catch (e) {
-        console.error(e);
-      }
+      await rateRecipe(ratings);
+      navigation.navigate('Tabs', {
+        screen: 'Recipes',
+        params: {screen: 'View Recipe', params: {id: route.params.id}},
+      });
     };
-    const headerRight = () => <Appbar.Action icon="check" onPress={onPress} />;
+    const headerRight = () => (
+      <Appbar.Action
+        icon="check"
+        onPress={() => {
+          onPress().catch(console.error);
+        }}
+      />
+    );
     navigation.setOptions({headerRight});
   }, [navigation, rateRecipe, ratings, route.params.id]);
   const addRating = () =>

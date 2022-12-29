@@ -138,7 +138,7 @@ export function SettingsScreen() {
             flex: 1,
             backgroundColor: colors.onSurfaceVariant,
           }}>
-          <Text style={{color: colors.SurfaceVariant}}>onSurfaceVariant</Text>
+          <Text style={{color: colors.surfaceVariant}}>onSurfaceVariant</Text>
         </View>
 
         <View style={{flex: 1, backgroundColor: colors.outline}}>
