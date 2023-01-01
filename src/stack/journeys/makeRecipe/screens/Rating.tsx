@@ -1,9 +1,5 @@
 import Slider from '@react-native-community/slider';
-import {
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-} from '@react-navigation/native';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
 import React, {useState, useEffect} from 'react';
 import {FlatList, View} from 'react-native';
 import {
@@ -24,6 +20,7 @@ import {MakeRecipeStackParamList} from '../types';
 
 type Params = {
   route: RouteProp<MakeRecipeStackParamList, 'Rate'>;
+  navigation: NavigationProp<SuperStackParamList>;
 };
 
 type IdRating = Rating & {id: string};
@@ -44,12 +41,11 @@ const starByRating = (rating: number, halfStarPoint: number) => {
   return 'star-half-full';
 };
 
-export function RatingScreen({route}: Params) {
+export function RatingScreen({route, navigation}: Params) {
   const [ratings, setRatings] = useState<IdRating[]>([
     {id: v4(), rater: 'Nick', value: 5, scaleFrom: 0, scaleTo: 10},
     {id: v4(), rater: 'Heather', value: 5, scaleFrom: 0, scaleTo: 10},
   ]);
-  const navigation = useNavigation<NavigationProp<SuperStackParamList>>();
 
   const {rateRecipe} = useRateRecipe(route.params.id);
   const theme = useTheme();

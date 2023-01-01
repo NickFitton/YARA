@@ -8,7 +8,7 @@ import {CreateRecipeScreen} from './screens/CreateRecipeScreen';
 import {RecipesScreen} from './screens/RecipesScreen';
 import {ViewRecipeScreen} from './screens/ViewRecipeScreen';
 import {RecipeStackParamList} from './RecipeStackParam';
-import RecipeRatingsBottomSheet from './screens/RecipeRatingsBottomSheet';
+import {RecipeRatingsBottomSheet} from './screens/RecipeRatingsBottomSheet/RecipeRatingsBottomSheet';
 import {Header} from '../../../components/Header/Header';
 
 const Stack = createNativeStackNavigator<RecipeStackParamList>();
