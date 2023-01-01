@@ -18,6 +18,7 @@ import {RecipeStackParamList} from '../RecipeStackParam';
 import {IngredientList, parseIngredient} from '../components/IngredientList';
 import {MethodList} from '../components/MethodList';
 import {ScrollScreen} from '../../../../components/Screen/Screen';
+import {Column} from '../../../../components/Column/Column';
 
 const styles = StyleSheet.create({
   row: {
@@ -29,42 +30,6 @@ const styles = StyleSheet.create({
   rowItem: {
     flex: 1,
     flexGrow: 1,
-  },
-
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    padding: 8,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    elevation: 5,
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  input: {
-    flex: 1,
-    color: '#000',
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    padding: 8,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-    marginBottom: 8,
-  },
-
-  hint: {
-    color: '#e55',
-    fontSize: 12,
   },
 });
 
@@ -186,12 +151,9 @@ export function CreateRecipeScreen({
   }, [route]);
 
   return (
-    <KeyboardAvoidingView
-      style={{flex: 1}}
-      behavior="padding"
-      keyboardVerticalOffset={100}>
+    <KeyboardAvoidingView style={{flex: 1}} behavior="padding">
       <ScrollScreen>
-        <View>
+        <Column space={8} style={{marginBottom: 64}}>
           <TextInput
             mode="outlined"
             label="Name"
@@ -209,12 +171,11 @@ export function CreateRecipeScreen({
           <TextInput
             mode="outlined"
             label="Servings"
-            required
             value={formState.servings}
             onChangeText={updateForm('servings')}
             keyboardType="number-pad"
           />
-          <View style={[styles.row]}>
+          <View style={styles.row}>
             <TextInput
               style={styles.rowItem}
               mode="outlined"
@@ -246,7 +207,7 @@ export function CreateRecipeScreen({
               Create
             </Button>
           </View>
-        </View>
+        </Column>
       </ScrollScreen>
     </KeyboardAvoidingView>
   );
