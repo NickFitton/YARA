@@ -132,7 +132,7 @@ const useCreateForm = () => {
                 params: {id: recipeId},
               },
             ],
-            index: 0,
+            index: 1,
           }),
         );
       })
