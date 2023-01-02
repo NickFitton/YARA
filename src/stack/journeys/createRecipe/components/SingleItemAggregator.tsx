@@ -150,10 +150,6 @@ export function SingleItemAggregator({
     data,
     casing,
   );
-  const cleanedAggregatedItem =
-    casing === 'title'
-      ? itemToTitleCase(aggregatedItem)
-      : itemToSentenceCase(aggregatedItem);
   const navigation =
     useNavigation<NavigationProp<CreateRecipeStackParamList>>();
 
@@ -161,12 +157,12 @@ export function SingleItemAggregator({
     const headerRight = () => (
       <Appbar.Action
         icon="arrow-right"
-        onPress={() => onSubmit(text || cleanedAggregatedItem)}
+        onPress={() => onSubmit(text || aggregatedItem)}
       />
     );
 
     navigation.setOptions({headerRight});
-  }, [text, cleanedAggregatedItem, navigation, onSubmit]);
+  }, [text, aggregatedItem, navigation, onSubmit]);
 
   const keyExtractor = ([key]: [string, Item]): string => key;
   const renderItem = ({item: [key, value]}: {item: [string, Item]}) => (
@@ -184,9 +180,10 @@ export function SingleItemAggregator({
     <>
       <Screen style={{maxHeight: '100%'}}>
         <TextInput
+          multiline={casing === 'sentence'}
           mode="outlined"
           placeholder={`Your recipe ${itemType}`}
-          value={text || cleanedAggregatedItem}
+          value={text || aggregatedItem}
           onChangeText={newText => {
             setText(newText);
             clearSelection();
