@@ -1,7 +1,7 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
-import {Appbar, FAB, List, TextInput} from 'react-native-paper';
+import {Appbar, FAB, List, Text, TextInput} from 'react-native-paper';
 import {v4} from 'uuid';
 import {Screen} from '../../../../components/Screen/Screen';
 
@@ -109,6 +109,14 @@ const useData = (data: string[], casing: 'title' | 'sentence') => {
     removeItem(id);
   };
 
+  const clearSelection = () =>
+    setItems(pItems =>
+      Object.entries(pItems).reduce(
+        (agg, [key, value]) => ({...agg, [key]: {...value, selected: false}}),
+        {} as Record<string, Item>,
+      ),
+    );
+
   return {
     items,
     aggregatedItem:
@@ -120,6 +128,7 @@ const useData = (data: string[], casing: 'title' | 'sentence') => {
     onAdd,
     removeItem,
     addItem,
+    clearSelection,
   };
 };
 
@@ -136,7 +145,15 @@ export function SingleItemAggregator({
   onRetry: () => void;
   casing: 'title' | 'sentence';
 }) {
-  const {items, aggregatedItem, toggleItemSelect} = useData(data, casing);
+  const [text, setText] = useState<string>('');
+  const {items, aggregatedItem, toggleItemSelect, clearSelection} = useData(
+    data,
+    casing,
+  );
+  const cleanedAggregatedItem =
+    casing === 'title'
+      ? itemToTitleCase(aggregatedItem)
+      : itemToSentenceCase(aggregatedItem);
   const navigation =
     useNavigation<NavigationProp<CreateRecipeStackParamList>>();
 
@@ -144,16 +161,23 @@ export function SingleItemAggregator({
     const headerRight = () => (
       <Appbar.Action
         icon="arrow-right"
-        onPress={() => onSubmit(aggregatedItem)}
+        onPress={() => onSubmit(text || cleanedAggregatedItem)}
       />
     );
 
     navigation.setOptions({headerRight});
-  }, [aggregatedItem, navigation, onSubmit]);
+  }, [text, cleanedAggregatedItem, navigation, onSubmit]);
 
   const keyExtractor = ([key]: [string, Item]): string => key;
   const renderItem = ({item: [key, value]}: {item: [string, Item]}) => (
-    <ListItem item={value} id={key} toggleSelect={toggleItemSelect} />
+    <ListItem
+      item={value}
+      id={key}
+      toggleSelect={id => {
+        setText('');
+        toggleItemSelect(id);
+      }}
+    />
   );
 
   return (
@@ -162,11 +186,11 @@ export function SingleItemAggregator({
         <TextInput
           mode="outlined"
           placeholder={`Your recipe ${itemType}`}
-          value={
-            casing === 'title'
-              ? itemToTitleCase(aggregatedItem)
-              : itemToSentenceCase(aggregatedItem)
-          }
+          value={text || cleanedAggregatedItem}
+          onChangeText={newText => {
+            setText(newText);
+            clearSelection();
+          }}
         />
         <View style={{paddingVertical: 4}} />
         <FlatList

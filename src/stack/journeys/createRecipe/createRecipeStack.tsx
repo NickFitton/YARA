@@ -18,10 +18,26 @@ export function CreateRecipeStack() {
   const header = (props: NativeStackHeaderProps) => <Header {...props} />;
   return (
     <CreateRecipe.Navigator screenOptions={{header}}>
-      <CreateRecipe.Screen name="Name" component={NameScreen} />
-      <CreateRecipe.Screen name="Description" component={DescriptionScreen} />
-      <CreateRecipe.Screen name="Ingredients" component={IngredientsScreen} />
-      <CreateRecipe.Screen name="Methods" component={MethodsScreen} />
+      <CreateRecipe.Screen
+        options={{title: 'Scan Name'}}
+        name="Name"
+        component={NameScreen}
+      />
+      <CreateRecipe.Screen
+        options={{title: 'Scan Description'}}
+        name="Description"
+        component={DescriptionScreen}
+      />
+      <CreateRecipe.Screen
+        options={{title: 'Scan Ingredients'}}
+        name="Ingredients"
+        component={IngredientsScreen}
+      />
+      <CreateRecipe.Screen
+        options={{title: 'Scan Methods'}}
+        name="Methods"
+        component={MethodsScreen}
+      />
     </CreateRecipe.Navigator>
   );
 }

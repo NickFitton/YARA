@@ -1,8 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, View} from 'react-native';
 import {RectButton, Swipeable} from 'react-native-gesture-handler';
-import {Appbar, FAB, List, TextInput, useTheme} from 'react-native-paper';
+import {Appbar, Card, FAB, List, useTheme, Text} from 'react-native-paper';
 import {v4} from 'uuid';
 import {Screen} from '../../../../components/Screen/Screen';
 import {itemToSentenceCase} from '../../../../utils/string';
@@ -254,11 +254,11 @@ export function ItemAggregator({
   return (
     <>
       <Screen style={{maxHeight: '100%'}}>
-        <TextInput
-          mode="outlined"
-          placeholder="Dummy manual input"
-          value={aggregatedItem}
-        />
+        <Card>
+          <Card.Content>
+            <Text variant="bodySmall">{aggregatedItem}</Text>
+          </Card.Content>
+        </Card>
         <FlatList
           data={data}
           keyExtractor={keyExtractor}
