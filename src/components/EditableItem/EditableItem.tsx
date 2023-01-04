@@ -6,11 +6,13 @@ export function EditableItem({
   onValueChange,
   onDelete,
   index,
+  multiline,
 }: {
   value: string;
   onValueChange: (newValue: string) => void;
   onDelete: () => void;
   index?: number;
+  multiline: boolean;
 }) {
   const [input, setInput] = useState<string>(value);
   const onSubmit = () => {
@@ -19,6 +21,7 @@ export function EditableItem({
 
   return (
     <TextInput
+      multiline={multiline}
       mode="outlined"
       placeholder="1 Carrot"
       returnKeyType="next"

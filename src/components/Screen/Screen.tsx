@@ -11,10 +11,13 @@ const useStyles = (theme: MD3Theme) =>
     },
   });
 
-export function ScrollScreen({children}: PropsWithChildren<unknown>) {
+export function ScrollScreen({
+  children,
+  style,
+}: PropsWithChildren<{style?: ViewStyle}>) {
   const theme = useTheme();
   const styles = useStyles(theme);
-  return <ScrollView style={styles.screen}>{children}</ScrollView>;
+  return <ScrollView style={[styles.screen, style]}>{children}</ScrollView>;
 }
 
 export function Screen({

@@ -27,6 +27,7 @@ export function MethodList({
       {value.map((step, index) => (
         <View key={step.id}>
           <EditableItem
+            multiline
             index={index + 1}
             onDelete={() => {
               onChange(value.filter(filterStep => filterStep.id !== step.id));
@@ -49,6 +50,7 @@ export function MethodList({
         </View>
       ))}
       <TextInput
+        multiline
         mode="outlined"
         placeholder="Put the lime in the coconut"
         returnKeyType="next"
