@@ -1,7 +1,7 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
-import {Appbar, FAB, List, Text, TextInput} from 'react-native-paper';
+import {Appbar, FAB, List, TextInput} from 'react-native-paper';
 import {v4} from 'uuid';
 import {Screen} from '../../../../components/Screen/Screen';
 

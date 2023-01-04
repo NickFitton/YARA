@@ -1,4 +1,4 @@
-import React, {PropsWithChildren, useCallback, useRef} from 'react';
+import React, {PropsWithChildren, useCallback, useRef, useEffect} from 'react';
 import {View, StyleSheet, Pressable, Animated} from 'react-native';
 import BottomSheet, {
   BottomSheetProps,
@@ -6,7 +6,6 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import {useTheme} from 'react-native-paper';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {useEffect} from 'react';
 
 export function BottomSheetWrapper({
   children,
