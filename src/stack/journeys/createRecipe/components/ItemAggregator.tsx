@@ -54,8 +54,15 @@ type ItemState = {
 
 type Item = ItemData & ItemState;
 
+const NULLISH_STATE: ItemState = {selected: false, used: true} as ItemState;
+
 function Separator() {
-  return <View style={{borderBottomColor: '#ddd', borderBottomWidth: 1}} />;
+  const {colors} = useTheme();
+  return (
+    <View
+      style={{borderBottomWidth: 1, borderColor: colors.elevation.level5}}
+    />
+  );
 }
 
 function SwipeItem({
@@ -251,6 +258,13 @@ export function ItemAggregator({
     .map(itemData => itemData?.value)
     .join(' ');
 
+  const items: Item[] = data
+    .map(itemData => {
+      const itemState = state.find(({id, used}) => !used && id === itemData.id);
+      return {...itemData, ...(itemState ?? NULLISH_STATE)};
+    })
+    .filter(item => !item.used);
+
   return (
     <>
       <Screen style={{maxHeight: '100%'}}>
@@ -259,8 +273,14 @@ export function ItemAggregator({
             <Text variant="bodySmall">{aggregatedItem}</Text>
           </Card.Content>
         </Card>
+        <View style={{height: 16}} />
         <FlatList
-          data={data}
+          style={{
+            flexShrink: 1,
+            flexGrow: 1,
+            marginHorizontal: -16,
+          }}
+          data={items}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           ItemSeparatorComponent={Separator}
