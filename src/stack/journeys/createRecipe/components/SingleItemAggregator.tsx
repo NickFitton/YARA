@@ -1,7 +1,7 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
-import {Appbar, FAB, List, TextInput} from 'react-native-paper';
+import {Appbar, FAB, List, TextInput, useTheme} from 'react-native-paper';
 import {v4} from 'uuid';
 import {Screen} from '../../../../components/Screen/Screen';
 
@@ -40,6 +40,14 @@ function ListItem({
       onPress={() => toggleSelect(id)}
       title={item.value}
       right={right}
+    />
+  );
+}
+function Border() {
+  const {colors} = useTheme();
+  return (
+    <View
+      style={{borderBottomWidth: 1, borderColor: colors.elevation.level5}}
     />
   );
 }
@@ -194,6 +202,7 @@ export function SingleItemAggregator({
           data={Object.entries(items)}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
+          ItemSeparatorComponent={<Border />}
         />
       </Screen>
 

@@ -1,5 +1,11 @@
 import React, {PropsWithChildren} from 'react';
-import {StyleSheet, ScrollView, View, ViewStyle} from 'react-native';
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  ViewStyle,
+  SafeAreaView,
+} from 'react-native';
 import {MD3Theme, useTheme} from 'react-native-paper';
 
 const useStyles = (theme: MD3Theme) =>
@@ -26,5 +32,9 @@ export function Screen({
 }: PropsWithChildren<{style?: ViewStyle}>) {
   const theme = useTheme();
   const styles = useStyles(theme);
-  return <View style={[styles.screen, style]}>{children}</View>;
+  return (
+    <SafeAreaView>
+      <View style={[styles.screen, style]}>{children}</View>
+    </SafeAreaView>
+  );
 }
