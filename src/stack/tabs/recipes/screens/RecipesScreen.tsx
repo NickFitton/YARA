@@ -1,13 +1,8 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {PropsWithChildren} from 'react';
 import {View, TouchableOpacity, FlatList} from 'react-native';
-import {
-  Card,
-  Paragraph,
-  ActivityIndicator,
-  Text,
-  FAB,
-} from 'react-native-paper';
+import {Card, Paragraph, ActivityIndicator, Text} from 'react-native-paper';
+import {FAB} from '../../../../components/FAB/FAB';
 
 import {Screen} from '../../../../components/Screen/Screen';
 import {useRecipe, useRecipes} from '../../../../db/recipeHooks';
@@ -93,11 +88,7 @@ export function RecipesScreen() {
               renderItem={({item: {id}}) => <RecipePreview id={id} />}
             />
           </Screen>
-          <FAB
-            icon="plus"
-            style={{position: 'absolute', bottom: 16, right: 16}}
-            onPress={startCreateRecipeJourney}
-          />
+          <FAB icon="plus" onPress={startCreateRecipeJourney} />
         </>
       );
     case 'loading':
