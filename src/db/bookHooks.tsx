@@ -1,8 +1,9 @@
-import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {QueryClient, useQuery, useQueryClient} from '@tanstack/react-query';
 import {Transaction} from 'react-native-sqlite-storage';
 import {v4} from 'uuid';
 import {useDatabase} from '../providers/database/Provider';
 import {BookModel, PartialBook} from './models/Book';
+import {RecipeBook} from './models/RecipeBook';
 import {DBRecord} from './models/shared';
 
 function getQuickBooks(
@@ -97,4 +98,31 @@ export const useBooks = () => {
         );
       }),
   });
+};
+
+export const useAddToBook = (recipeId: string) => {
+  const db = useDatabase();
+  const queryClient = useQueryClient();
+
+  const addToBook = ({bookId}: Pick<RecipeBook, 'bookId'>): Promise<void> =>
+    new Promise((resolve, reject) => {
+      db.transaction(initialTransaction => {
+        const id = v4();
+        initialTransaction.executeSql(
+          'INSERT INTO RecipeBook (id, bookId, recipeId) VALUES (?, ?, ?)',
+          [id, bookId, recipeId],
+          () => {
+            queryClient
+              .invalidateQueries(['books', bookId])
+              .catch(console.trace);
+            resolve();
+          },
+          (_, err) => {
+            reject(err);
+          },
+        );
+      }).catch(console.log);
+    });
+
+  return {addToBook};
 };
