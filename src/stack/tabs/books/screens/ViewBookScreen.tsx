@@ -32,12 +32,12 @@ export function ViewBookScreen({route}: Props) {
       return (
         <ScrollScreen>
           <Text variant="headlineMedium">{name}</Text>
-          {author ? <Text variant="headlineSmall">by {author}</Text> : null}
-          {publisher ? (
-            <Text variant="headlineSmall">published by {publisher}</Text>
-          ) : null}
+          <Text variant="headlineSmall">{description}</Text>
+          {author ? <Text variant="bodyLarge">by {author}</Text> : null}
 
-          <Text variant="bodyLarge">{description}</Text>
+          {publisher ? (
+            <Text variant="bodyLarge">published by {publisher}</Text>
+          ) : null}
         </ScrollScreen>
       );
     }

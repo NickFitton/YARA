@@ -5,23 +5,26 @@ import {useDatabase} from '../providers/database/Provider';
 import {BookModel, PartialBook} from './models/Book';
 import {DBRecord} from './models/shared';
 
-const getQuickBooks = (tx: Transaction): Promise<PartialBook[]> =>
-  new Promise((resolve, reject) => {
-    tx.executeSql(
-      'SELECT id, name, description FROM Book ORDER BY updatedAt DESC',
-      undefined,
-      (_, results) => {
-        const rows: PartialBook[] = [];
-        for (let i = 0; i < results.rows.length; i++) {
-          rows.push(results.rows.item(i) as PartialBook);
-        }
-        resolve(rows);
-      },
-      e => {
-        reject(e);
-      },
-    );
-  });
+function getQuickBooks(
+  tx: Transaction,
+  resolve: (value: PartialBook[]) => void,
+  reject: (reason: unknown) => void,
+): void {
+  return tx.executeSql(
+    'SELECT id, name, description FROM Book ORDER BY updatedAt DESC',
+    undefined,
+    (_, results) => {
+      const rows: PartialBook[] = [];
+      for (let i = 0; i < results.rows.length; i++) {
+        rows.push(results.rows.item(i) as PartialBook);
+      }
+      resolve(rows);
+    },
+    e => {
+      reject(e);
+    },
+  );
+}
 
 const getBookByBookId = (tx: Transaction, bookId: string): Promise<BookModel> =>
   new Promise((resolve, reject) => {
@@ -89,7 +92,9 @@ export const useBooks = () => {
     queryKey: ['Books'],
     queryFn: () =>
       new Promise((resolve, reject) => {
-        db.readTransaction(tx => resolve(getQuickBooks(tx)), reject);
+        db.readTransaction(tx => getQuickBooks(tx, resolve, reject)).catch(
+          console.error,
+        );
       }),
   });
 };
