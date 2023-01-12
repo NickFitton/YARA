@@ -1,5 +1,4 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {useQueries, useQueryClient} from '@tanstack/react-query';
 import React, {PropsWithChildren} from 'react';
 import {View, TouchableOpacity, FlatList} from 'react-native';
 import {Card, Paragraph, ActivityIndicator, Text} from 'react-native-paper';

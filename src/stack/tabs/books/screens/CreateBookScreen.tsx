@@ -1,8 +1,4 @@
-import {
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {View, Alert, SafeAreaView} from 'react-native';
 import {Button, TextInput} from 'react-native-paper';
@@ -24,7 +20,7 @@ const useCreateForm = () => {
   const navigation = useNavigation<NavigationProp<BookStackParamList>>();
   const createBook = (book: BookFields) => {
     create(book)
-      .then(id => {
+      .then(() => {
         navigation.goBack();
       })
       .catch(e => {
@@ -35,13 +31,9 @@ const useCreateForm = () => {
   return {createBook};
 };
 
-export function CreateBookScreen({
-  route,
-}: {
-  route: RouteProp<BookStackParamList, 'Create Book'>;
-}) {
+export function CreateBookScreen() {
   const {createBook} = useCreateForm();
-  const [formState, setFormState] = useState<BookFields>({
+  const [formState, setFormState] = useState<Omit<BookFields, 'recipes'>>({
     name: '',
     description: '',
     author: '',

@@ -9,18 +9,18 @@ import {getRecipesByBookId} from './recipeHooks';
 
 function getQuickBooks(
   tx: Transaction,
+  query: string,
   resolve: (value: PartialBook[]) => void,
   reject: (reason: unknown) => void,
 ): void {
   return tx.executeSql(
-    'SELECT id, name, description FROM Book ORDER BY updatedAt DESC',
-    undefined,
+    'SELECT id, name, description FROM Book WHERE name LIKE ? ORDER BY updatedAt DESC',
+    [`%${query}%`],
     (_, results) => {
       const rows: PartialBook[] = [];
       for (let i = 0; i < results.rows.length; i++) {
         rows.push(results.rows.item(i) as PartialBook);
       }
-      console.log(rows);
       resolve(rows);
     },
     e => {
@@ -93,16 +93,16 @@ export const useCreateBook = () => {
   return {createBook};
 };
 
-export const useBooks = () => {
+export const useBooks = (query: string) => {
   const db = useDatabase();
 
   return useQuery<PartialBook[]>({
-    queryKey: ['Books'],
+    queryKey: ['Books', 'search', query],
     queryFn: () =>
       new Promise((resolve, reject) => {
-        db.readTransaction(tx => getQuickBooks(tx, resolve, reject)).catch(
-          console.error,
-        );
+        db.readTransaction(tx =>
+          getQuickBooks(tx, query, resolve, reject),
+        ).catch(console.error);
       }),
   });
 };
@@ -119,7 +119,6 @@ export const useAddToBook = (recipeId: string) => {
           'INSERT INTO RecipeBook (id, bookId, recipeId) VALUES (?, ?, ?)',
           [id, bookId, recipeId],
           () => {
-            console.log('Insert success!');
             queryClient
               .invalidateQueries(['books', bookId])
               .catch(console.trace);
@@ -141,25 +140,13 @@ export const getBookByRecipeId = (
 ): Promise<BookModel | undefined> =>
   new Promise((resolve, reject) => {
     tx.executeSql(
-      'SELECT * FROM RecipeBook WHERE recipeId=?;',
+      `SELECT A.* FROM Book A WHERE A.id in ( select B.bookId from RecipeBook B where B.recipeId = ? );`,
       [recipeId],
-      (nextTx, results) => {
-        if (results.rows.length === 0) {
-          resolve(undefined);
-        }
-        const join = results.rows.item(0) as RecipeBook;
-        console.log(join);
-        nextTx.executeSql(
-          'SELECT * FROM Book WHERE id=?',
-          [join.bookId],
-          (_, recipeResults) => {
-            const book = recipeResults.rows.item(0) as BookModel;
-            resolve(book);
-          },
-          (_, e) => reject(e),
-        );
+      (_, recipeResults) => {
+        const book = recipeResults.rows.item(0) as BookModel;
+        resolve(book);
       },
-      (_, e) => reject(e),
+      error => reject(error),
     );
   });
 
