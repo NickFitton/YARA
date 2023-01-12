@@ -19,12 +19,12 @@ export function ErrorFiller({
         justifyContent: 'center',
       }}>
       <View>
-        <Text style={{color: '#111'}}>Something went wrong</Text>
-        <Text style={{color: '#111'}}>
+        <Text variant="displayMedium">Something went wrong</Text>
+        <Text variant="bodyMedium">
           We couldn&apos;t retrieve your {subject}, you can go back and try
           again.
         </Text>
-        <Text style={{color: '#111'}}>{JSON.stringify(error)}</Text>
+        <Text variant="displaySmall">{JSON.stringify(error)}</Text>
       </View>
     </View>
   );
