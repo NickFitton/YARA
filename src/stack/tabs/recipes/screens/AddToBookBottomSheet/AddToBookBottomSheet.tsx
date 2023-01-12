@@ -22,7 +22,7 @@ import {RecipeModel} from '../../../../../db/models/Recipe';
 import {BottomSheetWrapper} from '../../../../../components/BottomSheet/BottomSheet';
 import {SuperStackParamList} from '../../../../RootStackParam';
 import {SearchBook} from '../../../../../db/models/Book';
-import {useAddToBook, useBookSearch} from '../../../../../db/bookHooks';
+import {useAddToBook, useBookSearch} from '../../../../../db/hooks/bookHooks';
 import {useDebounce} from '../../../../../utils/hooks/useDebounce';
 
 function NoRatings({onCreateBook: onAddRating}: {onCreateBook: () => void}) {

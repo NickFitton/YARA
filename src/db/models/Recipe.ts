@@ -19,3 +19,5 @@ export interface RecipeModel extends DBRecord {
 export type RecipePreview = Required<
   Pick<RecipeModel, 'id' | 'name' | 'description'>
 >;
+
+export type BaseRecipe = Omit<RecipeModel, 'ingredients' | 'method'>;

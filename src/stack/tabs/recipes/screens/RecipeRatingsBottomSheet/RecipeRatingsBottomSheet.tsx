@@ -22,7 +22,7 @@ import {
 
 import {RecipeStackParamList} from '../../RecipeStackParam';
 import {chartTheme} from '../../../../../components/charts/theme';
-import {useRecipeRatings} from '../../../../../db/recipeHooks';
+import {useRecipeRatings} from '../../../../../db/hooks/recipeHooks';
 import {RatingModel} from '../../../../../db/models/Rating';
 import {RecipeModel} from '../../../../../db/models/Recipe';
 import {BottomSheetWrapper} from '../../../../../components/BottomSheet/BottomSheet';
@@ -238,7 +238,7 @@ function RecipeRatings({id}: Pick<RecipeModel, 'id'>) {
         return <RatingsError reason="undefined" />;
       }
       if (data.data.length === 0) {
-        return <NoRatings id={id} onAddRating={onAddRating} />;
+        return <NoRatings onAddRating={onAddRating} />;
       }
       return <RatingsDisplay ratings={data.data} onAddRating={onAddRating} />;
 

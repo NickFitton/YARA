@@ -14,7 +14,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {v4} from 'uuid';
 import {Screen} from '../../../../components/Screen/Screen';
-import {Rating, useRateRecipe} from '../../../../db/recipeHooks';
+import {Rating, useRateRecipe} from '../../../../db/hooks/recipeHooks';
 import {SuperStackParamList} from '../../../RootStackParam';
 import {MakeRecipeStackParamList} from '../types';
 

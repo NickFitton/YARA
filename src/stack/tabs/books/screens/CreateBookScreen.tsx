@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {View, Alert, SafeAreaView} from 'react-native';
 import {Button, TextInput} from 'react-native-paper';
 
-import {useCreateBook} from '../../../../db/bookHooks';
+import {useCreateBook} from '../../../../db/hooks/bookHooks';
 
 import {ScrollScreen} from '../../../../components/Screen/Screen';
 import {Column} from '../../../../components/Column/Column';

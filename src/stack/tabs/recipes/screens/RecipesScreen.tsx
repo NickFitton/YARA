@@ -5,7 +5,7 @@ import {Card, Paragraph, ActivityIndicator, Text} from 'react-native-paper';
 import {FAB} from '../../../../components/FAB/FAB';
 
 import {Screen} from '../../../../components/Screen/Screen';
-import {useRecipe, useRecipes} from '../../../../db/recipeHooks';
+import {useRecipe, useRecipes} from '../../../../db/hooks/recipeHooks';
 import {useCreateRecipeJourney} from '../../../journeys/createRecipe/utils';
 import {RecipeStackParamList} from '../RecipeStackParam';
 

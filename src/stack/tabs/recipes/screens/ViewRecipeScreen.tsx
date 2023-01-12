@@ -9,9 +9,9 @@ import {Appbar, Chip, FAB, Text} from 'react-native-paper';
 
 import {Row} from '../../../../components/Row/Row';
 import {ScrollScreen} from '../../../../components/Screen/Screen';
+import {useDeleteRecipe, useRecipe} from '../../../../db/hooks/recipeHooks';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
-import {useDeleteRecipe, useRecipe} from '../../../../db/recipeHooks';
 import {toString} from '../../../../utils/measurement';
 import {SuperStackParamList} from '../../../RootStackParam';
 import {RecipeStackParamList} from '../RecipeStackParam';
