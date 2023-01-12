@@ -36,12 +36,15 @@ export const useCreateBook = () => {
   const db = useDatabase();
   const queryClient = useQueryClient();
 
-  const createBook = (book: Omit<BookModel, keyof DBRecord>): Promise<string> =>
+  const createBook = (book: Omit<BookModel, keyof DBRecord>): Promise<void> =>
     new Promise((resolve, reject) => {
       db.transaction(initialTransaction => {
         createNewBook(initialTransaction, book, queryClient, resolve, reject);
-      }).catch(console.log);
-    });
+      }).catch(reject);
+    })
+      .then(() => queryClient.invalidateQueries(['books']))
+      .then(() => queryClient.invalidateQueries(['BookSearch']))
+      .catch(console.log);
 
   return {createBook};
 };
@@ -50,7 +53,7 @@ export const useBooks = (query: string) => {
   const db = useDatabase();
 
   return useQuery<PartialBook[]>({
-    queryKey: ['Books', 'search', query],
+    queryKey: ['BookSearch', query],
     queryFn: () =>
       new Promise((resolve, reject) => {
         db.readTransaction(tx =>
@@ -72,16 +75,15 @@ export const useAddToBook = (recipeId: string) => {
           'INSERT INTO RecipeBook (id, bookId, recipeId) VALUES (?, ?, ?)',
           [id, bookId, recipeId],
           () => {
-            queryClient
-              .invalidateQueries(['books', bookId])
-              .catch(console.trace);
             resolve();
           },
           (_, err) => {
             reject(err);
           },
         );
-      }).catch(console.log);
+      })
+        .then(() => queryClient.invalidateQueries(['books', bookId]))
+        .catch(console.log);
     });
 
   return {addToBook};
@@ -91,7 +93,7 @@ export const useBookSearch = (query: string) => {
   const db = useDatabase();
 
   return useQuery<SearchBook[]>({
-    queryKey: ['Book Search', query],
+    queryKey: ['BookSearch', query],
     queryFn: () =>
       new Promise((resolve, reject) => {
         db.readTransaction(tx => searchBooks(tx, query, resolve, reject)).catch(

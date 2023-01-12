@@ -21,27 +21,6 @@ export const getBookByRecipeId = (
     );
   });
 
-export const searchBooks = (
-  tx: Transaction,
-  query: string,
-  resolve: (value: SearchBook[]) => void,
-  reject: (reason: unknown) => void,
-): void =>
-  tx.executeSql(
-    'SELECT id, name FROM Book WHERE name LIKE ? ORDER BY updatedAt DESC',
-    [`%${query}%`],
-    (_, results) => {
-      const rows: SearchBook[] = [];
-      for (let i = 0; i < results.rows.length; i++) {
-        rows.push(results.rows.item(i) as SearchBook);
-      }
-      resolve(rows);
-    },
-    e => {
-      reject(e);
-    },
-  );
-
 export const getQuickBooks = (
   tx: Transaction,
   query: string,
@@ -62,6 +41,13 @@ export const getQuickBooks = (
       reject(e);
     },
   );
+
+export const searchBooks = (
+  tx: Transaction,
+  query: string,
+  resolve: (value: SearchBook[]) => void,
+  reject: (reason: unknown) => void,
+): void => getQuickBooks(tx, query, resolve, reject);
 
 export const getBookByBookId = (
   tx: Transaction,
@@ -102,7 +88,6 @@ export function createNewBook(
       book.imageLocation,
     ],
     () => {
-      queryClient.invalidateQueries(['books']).catch(console.trace);
       resolve(bookId);
     },
     (_, err) => reject(err),

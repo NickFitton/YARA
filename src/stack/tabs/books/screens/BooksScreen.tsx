@@ -67,7 +67,7 @@ function BookFlatList() {
 export function BooksScreen({navigation}: Props) {
   return (
     <>
-      <Screen style={{padding: 0}}>
+      <Screen style={{padding: 0, flex: 1, flexDirection: 'column'}}>
         <BookFlatList />
       </Screen>
       <FAB icon="plus" onPress={() => navigation.navigate('Create Book')} />
