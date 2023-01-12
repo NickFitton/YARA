@@ -74,7 +74,13 @@ export const useAddToBook = (recipeId: string) => {
         initialTransaction.executeSql(
           'INSERT INTO RecipeBook (id, bookId, recipeId) VALUES (?, ?, ?)',
           [id, bookId, recipeId],
-          () => {
+          tx => {
+            tx.executeSql('UPDATE Book SET updatedAt = ? WHERE id=?;', [
+              new Date().toString(),
+              bookId,
+            ])
+              .then(() => resolve())
+              .catch(reject);
             resolve();
           },
           (_, err) => {
@@ -82,7 +88,8 @@ export const useAddToBook = (recipeId: string) => {
           },
         );
       })
-        .then(() => queryClient.invalidateQueries(['books', bookId]))
+        .then(() => queryClient.invalidateQueries(['books']))
+        .then(() => queryClient.invalidateQueries(['BookSearch']))
         .catch(console.log);
     });
 
