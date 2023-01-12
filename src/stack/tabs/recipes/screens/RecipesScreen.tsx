@@ -1,4 +1,5 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {useQueries, useQueryClient} from '@tanstack/react-query';
 import React, {PropsWithChildren} from 'react';
 import {View, TouchableOpacity, FlatList} from 'react-native';
 import {Card, Paragraph, ActivityIndicator, Text} from 'react-native-paper';
@@ -82,6 +83,10 @@ export function RecipesScreen() {
         <>
           <Screen>
             <FlatList
+              refreshing={data.isRefetching}
+              onRefresh={() => {
+                data.refetch().catch(console.error);
+              }}
               ItemSeparatorComponent={Seperator}
               ListEmptyComponent={ListEmpty}
               data={data.data}

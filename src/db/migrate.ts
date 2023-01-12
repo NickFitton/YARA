@@ -55,6 +55,13 @@ imageLocation TEXT,
 createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );`,
+  `create TABLE IF NOT EXISTS RecipeBook(
+id TEXT PRIMARY KEY NOT NULL,
+bookId TEXT NOT NULL,
+recipeId TEXT NOT NULL UNIQUE,
+createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);`,
 ];
 
 export const teardown = [
@@ -64,13 +71,14 @@ export const teardown = [
   'DROP TABLE IF EXISTS Recipe;',
   'DROP TABLE IF EXISTS Rating;',
   'DROP TABLE IF EXISTS Book;',
+  'DROP TABLE IF EXISTS RecipeBook;',
 ];
 
 export const migrate = (db: SQLiteDatabase): Promise<void> =>
   new Promise((resolve, reject) => {
     db.transaction(txn => {
       manifest.forEach(tableDef => {
-        txn.executeSql(tableDef, []).catch(resolve);
+        txn.executeSql(tableDef, []).catch(reject);
       });
       resolve();
     }).catch(reject);

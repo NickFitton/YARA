@@ -1,10 +1,11 @@
-import {QueryClient, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {Transaction} from 'react-native-sqlite-storage';
 import {v4} from 'uuid';
 import {useDatabase} from '../providers/database/Provider';
-import {BookModel, PartialBook} from './models/Book';
+import {BookModel, PartialBook, SearchBook} from './models/Book';
 import {RecipeBook} from './models/RecipeBook';
 import {DBRecord} from './models/shared';
+import {getRecipesByBookId} from './recipeHooks';
 
 function getQuickBooks(
   tx: Transaction,
@@ -19,6 +20,7 @@ function getQuickBooks(
       for (let i = 0; i < results.rows.length; i++) {
         rows.push(results.rows.item(i) as PartialBook);
       }
+      console.log(rows);
       resolve(rows);
     },
     e => {
@@ -50,9 +52,14 @@ export const useBook = (bookId: string) => {
     queryKey: ['books', bookId],
     queryFn: () =>
       new Promise((resolve, reject) => {
-        db.readTransaction(tx => resolve(getBookByBookId(tx, bookId))).catch(
-          e => reject(e),
-        );
+        db.readTransaction(tx => {
+          Promise.all([
+            getBookByBookId(tx, bookId),
+            getRecipesByBookId(tx, bookId),
+          ])
+            .then(([book, recipes]) => resolve({...book, recipes}))
+            .catch(e => reject(e));
+        }).catch(e => reject(e));
       }),
   });
 };
@@ -112,6 +119,7 @@ export const useAddToBook = (recipeId: string) => {
           'INSERT INTO RecipeBook (id, bookId, recipeId) VALUES (?, ?, ?)',
           [id, bookId, recipeId],
           () => {
+            console.log('Insert success!');
             queryClient
               .invalidateQueries(['books', bookId])
               .catch(console.trace);
@@ -125,4 +133,67 @@ export const useAddToBook = (recipeId: string) => {
     });
 
   return {addToBook};
+};
+
+export const getBookByRecipeId = (
+  tx: Transaction,
+  recipeId: string,
+): Promise<BookModel | undefined> =>
+  new Promise((resolve, reject) => {
+    tx.executeSql(
+      'SELECT * FROM RecipeBook WHERE recipeId=?;',
+      [recipeId],
+      (nextTx, results) => {
+        if (results.rows.length === 0) {
+          resolve(undefined);
+        }
+        const join = results.rows.item(0) as RecipeBook;
+        console.log(join);
+        nextTx.executeSql(
+          'SELECT * FROM Book WHERE id=?',
+          [join.bookId],
+          (_, recipeResults) => {
+            const book = recipeResults.rows.item(0) as BookModel;
+            resolve(book);
+          },
+          (_, e) => reject(e),
+        );
+      },
+      (_, e) => reject(e),
+    );
+  });
+
+const SearchBooks = (
+  tx: Transaction,
+  query: string,
+  resolve: (value: SearchBook[]) => void,
+  reject: (reason: unknown) => void,
+): void =>
+  tx.executeSql(
+    'SELECT id, name FROM Book WHERE name LIKE ? ORDER BY updatedAt DESC',
+    [`%${query}%`],
+    (_, results) => {
+      const rows: SearchBook[] = [];
+      for (let i = 0; i < results.rows.length; i++) {
+        rows.push(results.rows.item(i) as SearchBook);
+      }
+      resolve(rows);
+    },
+    e => {
+      reject(e);
+    },
+  );
+
+export const useBookSearch = (query: string) => {
+  const db = useDatabase();
+
+  return useQuery<SearchBook[]>({
+    queryKey: ['Book Search', query],
+    queryFn: () =>
+      new Promise((resolve, reject) => {
+        db.readTransaction(tx => SearchBooks(tx, query, resolve, reject)).catch(
+          console.error,
+        );
+      }),
+  });
 };

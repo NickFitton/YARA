@@ -10,4 +10,5 @@ export type RecipeStackParamList = {
   'Create Recipe'?: RecipeData;
   'View Recipe': {id: string};
   'Recipe Ratings': {id: string};
+  'Add to Book': {id: string};
 };

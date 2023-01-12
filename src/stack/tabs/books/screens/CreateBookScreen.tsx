@@ -1,5 +1,4 @@
 import {
-  CommonActions,
   NavigationProp,
   RouteProp,
   useNavigation,
@@ -8,7 +7,6 @@ import React, {useState} from 'react';
 import {View, Alert, SafeAreaView} from 'react-native';
 import {Button, TextInput} from 'react-native-paper';
 
-import {randomHex} from '../../../../utils/hex';
 import {useCreateBook} from '../../../../db/bookHooks';
 
 import {ScrollScreen} from '../../../../components/Screen/Screen';
@@ -27,20 +25,7 @@ const useCreateForm = () => {
   const createBook = (book: BookFields) => {
     create(book)
       .then(id => {
-        navigation.dispatch(state =>
-          CommonActions.reset({
-            ...state,
-            routes: [
-              state.routes[0],
-              {
-                key: `View Book-${randomHex(8)}`,
-                name: 'View Book',
-                params: {id},
-              },
-            ],
-            index: 1,
-          }),
-        );
+        navigation.goBack();
       })
       .catch(e => {
         Alert.alert(JSON.stringify(e));

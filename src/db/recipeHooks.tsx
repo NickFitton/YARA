@@ -7,10 +7,11 @@ import {
   RawIngredientModel,
 } from './models/Ingredient';
 import {MethodModel, RawMethodModel} from './models/Method';
-import {RecipeModel} from './models/Recipe';
+import {RecipeModel, RecipePreview} from './models/Recipe';
 import {useDatabase} from '../providers/database/Provider';
 import {RatingModel} from './models/Rating';
 import {DBRecord} from './models/shared';
+import {getBookByRecipeId} from './bookHooks';
 
 type BaseRecipe = Omit<RecipeModel, 'ingredients' | 'method'>;
 
@@ -211,36 +212,50 @@ export const useRecipe = (recipeId: string) => {
           );
           const rawMethodPromise = getRawMethodByRecipeId(tx, recipeId);
           const recipePromise = getRecipeByRecipeId(tx, recipeId);
+          const bookPromise = getBookByRecipeId(tx, recipeId);
 
           Promise.all([
             recipePromise,
             parsedIngredientsPromise,
             rawIngredientsPromise,
             rawMethodPromise,
+            bookPromise,
           ])
-            .then(([recipe, parsedIngredients, rawIngredients, rawMethod]) => {
-              const raw: IngredientModel[] = rawIngredients.map(ingredient => ({
-                ...ingredient,
-                type: 'raw',
-              }));
-              const parsed: IngredientModel[] = parsedIngredients.map(
-                ingredient => ({
-                  ...ingredient,
-                  type: 'parsed',
-                }),
-              );
-              const ingredients: IngredientModel[] = [...parsed, ...raw];
-              const method = [
-                ...rawMethod.map(
-                  rMethod => ({...rMethod, type: 'raw'} as MethodModel),
-                ),
-              ];
-              resolve({
-                ...recipe,
-                ingredients,
-                method,
-              });
-            })
+            .then(
+              ([
+                recipe,
+                parsedIngredients,
+                rawIngredients,
+                rawMethod,
+                book,
+              ]) => {
+                console.log(book);
+                const raw: IngredientModel[] = rawIngredients.map(
+                  ingredient => ({
+                    ...ingredient,
+                    type: 'raw',
+                  }),
+                );
+                const parsed: IngredientModel[] = parsedIngredients.map(
+                  ingredient => ({
+                    ...ingredient,
+                    type: 'parsed',
+                  }),
+                );
+                const ingredients: IngredientModel[] = [...parsed, ...raw];
+                const method = [
+                  ...rawMethod.map(
+                    rMethod => ({...rMethod, type: 'raw'} as MethodModel),
+                  ),
+                ];
+                resolve({
+                  ...recipe,
+                  ingredients,
+                  method,
+                  book,
+                });
+              },
+            )
             .catch(e => {
               console.log(recipeId);
               console.trace(e);
@@ -342,3 +357,28 @@ export const useRecipes = () => {
       }),
   });
 };
+
+export const getRecipesByBookId = (tx: Transaction, bookId: string) =>
+  new Promise<RecipePreview[]>((resolve, reject) => {
+    tx.executeSql(
+      `SELECT
+         A.id, A.name, A.description
+     FROM
+         Recipe A
+     WHERE
+         A.id in (
+             select B.recipeId from RecipeBook B where B.bookId = ?
+);`,
+      [bookId],
+      (_, success) => {
+        console.log(`Oh my god it actually worked: ${success.rows.length}`);
+        const data = [];
+        for (let i = 0; i < success.rows.length; i++) {
+          data.push(success.rows.item(i) as RecipePreview);
+        }
+        console.log(data);
+        resolve(data);
+      },
+      error => reject(error),
+    );
+  });

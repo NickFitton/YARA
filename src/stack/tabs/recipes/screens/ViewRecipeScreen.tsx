@@ -129,6 +129,19 @@ export function ViewRecipeScreen({route, navigation}: Props) {
         params: {screen: 'Recipe Ratings', params: {id: route.params.id}},
       });
 
+    const goToBook = (bookId: string) =>
+      navigation.navigate('Tabs', {
+        screen: 'Books',
+        params: {screen: 'View Book', params: {id: bookId}},
+      });
+
+    const connectToBook = () =>
+      navigation.navigate('Tabs', {
+        screen: 'Recipes',
+        params: {screen: 'Add to Book', params: {id: route.params.id}},
+      });
+
+    const hasBook = !!recipe.data?.book;
     const header = () => (
       <Appbar.Header>
         {navigation.canGoBack() ? (
@@ -136,6 +149,12 @@ export function ViewRecipeScreen({route, navigation}: Props) {
         ) : null}
         <Appbar.Content />
         <Appbar.Action icon="star" onPress={goToRatings} />
+        <Appbar.Action
+          icon={`book${hasBook ? '' : '-plus'}`}
+          onPress={
+            hasBook ? () => goToBook(recipe.data!.book!.id) : connectToBook
+          }
+        />
         <Appbar.Action icon="chef-hat" onPress={goToMake} />
       </Appbar.Header>
     );
@@ -194,10 +213,14 @@ export function ViewRecipeScreen({route, navigation}: Props) {
         cookTimeMinutes,
         ingredients,
         method,
+        book,
       } = recipe.data;
       return (
         <>
           <ScrollScreen>
+            {book?.name ? (
+              <Text variant="bodySmall">From {book.name}</Text>
+            ) : null}
             <Text variant="headlineMedium">{name}</Text>
             <Text variant="bodyLarge">{description}</Text>
             <View style={{paddingVertical: 8}} />
