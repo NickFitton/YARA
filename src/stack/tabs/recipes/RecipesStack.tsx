@@ -10,6 +10,7 @@ import {ViewRecipeScreen} from './screens/ViewRecipeScreen';
 import {RecipeStackParamList} from './RecipeStackParam';
 import {RecipeRatingsBottomSheet} from './screens/RecipeRatingsBottomSheet/RecipeRatingsBottomSheet';
 import {Header} from '../../../components/Header/Header';
+import {AddToBookBottomSheet} from './screens/AddToBookBottomSheet/AddToBookBottomSheet';
 
 const Stack = createNativeStackNavigator<RecipeStackParamList>();
 
@@ -27,6 +28,15 @@ export function RecipesStack() {
       <Stack.Screen
         name="Recipe Ratings"
         component={RecipeRatingsBottomSheet}
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          animation: 'none',
+        }}
+      />
+      <Stack.Screen
+        name="Add to Book"
+        component={AddToBookBottomSheet}
         options={{
           headerShown: false,
           presentation: 'transparentModal',

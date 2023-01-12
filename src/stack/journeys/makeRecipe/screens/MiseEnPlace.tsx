@@ -3,7 +3,7 @@ import {FlatList, Image, StyleSheet, View} from 'react-native';
 import {Appbar, Text} from 'react-native-paper';
 import {Screen} from '../../../../components/Screen/Screen';
 import {IngredientModel} from '../../../../db/models/Ingredient';
-import {useRecipe} from '../../../../db/recipeHooks';
+import {useRecipe} from '../../../../db/hooks/recipeHooks';
 import {LoadingSpinner} from '../components/LoadingSpinner';
 import {useMeasuredView} from '../hooks';
 import {MakeRecipeProps} from '../types';

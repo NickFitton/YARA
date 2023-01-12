@@ -1,4 +1,5 @@
-import React from 'react';
+import {useQueryClient} from '@tanstack/react-query';
+import React, {useEffect} from 'react';
 import {Alert, View} from 'react-native';
 import {Button, Text, useTheme} from 'react-native-paper';
 import {ScrollScreen} from '../../../../components/Screen/Screen';
@@ -7,7 +8,21 @@ import {useDatabase} from '../../../../providers/database/Provider';
 
 export function SettingsScreen() {
   const db = useDatabase();
+  const queryClient = useQueryClient();
   const {colors} = useTheme();
+
+  useEffect(() => {
+    db.readTransaction(tx =>
+      tx.executeSql(
+        "SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name; ",
+        [],
+        (_, result) => {
+          console.log(result);
+        },
+        e => console.error(e),
+      ),
+    ).catch(e => console.error(e));
+  }, [db]);
 
   const dropTablesAsync = async () => {
     await db.transaction(tx => {
@@ -22,7 +37,8 @@ export function SettingsScreen() {
   };
 
   const migrateDatabase = () => {
-    migrate(db).catch(Alert.alert);
+    migrate(db).catch(console.error);
+    queryClient.invalidateQueries().catch(console.error);
   };
 
   return (

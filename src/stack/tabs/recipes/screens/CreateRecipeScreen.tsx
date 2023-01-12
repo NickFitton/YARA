@@ -12,7 +12,7 @@ import {v4} from 'uuid';
 import {IngredientModel} from '../../../../db/models/Ingredient';
 import {MethodModel} from '../../../../db/models/Method';
 import {randomHex} from '../../../../utils/hex';
-import {useCreateRecipe} from '../../../../db/recipeHooks';
+import {useCreateRecipe} from '../../../../db/hooks/recipeHooks';
 
 import {RecipeStackParamList} from '../RecipeStackParam';
 import {IngredientList, parseIngredient} from '../components/IngredientList';

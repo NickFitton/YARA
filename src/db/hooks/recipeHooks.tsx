@@ -2,110 +2,20 @@ import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {Transaction} from 'react-native-sqlite-storage';
 import {v4} from 'uuid';
 import {
-  IngredientModel,
-  ParsedIngredientModel,
-  RawIngredientModel,
-} from './models/Ingredient';
-import {MethodModel, RawMethodModel} from './models/Method';
-import {RecipeModel} from './models/Recipe';
-import {useDatabase} from '../providers/database/Provider';
-import {RatingModel} from './models/Rating';
-import {DBRecord} from './models/shared';
-
-type BaseRecipe = Omit<RecipeModel, 'ingredients' | 'method'>;
-
-const getRecipeRatingsByRecipeId = (tx: Transaction, recipeId: string) =>
-  new Promise<RatingModel[]>((resolve, reject) => {
-    tx.executeSql(
-      'SELECT * FROM Rating WHERE recipeId=?;',
-      [recipeId],
-      (_, results) => {
-        const rows: RatingModel[] = [];
-        for (let i = 0; i < results.rows.length; i++) {
-          rows.push(results.rows.item(i) as RatingModel);
-        }
-        resolve(rows);
-      },
-      (_, error) => reject(error),
-    );
-  });
-
-const getRecipeByRecipeId = (
-  tx: Transaction,
-  recipeId: string,
-): Promise<BaseRecipe> =>
-  new Promise((resolve, reject) => {
-    tx.executeSql(
-      'SELECT * FROM Recipe WHERE id=?;',
-      [recipeId],
-      (_, results) => {
-        if (results.rows.length === 0) {
-          reject(new Error('Recipe not found'));
-        }
-        resolve(results.rows.item(0) as BaseRecipe);
-      },
-      error => {
-        reject(error);
-      },
-    );
-  });
-
-const getParsedIngredientsByRecipeId = (
-  tx: Transaction,
-  recipeId: string,
-): Promise<ParsedIngredientModel[]> =>
-  new Promise((resolve, reject) => {
-    tx.executeSql(
-      'SELECT * FROM ParsedIngredient WHERE recipeId=?',
-      [recipeId],
-      (_, result) => {
-        const ingredients: ParsedIngredientModel[] = [];
-        for (let i = 0; i < result.rows.length; i++) {
-          ingredients.push(result.rows.item(i) as ParsedIngredientModel);
-        }
-        resolve(ingredients);
-      },
-      (_, error) => reject(error),
-    );
-  });
-
-const getRawIngredientsByRecipeId = (
-  tx: Transaction,
-  recipeId: string,
-): Promise<RawIngredientModel[]> =>
-  new Promise((resolve, reject) => {
-    tx.executeSql(
-      'SELECT * FROM RawIngredient WHERE recipeId=?',
-      [recipeId],
-      (_, result) => {
-        const ingredients: RawIngredientModel[] = [];
-        for (let i = 0; i < result.rows.length; i++) {
-          ingredients.push(result.rows.item(i) as RawIngredientModel);
-        }
-        resolve(ingredients);
-      },
-      (_, error) => reject(error),
-    );
-  });
-
-const getRawMethodByRecipeId = (
-  tx: Transaction,
-  recipeId: string,
-): Promise<RawMethodModel[]> =>
-  new Promise((resolve, reject) => {
-    tx.executeSql(
-      'SELECT * FROM RawMethod WHERE recipeId=?',
-      [recipeId],
-      (_, result) => {
-        const steps: RawMethodModel[] = [];
-        for (let i = 0; i < result.rows.length; i++) {
-          steps.push(result.rows.item(i) as RawMethodModel);
-        }
-        resolve(steps);
-      },
-      (_, error) => reject(error),
-    );
-  });
+  deleteRecipeById,
+  getParsedIngredientsByRecipeId,
+  getRawIngredientsByRecipeId,
+  getRawMethodByRecipeId,
+  getRecipeByRecipeId,
+  getRecipeRatingsByRecipeId,
+} from '../commands/recipe';
+import {getBookByRecipeId} from '../commands/book';
+import {useDatabase} from '../../providers/database/Provider';
+import {IngredientModel} from '../models/Ingredient';
+import {MethodModel} from '../models/Method';
+import {RatingModel} from '../models/Rating';
+import {RecipeModel, RecipePreview} from '../models/Recipe';
+import {DBRecord} from '../models/shared';
 
 export const useCreateRecipe = () => {
   const db = useDatabase();
@@ -185,9 +95,9 @@ export const useDeleteRecipe = (id: string) => {
 
   const deleteRecipe = () => {
     db.transaction(tx => {
-      tx.executeSql('DELETE FROM Recipe WHERE id=?', [id], () => {
-        queryClient.invalidateQueries(['recipes']).catch(console.trace);
-      });
+      deleteRecipeById(tx, id)
+        .then(() => queryClient.invalidateQueries(['recipes']))
+        .catch(console.trace);
     }).catch(console.trace);
   };
   return {deleteRecipe};
@@ -211,36 +121,50 @@ export const useRecipe = (recipeId: string) => {
           );
           const rawMethodPromise = getRawMethodByRecipeId(tx, recipeId);
           const recipePromise = getRecipeByRecipeId(tx, recipeId);
+          const bookPromise = getBookByRecipeId(tx, recipeId);
 
           Promise.all([
             recipePromise,
             parsedIngredientsPromise,
             rawIngredientsPromise,
             rawMethodPromise,
+            bookPromise,
           ])
-            .then(([recipe, parsedIngredients, rawIngredients, rawMethod]) => {
-              const raw: IngredientModel[] = rawIngredients.map(ingredient => ({
-                ...ingredient,
-                type: 'raw',
-              }));
-              const parsed: IngredientModel[] = parsedIngredients.map(
-                ingredient => ({
-                  ...ingredient,
-                  type: 'parsed',
-                }),
-              );
-              const ingredients: IngredientModel[] = [...parsed, ...raw];
-              const method = [
-                ...rawMethod.map(
-                  rMethod => ({...rMethod, type: 'raw'} as MethodModel),
-                ),
-              ];
-              resolve({
-                ...recipe,
-                ingredients,
-                method,
-              });
-            })
+            .then(
+              ([
+                recipe,
+                parsedIngredients,
+                rawIngredients,
+                rawMethod,
+                book,
+              ]) => {
+                console.log(book);
+                const raw: IngredientModel[] = rawIngredients.map(
+                  ingredient => ({
+                    ...ingredient,
+                    type: 'raw',
+                  }),
+                );
+                const parsed: IngredientModel[] = parsedIngredients.map(
+                  ingredient => ({
+                    ...ingredient,
+                    type: 'parsed',
+                  }),
+                );
+                const ingredients: IngredientModel[] = [...parsed, ...raw];
+                const method = [
+                  ...rawMethod.map(
+                    rMethod => ({...rMethod, type: 'raw'} as MethodModel),
+                  ),
+                ];
+                resolve({
+                  ...recipe,
+                  ingredients,
+                  method,
+                  book,
+                });
+              },
+            )
             .catch(e => {
               console.log(recipeId);
               console.trace(e);
@@ -284,7 +208,6 @@ export const useRateRecipe = (id: string) => {
 
   const rateRecipe = (ratings: Rating[]) =>
     db.transaction(tx => {
-      console.log(ratings);
       tx.executeSql(
         `INSERT INTO Rating (id, recipeId, rater, value, scaleFrom, scaleTo) VALUES ${genValueTemplate(
           6,
@@ -342,3 +265,28 @@ export const useRecipes = () => {
       }),
   });
 };
+
+export const getRecipesByBookId = (tx: Transaction, bookId: string) =>
+  new Promise<RecipePreview[]>((resolve, reject) => {
+    tx.executeSql(
+      `SELECT
+         A.id, A.name, A.description
+     FROM
+         Recipe A
+     WHERE
+         A.id in (
+             select B.recipeId from RecipeBook B where B.bookId = ?
+);`,
+      [bookId],
+      (_, success) => {
+        console.log(`Oh my god it actually worked: ${success.rows.length}`);
+        const data = [];
+        for (let i = 0; i < success.rows.length; i++) {
+          data.push(success.rows.item(i) as RecipePreview);
+        }
+        console.log(data);
+        resolve(data);
+      },
+      error => reject(error),
+    );
+  });
