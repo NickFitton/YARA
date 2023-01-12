@@ -97,7 +97,6 @@ function SwipeItem({
         onPress={() => changeToSelect(item.id)}
         style={{backgroundColor: theme.colors.background}}
         onLongPress={() => {
-          console.log('onLongPress');
           changeToSelect(item.id);
         }}
         title={item.value}

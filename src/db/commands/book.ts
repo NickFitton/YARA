@@ -28,7 +28,7 @@ export const getQuickBooks = (
   reject: (reason: unknown) => void,
 ): void =>
   tx.executeSql(
-    'SELECT id, name, description FROM Book WHERE name LIKE ? ORDER BY updatedAt DESC',
+    'SELECT id, name, description FROM Book WHERE name LIKE ? ORDER BY updatedAt DESC;',
     [`%${query}%`],
     (_, results) => {
       const rows: PartialBook[] = [];
@@ -78,7 +78,7 @@ export function createNewBook(
 ) {
   const bookId = v4();
   tx.executeSql(
-    `INSERT INTO Book (id, name, description, author, publisher, imageLocation) VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO Book (id, name, description, author, publisher, imageLocation) VALUES (?, ?, ?, ?, ?, ?);`,
     [
       bookId,
       book.name,

@@ -78,7 +78,10 @@ export const useCreateRecipe = () => {
               }
             });
             resolve(recipeId);
-            queryClient.invalidateQueries(['recipes']).catch(console.trace);
+            queryClient
+              .invalidateQueries(['recipes'])
+              .then(() => queryClient.invalidateQueries(['RecipeSearch']))
+              .catch(console.trace);
           },
           (_, err) => {
             reject(err);
@@ -138,7 +141,6 @@ export const useRecipe = (recipeId: string) => {
                 rawMethod,
                 book,
               ]) => {
-                console.log(book);
                 const raw: IngredientModel[] = rawIngredients.map(
                   ingredient => ({
                     ...ingredient,
@@ -166,7 +168,6 @@ export const useRecipe = (recipeId: string) => {
               },
             )
             .catch(e => {
-              console.log(recipeId);
               console.trace(e);
             });
         }).catch(console.trace);
@@ -236,24 +237,22 @@ export const useRecipeRatings = (recipeId: string) => {
   });
 };
 
-type RecipeById = Required<Pick<RecipeModel, 'id'>>;
-
 // TODO: Add search to hook
-export const useRecipes = () => {
+export const useRecipes = (query: string) => {
   const db = useDatabase();
 
-  return useQuery<RecipeById[]>({
-    queryKey: ['recipes'],
+  return useQuery<RecipePreview[]>({
+    queryKey: ['RecipeSearch', query],
     queryFn: () =>
       new Promise((resolve, reject) => {
         db.transaction(tx => {
           tx.executeSql(
-            'SELECT id FROM Recipe;',
-            [],
+            'SELECT id, name, description FROM Recipe WHERE name LIKE ? ORDER BY updatedAt DESC;',
+            [`%${query}%`],
             (_, results) => {
-              const rows: RecipeById[] = [];
+              const rows: RecipePreview[] = [];
               for (let i = 0; i < results.rows.length; i++) {
-                rows.push(results.rows.item(i) as RecipeById);
+                rows.push(results.rows.item(i) as RecipePreview);
               }
               resolve(rows);
             },
@@ -279,12 +278,10 @@ export const getRecipesByBookId = (tx: Transaction, bookId: string) =>
 );`,
       [bookId],
       (_, success) => {
-        console.log(`Oh my god it actually worked: ${success.rows.length}`);
         const data = [];
         for (let i = 0; i < success.rows.length; i++) {
           data.push(success.rows.item(i) as RecipePreview);
         }
-        console.log(data);
         resolve(data);
       },
       error => reject(error),
