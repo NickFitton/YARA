@@ -41,6 +41,7 @@ specifiers:
   eslint-plugin-react-hooks: ^4.6.0
   eslint-plugin-react-native: ^4.0.0
   jest: ^26.6.3
+  jsc-android: ^250230.2.1
   metro-react-native-babel-preset: 0.72.3
   react: 18.1.0
   react-dom: ^18.2.0
@@ -48,6 +49,7 @@ specifiers:
   react-native-clean-project: ^4.0.1
   react-native-gesture-handler: ^2.8.0
   react-native-get-random-values: ^1.8.0
+  react-native-gradle-plugin: ^0.71.12
   react-native-image-crop-picker: ^0.39.0
   react-native-paper: ^5.1.0
   react-native-reanimated: ^2.10.0
@@ -76,11 +78,13 @@ dependencies:
   '@rnx-kit/metro-resolver-symlinks': 0.1.23
   '@tanstack/react-query': 4.22.0_49bb5a3410293be20af78c148dd69929
   '@types/react-native-sqlite-storage': 5.0.2
+  jsc-android: 250230.2.1
   react: 18.1.0
   react-dom: 18.2.0_react@18.1.0
   react-native: 0.70.6_8b5f51e7afdf9f54217193e2dd0d1360
   react-native-gesture-handler: 2.9.0_react-native@0.70.6+react@18.1.0
   react-native-get-random-values: 1.8.0_react-native@0.70.6
+  react-native-gradle-plugin: 0.71.12
   react-native-image-crop-picker: 0.39.0_react-native@0.70.6
   react-native-paper: 5.1.3_5b94a91f19366cbcc45c31ab7ef2a0ad
   react-native-reanimated: 2.14.1_a8fccdf53ef9837f13822f6cfed2a445
@@ -7361,6 +7365,10 @@ packages:
 
   /react-native-gradle-plugin/0.70.3:
     resolution: {integrity: sha512-oOanj84fJEXUg9FoEAQomA8ISG+DVIrTZ3qF7m69VQUJyOGYyDZmPqKcjvRku4KXlEH6hWO9i4ACLzNBh8gC0A==}
+    dev: false
+
+  /react-native-gradle-plugin/0.71.12:
+    resolution: {integrity: sha512-ILujN0C+cX5QHmm22MXbHqZR619OzV/VThLHFhe7qnzZWpPh8O4KSvbtezoYMiBbmowAfy8SQpohwlN3nv6wZQ==}
     dev: false
 
   /react-native-image-crop-picker/0.39.0_react-native@0.70.6:
