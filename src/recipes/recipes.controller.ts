@@ -29,8 +29,8 @@ export class RecipesController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(createRecipeSchema))
-  create(@Body() createRecipeDto: CreateRecipeSchema): Promise<ReadRecipeDto> {
-    return this.recipesService.create(createRecipeDto);
+  create(@Body() recipe: CreateRecipeSchema): Promise<ReadRecipeDto> {
+    return this.recipesService.create(recipe);
   }
 
   @Get()
@@ -55,9 +55,9 @@ export class RecipesController {
   )
   update(
     @Param('id') id: string,
-    @Body() updateRecipeDto: UpdateRecipeSchema,
+    @Body() recipe: UpdateRecipeSchema,
   ): Promise<void> {
-    return this.recipesService.update(id, updateRecipeDto);
+    return this.recipesService.update(id, recipe);
   }
 
   @Delete(':id')

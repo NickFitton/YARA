@@ -44,7 +44,7 @@ export class RecipesService {
       .then();
   }
 
-  async remove(id: string): Promise<void> {
+  remove(id: string): Promise<void> {
     return this.prisma.recipe.delete({ where: { id } }).then();
   }
 }

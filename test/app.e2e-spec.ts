@@ -49,14 +49,14 @@ describe('AppController (e2e)', () => {
   });
 
   it('/recipes (POST)', async () => {
-    const body = await createRecipe(app);
+    const { id, ingredients, instructions } = await createRecipe(app);
 
-    expect(body.id).toBeDefined();
-    expect(body.ingredients).toHaveLength(7);
-    expect(body.ingredients[0].id).toBeDefined();
+    expect(id).toBeDefined();
+    expect(ingredients).toHaveLength(7);
+    expect(ingredients[0].id).toBeDefined();
 
-    expect(body.instructions).toHaveLength(4);
-    expect(body.instructions[0].id).toBeDefined();
+    expect(instructions).toHaveLength(4);
+    expect(instructions[0].id).toBeDefined();
   });
 
   it('/recipes (GET)', async () => {
@@ -90,7 +90,6 @@ describe('AppController (e2e)', () => {
 
   it('/recipes/:id (DELETE)', async () => {
     const { id: createdId } = await createRecipe(app);
-
     const findAll = await findAllRecipes(app);
     expect(findAll.find(({ id }) => id === createdId)).toBeDefined();
 
@@ -128,8 +127,8 @@ async function findRecipeById(
   app: INestApplication<any>,
   id: string,
 ): Promise<ReadRecipeDto> {
-  const response = await request(app.getHttpServer())
+  const { body } = await request(app.getHttpServer())
     .get(`/recipes/${id}`)
     .expect(200);
-  return response.body;
+  return body;
 }
