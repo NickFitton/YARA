@@ -27,7 +27,8 @@
     "@prisma/client": "5.20.0",
     "prisma": "^5.20.0",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
