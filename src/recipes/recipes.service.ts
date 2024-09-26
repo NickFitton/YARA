@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRecipeDto } from './dto/create-recipe.dto';
-import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { CreateRecipeSchema } from './dto/create-recipe.dto';
+import { UpdateRecipeSchema } from './dto/update-recipe.dto';
 import { PrismaService } from '../services/prisma.service';
 import {
   createFromDbEntity,
@@ -17,9 +17,9 @@ const include = {
 export class RecipesService {
   constructor(private prisma: PrismaService) {}
 
-  create(createRecipeDto: CreateRecipeDto): Promise<ReadRecipeDto> {
+  create(recipe: CreateRecipeSchema): Promise<ReadRecipeDto> {
     return this.prisma.recipe
-      .create({ data: createToDbEntity(createRecipeDto), include })
+      .create({ data: createToDbEntity(recipe), include })
       .then(createFromDbEntity);
   }
 
@@ -35,17 +35,16 @@ export class RecipesService {
       .then((result) => (result ? createFromDbEntity(result) : result));
   }
 
-  update(id: string, updateRecipeDto: UpdateRecipeDto): Promise<void> {
+  update(id: string, recipe: UpdateRecipeSchema): Promise<void> {
     return this.prisma.recipe
       .update({
         where: { id },
-        data: updateToDbEntity(updateRecipeDto),
+        data: updateToDbEntity(recipe),
       })
       .then();
   }
 
   async remove(id: string): Promise<void> {
-    const newLocal = await this.prisma.recipe.delete({ where: { id } }).then();
-    console.log(newLocal);
+    return this.prisma.recipe.delete({ where: { id } }).then();
   }
 }

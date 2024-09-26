@@ -8,18 +8,28 @@ import {
   Delete,
   HttpCode,
   NotFoundException,
+  UsePipes,
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
-import { CreateRecipeDto } from './dto/create-recipe.dto';
-import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import {
+  CreateRecipeSchema,
+  createRecipeSchema,
+} from './dto/create-recipe.dto';
+import {
+  UpdateRecipeSchema,
+  updateRecipeSchema,
+} from './dto/update-recipe.dto';
 import { ReadRecipeDto } from './dto/read-recipe.dto';
+import { ZodValidationPipe } from '../pipes/zod.pipe';
+import { z } from 'zod';
 
 @Controller('recipes')
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
   @Post()
-  create(@Body() createRecipeDto: CreateRecipeDto): Promise<ReadRecipeDto> {
+  @UsePipes(new ZodValidationPipe(createRecipeSchema))
+  create(@Body() createRecipeDto: CreateRecipeSchema): Promise<ReadRecipeDto> {
     return this.recipesService.create(createRecipeDto);
   }
 
@@ -40,9 +50,12 @@ export class RecipesController {
 
   @Patch(':id')
   @HttpCode(204)
+  @UsePipes(
+    new ZodValidationPipe(updateRecipeSchema, { id: z.string().uuid() }),
+  )
   update(
     @Param('id') id: string,
-    @Body() updateRecipeDto: UpdateRecipeDto,
+    @Body() updateRecipeDto: UpdateRecipeSchema,
   ): Promise<void> {
     return this.recipesService.update(id, updateRecipeDto);
   }

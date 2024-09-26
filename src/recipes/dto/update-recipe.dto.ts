@@ -1,12 +1,8 @@
-import { CreateIngredientDto, CreateInstructionDto } from './create-recipe.dto';
+import { z } from 'zod';
+import { createRecipeSchema } from './create-recipe.dto';
 
-export interface UpdateInstructionDto extends Partial<CreateInstructionDto> {
-  id: string;
-}
-export interface UpdateIngredientDto extends Partial<CreateIngredientDto> {
-  id: string;
-}
-export interface UpdateRecipeDto {
-  name: string;
-  description?: string;
-}
+export const updateRecipeSchema = createRecipeSchema.partial().omit({
+  ingredients: true,
+  instructions: true,
+});
+export type UpdateRecipeSchema = z.infer<typeof updateRecipeSchema>;

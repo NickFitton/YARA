@@ -35,6 +35,7 @@ const RECIPE_DATA = {
     },
   ],
 };
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
@@ -60,23 +61,17 @@ describe('AppController (e2e)', () => {
 
   it('/recipes (GET)', async () => {
     const { id: createdId } = await createRecipe(app);
-
-    const { body: recipes } = await request(app.getHttpServer())
-      .get('/recipes')
-      .expect(200);
+    const recipes = await findAllRecipes(app);
 
     expect(recipes.find(({ id }) => id === createdId)).toBeDefined();
   });
 
   it('/recipes/:id (GET)', async () => {
     const postResponse = await createRecipe(app);
+    const body = await findRecipeById(app, postResponse.id);
 
-    const getResponse = await request(app.getHttpServer())
-      .get(`/recipes/${postResponse.id}`)
-      .expect(200);
-
-    expect(RECIPE_DATA.name).toEqual(getResponse.body.name);
-    expect(postResponse).toEqual(getResponse.body);
+    expect(RECIPE_DATA.name).toEqual(body.name);
+    expect(postResponse).toEqual(body);
   });
 
   it('/recipes/:id (PATCH)', async () => {
@@ -87,20 +82,16 @@ describe('AppController (e2e)', () => {
       .send({ name: 'A different name' })
       .expect(204);
 
-    const { body } = await request(app.getHttpServer())
-      .get(`/recipes/${postResponse.id}`)
-      .expect(200);
+    const { name, description } = await findRecipeById(app, postResponse.id);
 
-    expect(body.name).toBe('A different name');
-    expect(body.description).toBe(RECIPE_DATA.description);
+    expect(name).toBe('A different name');
+    expect(description).toBe(RECIPE_DATA.description);
   });
 
   it('/recipes/:id (DELETE)', async () => {
     const { id: createdId } = await createRecipe(app);
 
-    const { body: findAll } = await request(app.getHttpServer())
-      .get('/recipes')
-      .expect(200);
+    const findAll = await findAllRecipes(app);
     expect(findAll.find(({ id }) => id === createdId)).toBeDefined();
 
     await request(app.getHttpServer())
@@ -109,9 +100,7 @@ describe('AppController (e2e)', () => {
 
     await request(app.getHttpServer()).get(`/recipes/${createdId}`).expect(404);
 
-    const { body: findAllAgain } = await request(app.getHttpServer())
-      .get('/recipes')
-      .expect(200);
+    const findAllAgain = await findAllRecipes(app);
     expect(findAllAgain.find(({ id }) => id === createdId)).not.toBeDefined();
   });
 });
@@ -124,4 +113,23 @@ async function createRecipe(
     .send(RECIPE_DATA)
     .expect(201);
   return body;
+}
+
+async function findAllRecipes(
+  app: INestApplication<any>,
+): Promise<ReadRecipeDto[]> {
+  const { body } = await request(app.getHttpServer())
+    .get('/recipes')
+    .expect(200);
+  return body;
+}
+
+async function findRecipeById(
+  app: INestApplication<any>,
+  id: string,
+): Promise<ReadRecipeDto> {
+  const response = await request(app.getHttpServer())
+    .get(`/recipes/${id}`)
+    .expect(200);
+  return response.body;
 }

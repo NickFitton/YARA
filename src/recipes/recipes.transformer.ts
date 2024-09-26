@@ -1,4 +1,4 @@
-import { CreateRecipeDto } from './dto/create-recipe.dto';
+import { CreateRecipeSchema } from './dto/create-recipe.dto';
 import {
   Prisma,
   Recipe,
@@ -6,14 +6,14 @@ import {
   RecipeInstruction,
 } from '@prisma/client';
 import { ReadRecipeDto } from './dto/read-recipe.dto';
-import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { UpdateRecipeSchema } from './dto/update-recipe.dto';
 
 export const createToDbEntity = ({
   name,
   description,
   instructions,
   ingredients,
-}: CreateRecipeDto): Prisma.RecipeCreateInput => ({
+}: CreateRecipeSchema): Prisma.RecipeCreateInput => ({
   name,
   description,
   instructions: {
@@ -30,13 +30,17 @@ export const createToDbEntity = ({
   },
 });
 
-export const createFromDbEntity = (
-  recipe: Recipe & {
-    ingredients: RecipeIngredient[];
-    instructions: RecipeInstruction[];
-  },
-): ReadRecipeDto => recipe;
+export const createFromDbEntity = ({
+  description,
+  ...recipe
+}: Recipe & {
+  ingredients: RecipeIngredient[];
+  instructions: RecipeInstruction[];
+}): ReadRecipeDto => ({
+  description: description || undefined,
+  ...recipe,
+});
 
 export const updateToDbEntity = (
-  recipe: UpdateRecipeDto,
+  recipe: UpdateRecipeSchema,
 ): Prisma.RecipeUpdateInput => recipe;
