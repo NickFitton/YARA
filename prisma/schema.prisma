@@ -24,39 +24,20 @@ model Recipe {
   ingredients  RecipeIngredient[]
 }
 
-model Ingredient {
-  id   String @id @default(uuid()) @db.Uuid
-  name String @unique
-
-  recipes RecipeIngredient[]
-}
-
 model RecipeIngredient {
-  recipeId     String @db.Uuid
-  ingredientId String @db.Uuid
-  quantity     String
+  id       String @id @default(uuid()) @db.Uuid
+  recipeId String @db.Uuid
+  quantity String
+  name     String
 
-  recipe     Recipe     @relation(fields: [recipeId], references: [id])
-  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
-
-  @@id([recipeId, ingredientId])
-}
-
-model Instruction {
-  id   String @id @default(uuid()) @db.Uuid
-  step String
-
-  recipes RecipeInstruction[]
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 }
 
 model RecipeInstruction {
-  recipeId      String @db.Uuid
-  instructionId String @db.Uuid
-  order         Int
+  id       String @id @default(uuid()) @db.Uuid
+  recipeId String @db.Uuid
+  order    Int
+  step     String
 
-  recipe      Recipe      @relation(fields: [recipeId], references: [id])
-  instruction Instruction @relation(fields: [instructionId], references: [id])
-
-  @@id([recipeId, instructionId])
-  @@unique([recipeId, order])
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 }
