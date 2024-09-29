@@ -1,39 +1,37 @@
 import Link from "next/link";
+import { BookOpen, Search, Upload, Tags, Route } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UtensilsCrossed, BookOpen, Search, Upload, Tags } from "lucide-react";
+import { Header } from "@/components/organisms/header";
+import { Footer } from "@/components/organisms/footer";
 import "./style.css";
+import { ReactNode } from "react";
 
-const HEADER_LINKS: { title: string; href: string }[] = [
-  { title: "Features", href: "#" },
-  { title: "Contact", href: "#" },
-  { title: "Login", href: "#" },
-];
-const FOOTER_LINKS: { title: string; href: string }[] = [
-  { title: "Terms of Service", href: "#" },
-  { title: "Privacy Policy", href: "#" },
-];
+const Feature = ({
+  Icon,
+  title,
+  description,
+}: {
+  Icon: ({ className }: { className: string }) => ReactNode;
+  title: string;
+  description: string;
+}) => {
+  return (
+    <div className="flex flex-col items-center text-center space-y-4">
+      <div className="bg-primary text-primary-foreground p-3 rounded-full">
+        <Icon className="h-6 w-6" />
+      </div>
+      <h3 className="text-xl font-bold">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
+    </div>
+  );
+};
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
-        <Link className="flex items-center justify-center" href="#">
-          <UtensilsCrossed className="h-6 w-6" />
-          <span className="ml-2 text-lg font-semibold">MyRecipeVault</span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          {HEADER_LINKS.map(({ title, href }) => (
-            <Link
-              key={href}
-              className="text-sm font-medium hover:underline underline-offset-4"
-              href={href}
-            >
-              {title}
-            </Link>
-          ))}
-        </nav>
-      </header>
+      <Header />
       <main className="flex-1">
         <section>
           <div className="container px-4 md:px-6">
@@ -71,40 +69,34 @@ export default function LandingPage() {
           </div>
         </section>
         <section id="features" className="bg-gray-100 dark:bg-gray-800">
-          <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">
+          <div className="container px-4 md:px-6 flex flex-col gap-8">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center">
               Key Features
             </h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <div className="bg-primary text-primary-foreground p-3 rounded-full">
-                  <Search className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-bold">Easy Search</h3>
-                <p className="text-muted-foreground">
-                  Quickly find any recipe in your collection with our powerful
-                  search feature.
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center space-y-4">
-                <div className="bg-primary text-primary-foreground p-3 rounded-full">
-                  <Upload className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-bold">Import Recipes</h3>
-                <p className="text-muted-foreground">
-                  Easily import recipes from websites or input your own family
-                  favorites.
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center space-y-4">
-                <div className="bg-primary text-primary-foreground p-3 rounded-full">
-                  <Tags className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-bold">Organize & Tag</h3>
-                <p className="text-muted-foreground">
-                  Keep your recipes organized with custom categories and tags.
-                </p>
-              </div>
+              <Feature
+                Icon={Search}
+                title="Easy Search"
+                description="Quickly find any recipe in your collection with our powerful search feature."
+              />
+              <Feature
+                Icon={Upload}
+                title="Import Recipes"
+                description="Easily import recipes from websites, books or input your own family favorites."
+              />
+              <Feature
+                Icon={Tags}
+                title="Organize & Tag"
+                description="Keep your recipes organized with custom categories and tags."
+              />
+            </div>
+            <div className="flex flex-row justify-center">
+              <Link href="/roadmap">
+                <Button className="inline-flex items-center justify-center">
+                  View Roadmap
+                  <Route className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
@@ -141,22 +133,7 @@ export default function LandingPage() {
           </div>
         </section>
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">
-          © 2024 MyRecipeVault. All rights reserved.
-        </p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          {FOOTER_LINKS.map(({ title, href }) => (
-            <Link
-              key={href}
-              className="text-xs hover:underline underline-offset-4"
-              href={href}
-            >
-              {title}
-            </Link>
-          ))}
-        </nav>
-      </footer>
+      <Footer />
     </div>
   );
 }
