@@ -58,9 +58,16 @@ export const LoginForm = () => {
         </div>
       </div>
 
-      <Button type="submit" className="w-full">
-        Sign in
-      </Button>
+      <div className="flex flex-col gap-2">
+        <Button type="submit" className="w-full">
+          Sign in
+        </Button>
+        <Link href="/sign-up">
+          <Button type="submit" variant="secondary" className="w-full">
+            Sign up
+          </Button>
+        </Link>
+      </div>
     </form>
   );
 };
