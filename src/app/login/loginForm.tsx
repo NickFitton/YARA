@@ -58,15 +58,9 @@ export const LoginForm = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Sign in
-        </Button>
-        <Link href="/sign-up">
-          <Button type="submit" variant="secondary" className="w-full">
-            Sign up
-          </Button>
-        </Link>
+      <div className="flex flex-row gap-3 justify-between items-center">
+        <Link className="text-sm hover:underline underline-offset-4" href="/sign-up">Sign up</Link>
+        <Button type="submit">Sign in</Button>
       </div>
     </form>
   );
