@@ -3,8 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import { useMutation } from "@tanstack/react-query";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -15,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Hourglass } from "lucide-react";
 import { useSignUp } from "./sign-up.hook";
 import { userCreationFormSchema, UserCreationForm } from "./sign-up.schema";
 
@@ -106,13 +104,13 @@ export const SignUpForm = () => {
           </div>
           <div className="flex flex-row gap-3 justify-between items-center">
             <Link
-              className="text-sm hover:underline underline-offset-4 flex flex-row gap-1 items-center"
+              className="w-32 text-sm hover:underline underline-offset-4 flex flex-row gap-1 items-center"
               href="/login"
             >
               <ChevronLeft />
               Back to login
             </Link>
-            <Button type="submit">Submit</Button>
+            <Button className="w-32" type="submit" disabled={isPending}>{isPending ? <Hourglass size="1rem"/> : "Submit"}</Button>
           </div>
         </div>
       </form>
