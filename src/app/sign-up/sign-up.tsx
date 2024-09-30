@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import { FormEvent } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import {
   Form,
@@ -16,20 +16,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft } from "lucide-react";
-
-const userCreationFormSchema = z.object({
-  firstName: z.string().trim().min(1, { message: "Required" }).max(50),
-  lastName: z.string().trim().min(1, { message: "Required" }).max(100),
-  email: z.string().email().max(254),
-  password: z
-    .string()
-    .trim()
-    .min(12, { message: "Must be longer than 12 characters" })
-    .max(64),
-});
-type UserCreationForm = z.infer<typeof userCreationFormSchema>;
+import { useSignUp } from "./sign-up.hook";
+import { userCreationFormSchema, UserCreationForm } from "./sign-up.schema";
 
 export const SignUpForm = () => {
+  const { isPending, mutate } = useSignUp();
   const form = useForm<UserCreationForm>({
     resolver: zodResolver(userCreationFormSchema),
     defaultValues: {
@@ -41,6 +32,16 @@ export const SignUpForm = () => {
   });
   const onSubmit = (data: UserCreationForm) => {
     console.log(data);
+    mutate(data, {
+      onSuccess: (resp) => {
+        console.log("Request was successful");
+        console.log(resp);
+      },
+      onError: (e) => {
+        console.error("Request failed");
+        console.error(e);
+      },
+    });
   };
 
   return (
