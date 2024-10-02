@@ -29,11 +29,10 @@ export const SignUpForm = () => {
     },
   });
   const onSubmit = (data: UserCreationForm) => {
-    console.log(data);
     mutate(data, {
-      onSuccess: (resp) => {
+      onSuccess: ({accessToken}) => {
         console.log("Request was successful");
-        console.log(resp);
+        console.log(accessToken)
       },
       onError: (e) => {
         console.error("Request failed");

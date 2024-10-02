@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useLogin } from "./login.hook";
 import { useForm } from "react-hook-form";
@@ -16,10 +15,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ChevronLeft, Hourglass } from "lucide-react";
+import { Hourglass } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { attemptLogin } from "./login.action";
+import { useState } from "react";
 
 export const LoginForm = () => {
-  const { isPending, mutate } = useLogin();
+const [isPending, setIsPending] = useState(false);
+  const router = useRouter()
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -27,17 +30,14 @@ export const LoginForm = () => {
       password: "",
     },
   });
-  const onSubmit = (data: LoginSchema) => {
-    mutate(data, {
-      onSuccess: (resp) => {
-        console.log("Request was successful");
-        console.log(resp);
-      },
-      onError: (e) => {
-        console.error("Request failed");
-        console.error(e);
-      },
-    });
+  const onSubmit = async (data: LoginSchema) => {
+    setIsPending(true);
+    // I'd like to be able to tanstack this
+    const response = await attemptLogin(data);
+    if ("accessToken" in response && response.accessToken) {
+      router.push('/dashboard')
+    }
+    setIsPending(false);
   };
   return (
     <>
