@@ -17,34 +17,40 @@ const include = {
 export class RecipesService {
   constructor(private prisma: PrismaService) {}
 
-  create(recipe: CreateRecipeSchema): Promise<ReadRecipeDto> {
+  create(recipe: CreateRecipeSchema, userId: string): Promise<ReadRecipeDto> {
     return this.prisma.recipe
-      .create({ data: createToDbEntity(recipe), include })
+      .create({ data: createToDbEntity(recipe, userId), include })
       .then(createFromDbEntity);
   }
 
-  findAll(): Promise<ReadRecipeDto[]> {
+  findAll(userId: string): Promise<ReadRecipeDto[]> {
     return this.prisma.recipe
-      .findMany({ include })
+      .findMany({ include, where: { owner: { id: userId } } })
       .then((results) => results.map(createFromDbEntity));
   }
 
-  findOne(id: string): Promise<ReadRecipeDto | null> {
+  findOne(id: string, userId: string): Promise<ReadRecipeDto | null> {
     return this.prisma.recipe
-      .findFirst({ where: { id }, include })
+      .findFirst({ include, where: { id, owner: { id: userId } } })
       .then((result) => (result ? createFromDbEntity(result) : result));
   }
 
-  update(id: string, recipe: UpdateRecipeSchema): Promise<void> {
+  update(
+    id: string,
+    recipe: UpdateRecipeSchema,
+    userId: string,
+  ): Promise<void> {
     return this.prisma.recipe
       .update({
-        where: { id },
+        where: { id, owner: { id: userId } },
         data: updateToDbEntity(recipe),
       })
       .then();
   }
 
-  remove(id: string): Promise<void> {
-    return this.prisma.recipe.delete({ where: { id } }).then();
+  remove(id: string, userId: string): Promise<void> {
+    return this.prisma.recipe
+      .delete({ where: { id, owner: { id: userId } } })
+      .then();
   }
 }

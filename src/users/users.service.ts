@@ -23,7 +23,7 @@ export class UsersService {
   }
 
   update(id: string, user: InternalUpdateUserSchema): Promise<void> {
-    return this.prisma.recipe
+    return this.prisma.user
       .update({ where: { id }, data: updateToDbEntity(user) })
       .then();
   }
