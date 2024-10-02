@@ -9,6 +9,7 @@ import {
   HttpCode,
   NotFoundException,
   UsePipes,
+  UseGuards,
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import {
@@ -22,12 +23,14 @@ import {
 import { ReadRecipeDto } from './dto/read-recipe.dto';
 import { ZodValidationPipe } from '../pipes/zod.pipe';
 import { z } from 'zod';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('recipes')
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   @UsePipes(new ZodValidationPipe(createRecipeSchema))
   create(@Body() recipe: CreateRecipeSchema): Promise<ReadRecipeDto> {
     return this.recipesService.create(recipe);
