@@ -8,12 +8,11 @@ import {
 import { ReadRecipeDto } from './dto/read-recipe.dto';
 import { UpdateRecipeSchema } from './dto/update-recipe.dto';
 
-export const createToDbEntity = ({
-  name,
-  description,
-  instructions,
-  ingredients,
-}: CreateRecipeSchema): Prisma.RecipeCreateInput => ({
+export const createToDbEntity = (
+  { name, description, instructions, ingredients }: CreateRecipeSchema,
+  userId: string,
+): Prisma.RecipeCreateInput => ({
+  owner: { connect: { id: userId } },
   name,
   description,
   instructions: {

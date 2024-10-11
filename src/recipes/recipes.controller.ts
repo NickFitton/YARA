@@ -9,6 +9,7 @@ import {
   HttpCode,
   NotFoundException,
   UsePipes,
+  UseGuards,
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import {
@@ -22,25 +23,36 @@ import {
 import { ReadRecipeDto } from './dto/read-recipe.dto';
 import { ZodValidationPipe } from '../pipes/zod.pipe';
 import { z } from 'zod';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { UserId } from 'src/auth/auth.decorator';
 
 @Controller('recipes')
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   @UsePipes(new ZodValidationPipe(createRecipeSchema))
-  create(@Body() recipe: CreateRecipeSchema): Promise<ReadRecipeDto> {
-    return this.recipesService.create(recipe);
+  create(
+    @Body() recipe: CreateRecipeSchema,
+    @UserId() userId: string,
+  ): Promise<ReadRecipeDto> {
+    return this.recipesService.create(recipe, userId);
   }
 
   @Get()
-  findAll(): Promise<ReadRecipeDto[]> {
-    return this.recipesService.findAll();
+  @UseGuards(AuthGuard)
+  findAll(@UserId() userId: string): Promise<ReadRecipeDto[]> {
+    return this.recipesService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<ReadRecipeDto> {
-    return this.recipesService.findOne(id).then((recipe) => {
+  @UseGuards(AuthGuard)
+  findOne(
+    @Param('id') id: string,
+    @UserId() userId: string,
+  ): Promise<ReadRecipeDto> {
+    return this.recipesService.findOne(id, userId).then((recipe) => {
       if (!recipe) {
         throw new NotFoundException();
       }
@@ -49,6 +61,7 @@ export class RecipesController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   @HttpCode(204)
   @UsePipes(
     new ZodValidationPipe(updateRecipeSchema, { id: z.string().uuid() }),
@@ -56,13 +69,20 @@ export class RecipesController {
   update(
     @Param('id') id: string,
     @Body() recipe: UpdateRecipeSchema,
+
+    @UserId() userId: string,
   ): Promise<void> {
-    return this.recipesService.update(id, recipe);
+    return this.recipesService.update(id, recipe, userId);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   @HttpCode(204)
-  remove(@Param('id') id: string): Promise<void> {
-    return this.recipesService.remove(id);
+  remove(
+    @Param('id') id: string,
+
+    @UserId() userId: string,
+  ): Promise<void> {
+    return this.recipesService.remove(id, userId);
   }
 }

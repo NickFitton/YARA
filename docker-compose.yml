@@ -1,4 +1,15 @@
 services:
+  backend:
+    image: yara
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: "postgresql://yaraAdmin:yaraPasspass@db:5432/yara?schema=public"
+    networks:
+      - backend
+    depends_on:
+      - db
+
   db:
     image: postgres
     restart: always
@@ -10,12 +21,12 @@ services:
       POSTGRES_DB: yara
     volumes:
       - pgdata:/var/lib/postgresql/data 
- 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
- 
+    networks:
+      - backend
+
 volumes:
   pgdata:
+
+networks:
+  backend:
+    driver: bridge
