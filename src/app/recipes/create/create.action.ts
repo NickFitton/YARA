@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { z } from "zod";
+import { createRecipe as createRecipeApi } from "@/lib/api";
 
 const createInstructionSchema = z.object({
   step: z.string().min(1, "Step is required"),
@@ -52,18 +53,6 @@ export interface ReadRecipeDto {
 export const createRecipe = async (
   data: CreateRecipe
 ): Promise<ReadRecipeDto> => {
-  const response = await fetch("http://localhost:3000/recipes", {
-    method: "post",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookies().get("accessToken")!.value}`,
-    },
-  });
-  console.log(response);
-  if (response.status !== 201) {
-    console.log(await response.json())
-    throw new Error("Failed to create recipe");
-  }
-  return (await response.json()) as ReadRecipeDto;
+  const accessToken = cookies().get("accessToken")!.value;
+  return createRecipeApi(data, accessToken);
 };

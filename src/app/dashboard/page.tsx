@@ -20,28 +20,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronRight } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
-
-type Recipe = {
-  id: string;
-  name: string;
-  description: string;
-};
+import { getRecipes } from "@/lib/api";
 
 export default async function Dashboard() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")!;
-  const recipesRequest = await fetch("http://localhost:3000/recipes", {
-    method: "get",
-    headers: {
-      Authorization: `Bearer ${accessToken.value}`,
-    },
-  });
-  if (!recipesRequest.ok) {
-    console.log(recipesRequest);
-    throw new Error("failed to fetch recipes");
-  }
-  const recipes: Recipe[] = await recipesRequest.json();
-  console.log(recipes);
+  const recipes = await getRecipes(accessToken.value);
 
   return (
     <main className="flex-1 overflow-y-auto">
@@ -86,18 +70,9 @@ export default async function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {recipes.map((recipe) => (
             <Card key={recipe.id} className="overflow-hidden">
-              {/* <CardHeader className="p-0">
-                <img
-                  src={recipe.image}
-                  alt={recipe.name}
-                  className="w-full h-48 object-cover"
-                />
-              </CardHeader> */}
               <CardContent className="p-4">
                 <CardTitle>{recipe.name}</CardTitle>
-                {/* <CardDescription>
-                  {recipe.cuisine} • {recipe.prepTime}
-                </CardDescription> */}
+                <CardDescription>{recipe.description}</CardDescription>
               </CardContent>
               <CardFooter className="p-4 pt-0 flex justify-between">
                 <Button variant="outline" size="sm">
