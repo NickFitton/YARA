@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function SignUpLayout({
   children,
-}: React.PropsWithChildren<{}>) {
+}: React.PropsWithChildren<object>) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (

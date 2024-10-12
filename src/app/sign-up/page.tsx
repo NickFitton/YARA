@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { UtensilsCrossed } from "lucide-react";
 import { SignUpForm } from "./sign-up";
 import { Footer } from "@/components/organisms/footer";

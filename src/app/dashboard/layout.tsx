@@ -10,7 +10,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-export default function DashboardLayout({ children }: PropsWithChildren<{}>) {
+export default function DashboardLayout({ children }: PropsWithChildren<object>) {
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}

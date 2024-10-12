@@ -17,10 +17,11 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   } catch (e: unknown) {
+    console.error(e);
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return NextResponse.next();
+return NextResponse.next();
 }
 
 export const config = {

@@ -3,7 +3,7 @@ import { Header } from "@/components/organisms/header";
 import { PropsWithChildren } from "react";
 import "./layout.css"
 
-export default function Layout({ children }: PropsWithChildren<{}>) {
+export default function Layout({ children }: PropsWithChildren<object>) {
   return (
     <>
       <Header />

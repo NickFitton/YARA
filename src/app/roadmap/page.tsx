@@ -17,7 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Component } from "react";
 
 const determineStatus = (features: Feature[]): Status => {
   if (features.every(({ status }) => status === "pending")) {
