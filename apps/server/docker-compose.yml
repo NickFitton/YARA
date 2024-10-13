@@ -1,24 +1,24 @@
 services:
-  backend:
-    image: yara
-    ports:
-      - 3000:3000
-    environment:
-      DATABASE_URL: 'postgresql://yaraAdmin:yaraPasspass@db:5432/yara?schema=public'
-    networks:
-      - backend
-      - frontend
-    depends_on:
-      - db
+  # backend:
+  #   image: yara
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     DATABASE_URL: 'postgresql://yaraAdmin:yaraPasspass@db:5432/yara?schema=public'
+  #   networks:
+  #     - backend
+  #     - frontend
+  #   depends_on:
+  #     - db
 
-  frontend:
-    image: yara-web
-    ports:
-      - 3001:3001
-    environment:
-      BACKEND_URL: 'http://backend:3000'
-    networks:
-      - frontend
+  # frontend:
+  #   image: yara-web
+  #   ports:
+  #     - 3001:3001
+  #   environment:
+  #     BACKEND_URL: 'http://backend:3000'
+  #   networks:
+  #     - frontend
 
   db:
     image: postgres

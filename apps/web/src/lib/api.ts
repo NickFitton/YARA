@@ -1,5 +1,7 @@
 import { ReadRecipeDto } from "@/app/recipes/create/create.action";
 
+// TODO Request errors and better handling
+
 export type Instruction = {
   id: string;
   step: string;
