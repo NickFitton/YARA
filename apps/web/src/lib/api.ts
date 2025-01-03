@@ -91,7 +91,7 @@ export const getRecipes = async (accessToken: string): Promise<Recipe[]> => {
 };
 
 export const createUser = async (data: CreateUser): Promise<ReadUser> => {
-  const signupResponse = await fetch(`${baseUrl}/users`, {
+  const signupResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, {
     body: JSON.stringify(data),
     method: "post",
     headers: {

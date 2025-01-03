@@ -1,0 +1,20 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "extends": [
+        "//"
+    ],
+    "tasks": {
+        "build": {
+            "env": ["DATABASE_URL"],
+            "inputs": [
+                ".env"
+            ]
+        },
+        "dev": {
+            "env": ["DATABASE_URL"],
+            "inputs": [
+                ".env"
+            ]
+        }
+    }
+}
