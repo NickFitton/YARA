@@ -10,7 +10,7 @@
         },
         "dev": {
             "inputs": [
-                ".env"
+                ".env", ".env.local"
             ]
         }
     }

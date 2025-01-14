@@ -8,13 +8,19 @@
             "env": ["DATABASE_URL"],
             "inputs": [
                 ".env"
-            ]
+            ],
+            "dependsOn": ["build:db"]
         },
         "dev": {
             "env": ["DATABASE_URL"],
             "inputs": [
-                ".env"
-            ]
+                ".env",
+                ".env.local"
+            ],
+            "dependsOn": ["build:db"]
+        },
+        "build:db": {
+            "inputs": ["prisma/**/*"]
         }
     }
 }

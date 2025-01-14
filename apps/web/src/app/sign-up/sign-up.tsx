@@ -16,8 +16,10 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, Hourglass } from "lucide-react";
 import { useSignUp } from "./sign-up.hook";
 import { userCreationFormSchema, UserCreationForm } from "./sign-up.schema";
+import { useRouter } from "next/navigation";
 
 export const SignUpForm = () => {
+  const router = useRouter();
   const { isPending, mutate } = useSignUp();
   const form = useForm<UserCreationForm>({
     resolver: zodResolver(userCreationFormSchema),
@@ -30,9 +32,8 @@ export const SignUpForm = () => {
   });
   const onSubmit = (data: UserCreationForm) => {
     mutate(data, {
-      onSuccess: ({accessToken}) => {
-        console.log("Request was successful");
-        console.log(accessToken)
+      onSuccess: () => {
+        router.push("/dashboard");
       },
       onError: (e) => {
         console.error("Request failed");

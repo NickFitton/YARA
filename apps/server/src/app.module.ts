@@ -12,7 +12,7 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     AuthModule,
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath: ['.env.local', '.env'],
     }),
   ],
   controllers: [AppController],

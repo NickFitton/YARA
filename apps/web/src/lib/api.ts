@@ -53,7 +53,7 @@ export type ReadUser = {
   email: string;
 };
 
-const baseUrl = process.env.BACKEND_URL!;
+const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 export const createRecipe = async (
   data: CreateRecipe,
