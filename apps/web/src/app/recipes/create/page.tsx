@@ -24,43 +24,26 @@ import {
 } from "@/components/ui/form";
 import { Save, Trash, ChevronUp, ChevronDown } from "lucide-react";
 import { createRecipe } from "./create.action";
+import {
+  CreateRecipeDto,
+  createInstructionSchema,
+  createRecipeSchema,
+} from "@yara/api/recipe";
 
-const createInstructionSchema = z.object({
-  step: z.string().min(1, "Step is required"),
-});
-
-const createIngredientSchema = z.object({
-  name: z.string().min(1, "Ingredient name is required"),
-  quantity: z.string().min(1, "Quantity is required"),
-});
-
-const createRecipeSchema = z.object({
-  name: z.string().min(1, "Recipe name is required"),
-  description: z.string().optional(),
-  instructions: z
-    .array(createInstructionSchema)
-    .min(1, "At least one instruction is required"),
-  ephemeralInstruction: z.string().optional(),
-  ingredients: z
-    .array(createIngredientSchema)
-    .min(1, "At least one ingredient is required"),
-  ephemeralIngredient: z.object({
-    name: z.string(),
-    quantity: z.string(),
-  }),
-});
-type CreateRecipeSchema = z.infer<typeof createRecipeSchema>;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const externalCreateRecipeSchema = createRecipeSchema.extend({
-  instructions: z.array(createInstructionSchema.extend({ order: z.number() })),
-});
-type ExternalCreateRecipeSchema = z.infer<typeof externalCreateRecipeSchema>;
+const formInstructionSchema = createInstructionSchema.omit({ order: true });
+const formRecipeSchema = z
+  .object({
+    instructions: z.array(formInstructionSchema),
+    ephemeralIngredient: z.object({ name: z.string(), quantity: z.string() }),
+    ephemeralInstruction: z.string().optional(),
+  })
+  .merge(createRecipeSchema.omit({ instructions: true }));
+type FormRecipeSchema = z.infer<typeof formRecipeSchema>;
 
 const toExternal = ({
   instructions,
   ...rest
-}: CreateRecipeSchema): ExternalCreateRecipeSchema => {
+}: FormRecipeSchema): CreateRecipeDto => {
   const externalInstructions = instructions.map(({ step }, i) => ({
     step,
     order: i + 1,
@@ -69,8 +52,8 @@ const toExternal = ({
 };
 
 export default function CreateRecipePage() {
-  const form = useForm<CreateRecipeSchema>({
-    resolver: zodResolver(createRecipeSchema),
+  const form = useForm<FormRecipeSchema>({
+    resolver: zodResolver(formRecipeSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -139,18 +122,17 @@ export default function CreateRecipePage() {
     }
   };
 
-  async function onSubmit(data: CreateRecipeSchema) {
+  async function onSubmit(data: FormRecipeSchema) {
     console.log(data);
-    const external = toExternal(data)
-    
+    const external = toExternal(data);
+
     try {
-        const response = await createRecipe(external)
-        console.log(response)
-    }catch (e: unknown) {
-        console.error(e);
+      const response = await createRecipe(external);
+      console.log(response);
+    } catch (e: unknown) {
+      console.error(e);
     }
 
-    
     // Here you would typically send the data to your backend
     alert("Recipe saved successfully!");
   }

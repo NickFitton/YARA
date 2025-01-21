@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRecipeSchema } from './dto/create-recipe.dto';
-import { UpdateRecipeSchema } from './dto/update-recipe.dto';
 import { PrismaService } from '../services/prisma.service';
 import {
   createFromDbEntity,
   createToDbEntity,
   updateToDbEntity,
 } from './recipes.transformer';
-import { ReadRecipeDto } from './dto/read-recipe.dto';
+import {
+  ReadRecipeDto,
+  CreateRecipeDto,
+  UpdateRecipeDto,
+} from '@yara/api/recipe';
 
 const include = {
   instructions: true,
@@ -17,7 +19,7 @@ const include = {
 export class RecipesService {
   constructor(private prisma: PrismaService) {}
 
-  create(recipe: CreateRecipeSchema, userId: string): Promise<ReadRecipeDto> {
+  create(recipe: CreateRecipeDto, userId: string): Promise<ReadRecipeDto> {
     return this.prisma.recipe
       .create({ data: createToDbEntity(recipe, userId), include })
       .then(createFromDbEntity);
@@ -35,11 +37,7 @@ export class RecipesService {
       .then((result) => (result ? createFromDbEntity(result) : result));
   }
 
-  update(
-    id: string,
-    recipe: UpdateRecipeSchema,
-    userId: string,
-  ): Promise<void> {
+  update(id: string, recipe: UpdateRecipeDto, userId: string): Promise<void> {
     return this.prisma.recipe
       .update({
         where: { id, owner: { id: userId } },

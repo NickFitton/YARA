@@ -3,14 +3,14 @@ import {
   ExecutionContext,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { PayloadSchema } from './dto/payload.dto';
+import { TokenPayloadDto } from '@yara/api/auth';
 import { Request } from 'express';
 
 export const User = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext): PayloadSchema => {
+  (data: unknown, ctx: ExecutionContext): TokenPayloadDto => {
     const { user } = ctx
       .switchToHttp()
-      .getRequest<Request & { user?: PayloadSchema }>();
+      .getRequest<Request & { user?: TokenPayloadDto }>();
 
     if (!user) {
       throw new InternalServerErrorException(
@@ -25,7 +25,7 @@ export const UserId = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): string => {
     const { user } = ctx
       .switchToHttp()
-      .getRequest<Request & { user?: PayloadSchema }>();
+      .getRequest<Request & { user?: TokenPayloadDto }>();
 
     if (!user) {
       throw new InternalServerErrorException(

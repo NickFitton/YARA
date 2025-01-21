@@ -1,33 +1,34 @@
-import { CreateRecipeSchema } from './dto/create-recipe.dto';
+import { CreateRecipeDto } from '@yara/api/recipe';
 import {
   Prisma,
   Recipe,
   RecipeIngredient,
   RecipeInstruction,
 } from '@prisma/client';
-import { ReadRecipeDto } from './dto/read-recipe.dto';
-import { UpdateRecipeSchema } from './dto/update-recipe.dto';
+import { ReadRecipeDto, UpdateRecipeDto } from '@yara/api/recipe';
 
 export const createToDbEntity = (
-  { name, description, instructions, ingredients }: CreateRecipeSchema,
+  { name, description, instructions = [], ingredients = [] }: CreateRecipeDto,
   userId: string,
-): Prisma.RecipeCreateInput => ({
-  owner: { connect: { id: userId } },
-  name,
-  description,
-  instructions: {
-    create: instructions.map(({ order, step }) => ({
-      order,
-      step,
-    })),
-  },
-  ingredients: {
-    create: ingredients.map(({ name, quantity }) => ({
-      name,
-      quantity,
-    })),
-  },
-});
+): Prisma.RecipeCreateInput => {
+  return {
+    owner: { connect: { id: userId } },
+    name,
+    description,
+    instructions: {
+      create: instructions.map(({ order, step }) => ({
+        order,
+        step,
+      })),
+    },
+    ingredients: {
+      create: ingredients.map(({ name, quantity }) => ({
+        name,
+        quantity,
+      })),
+    },
+  };
+};
 
 export const createFromDbEntity = ({
   description,
@@ -41,5 +42,5 @@ export const createFromDbEntity = ({
 });
 
 export const updateToDbEntity = (
-  recipe: UpdateRecipeSchema,
+  recipe: UpdateRecipeDto,
 ): Prisma.RecipeUpdateInput => recipe;

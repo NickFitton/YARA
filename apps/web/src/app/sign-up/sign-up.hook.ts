@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { UserCreationForm } from "./sign-up.schema";
+import { CreateUserDto } from "@yara/api/user";
 import { createAccount } from "./sign-up.action";
 
 export const useSignUp = () =>
   useMutation({
-    mutationFn: async (data: UserCreationForm) => createAccount(data),
+    mutationFn: async (data: CreateUserDto) => createAccount(data),
   });

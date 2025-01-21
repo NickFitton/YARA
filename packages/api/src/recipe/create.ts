@@ -4,13 +4,13 @@ export const createInstructionSchema = z.object({
   step: z.string(),
   order: z.number().positive(),
 });
-export type CreateInstructionSchema = z.infer<typeof createInstructionSchema>;
+export type CreateInstructionDto = z.infer<typeof createInstructionSchema>;
 
 export const createIngredientSchema = z.object({
   name: z.string(),
   quantity: z.string(),
 });
-export type CreateIngredientSchema = z.infer<typeof createIngredientSchema>;
+export type CreateIngredientDto = z.infer<typeof createIngredientSchema>;
 
 export const createRecipeSchema = z.object({
   name: z.string(),
@@ -18,4 +18,4 @@ export const createRecipeSchema = z.object({
   instructions: z.array(createInstructionSchema),
   ingredients: z.array(createIngredientSchema),
 });
-export type CreateRecipeSchema = z.infer<typeof createRecipeSchema>;
+export type CreateRecipeDto = z.infer<typeof createRecipeSchema>;
