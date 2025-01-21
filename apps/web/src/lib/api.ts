@@ -1,62 +1,13 @@
-import { ReadRecipeDto } from "@/app/recipes/create/create.action";
+import { LoginDto, TokenDto } from "@yara/api/auth";
+import { CreateRecipeDto, ReadRecipeDto } from "@yara/api/recipe";
+import { CreateUserDto, ReadUserDto } from "@yara/api/user";
 
 // TODO Request errors and better handling
-
-export type Instruction = {
-  id: string;
-  step: string;
-  order: number;
-};
-export type Ingredient = {
-  id: string;
-  name: string;
-  quantity: string;
-};
-export type Recipe = {
-  id: string;
-  name: string;
-  description?: string;
-  instructions: Instruction[];
-  ingredients: Ingredient[];
-};
-export type Login = {
-  email: string;
-  password: string;
-};
-export type AccessToken = {
-  accessToken: string;
-};
-export type CreateRecipe = {
-  name: string;
-  instructions: {
-    order: number;
-    step: string;
-  }[];
-  ingredients: {
-    name: string;
-    quantity: string;
-  }[];
-  description?: string | undefined;
-};
-
-export type CreateUser = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
-
-export type ReadUser = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-};
 
 const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 export const createRecipe = async (
-  data: CreateRecipe,
+  data: CreateRecipeDto,
   accessToken: string
 ): Promise<ReadRecipeDto> => {
   const response = await fetch(`${baseUrl}/recipes`, {
@@ -74,7 +25,7 @@ export const createRecipe = async (
   return await response.json();
 };
 
-export const getRecipes = async (accessToken: string): Promise<Recipe[]> => {
+export const getRecipes = async (accessToken: string): Promise<ReadRecipeDto[]> => {
   const recipesResponse = await fetch(`${baseUrl}/recipes`, {
     method: "get",
     headers: {
@@ -90,7 +41,7 @@ export const getRecipes = async (accessToken: string): Promise<Recipe[]> => {
   return recipesResponse.json();
 };
 
-export const createUser = async (data: CreateUser): Promise<ReadUser> => {
+export const createUser = async (data: CreateUserDto): Promise<ReadUserDto> => {
   const signupResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, {
     body: JSON.stringify(data),
     method: "post",
@@ -104,7 +55,7 @@ export const createUser = async (data: CreateUser): Promise<ReadUser> => {
   return signupResponse.json();
 };
 
-export const login = async (data: Login): Promise<AccessToken> => {
+export const login = async (data: LoginDto): Promise<TokenDto> => {
   const loginResponse = await fetch(`${baseUrl}/auth/login`, {
     body: JSON.stringify(data),
     method: "post",

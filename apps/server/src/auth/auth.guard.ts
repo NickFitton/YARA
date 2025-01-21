@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { jwtConstants } from './auth.constants';
-import { payloadSchema } from './dto/payload.dto';
+import { tokenPayloadSchema } from '@yara/api/auth';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -24,7 +24,7 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
-      const userPayload = payloadSchema.parse(payload);
+      const userPayload = tokenPayloadSchema.parse(payload);
       request['user'] = userPayload;
     } catch {
       throw new UnauthorizedException('Invalid token');

@@ -13,14 +13,12 @@ import {
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import {
-  CreateRecipeSchema,
+  CreateRecipeDto,
   createRecipeSchema,
-} from './dto/create-recipe.dto';
-import {
-  UpdateRecipeSchema,
+  UpdateRecipeDto,
   updateRecipeSchema,
-} from './dto/update-recipe.dto';
-import { ReadRecipeDto } from './dto/read-recipe.dto';
+  ReadRecipeDto
+} from '@yara/api/recipe';
 import { ZodValidationPipe } from '../pipes/zod.pipe';
 import { z } from 'zod';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -34,7 +32,7 @@ export class RecipesController {
   @UseGuards(AuthGuard)
   @UsePipes(new ZodValidationPipe(createRecipeSchema))
   create(
-    @Body() recipe: CreateRecipeSchema,
+    @Body() recipe: CreateRecipeDto,
     @UserId() userId: string,
   ): Promise<ReadRecipeDto> {
     return this.recipesService.create(recipe, userId);
@@ -68,7 +66,7 @@ export class RecipesController {
   )
   update(
     @Param('id') id: string,
-    @Body() recipe: UpdateRecipeSchema,
+    @Body() recipe: UpdateRecipeDto,
 
     @UserId() userId: string,
   ): Promise<void> {

@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { LoginSchema } from './dto/login.dto';
-import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { PayloadSchema } from './dto/payload.dto';
+import { LoginDto, TokenPayloadDto } from '@yara/api/auth';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -11,9 +10,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login({ email, password }: LoginSchema) {
+  async login({ email, password }: LoginDto) {
     const user = await this.userService.validatePassword({ email }, password);
-    const payload: PayloadSchema = { sub: user.id, username: user.email };
+    const payload: TokenPayloadDto = { sub: user.id, username: user.email };
     return this.jwtService.signAsync(payload);
   }
 }

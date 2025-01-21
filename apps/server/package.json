@@ -30,6 +30,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "5.20.0",
+    "@yara/api": "workspace:^",
     "argon2": "^0.41.1",
     "cookie-parser": "^1.4.6",
     "prisma": "^5.20.0",

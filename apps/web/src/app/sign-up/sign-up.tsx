@@ -15,14 +15,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, Hourglass } from "lucide-react";
 import { useSignUp } from "./sign-up.hook";
-import { userCreationFormSchema, UserCreationForm } from "./sign-up.schema";
 import { useRouter } from "next/navigation";
+import { CreateUserDto, createUserSchema } from "@yara/api/user";
 
 export const SignUpForm = () => {
   const router = useRouter();
   const { isPending, mutate } = useSignUp();
-  const form = useForm<UserCreationForm>({
-    resolver: zodResolver(userCreationFormSchema),
+  const form = useForm<CreateUserDto>({
+    resolver: zodResolver(createUserSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -30,7 +30,7 @@ export const SignUpForm = () => {
       password: "",
     },
   });
-  const onSubmit = (data: UserCreationForm) => {
+  const onSubmit = (data: CreateUserDto) => {
     mutate(data, {
       onSuccess: () => {
         router.push("/dashboard");

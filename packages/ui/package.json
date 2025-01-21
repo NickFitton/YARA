@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./button": "./src/button.tsx",
-    "./card": "./src/card.tsx",
-    "./code": "./src/code.tsx"
+    "./button": {"import":"./src/button.tsx", "types":"./src/button.tsx" },
+    "./card": {"import":"./src/card.tsx", "types":"./src/card.tsx" },
+    "./code": {"import":"./src/code.tsx", "types":"./src/code.tsx" }
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

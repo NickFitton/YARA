@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { createRecipeSchema } from './create-recipe.dto';
+import { createRecipeSchema } from './create';
 
 export const updateRecipeSchema = createRecipeSchema.partial().omit({
   ingredients: true,
   instructions: true,
 });
-export type UpdateRecipeSchema = z.infer<typeof updateRecipeSchema>;
+export type UpdateRecipeDto = z.infer<typeof updateRecipeSchema>;

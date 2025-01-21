@@ -8,12 +8,14 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { createUserSchema, CreateUserSchema } from './dto/create-user.dto';
-import { updateUserSchema, UpdateUserSchema } from './dto/update-user.dto';
 import {
+  createUserSchema,
+  updateUserSchema,
   updatePasswordSchema,
-  UpdatePasswordSchema,
-} from './dto/update-password.dto';
+  CreateUserDto,
+  UpdateUserDto,
+  UpdatePasswordDto,
+} from '@yara/api/user';
 import { ZodValidationPipe } from 'src/pipes/zod.pipe';
 import { z } from 'zod';
 
@@ -23,13 +25,13 @@ export class UsersController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(createUserSchema))
-  create(@Body() body: CreateUserSchema) {
+  create(@Body() body: CreateUserDto) {
     return this.usersService.create(body);
   }
 
   @Patch(':id')
   @UsePipes(new ZodValidationPipe(updateUserSchema, { id: z.string().uuid() }))
-  update(@Param('id') id: string, @Body() body: UpdateUserSchema) {
+  update(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.usersService.update(id, body);
   }
 
@@ -37,7 +39,7 @@ export class UsersController {
   @UsePipes(
     new ZodValidationPipe(updatePasswordSchema, { id: z.string().uuid() }),
   )
-  updatePassword(@Param('id') id: string, @Body() body: UpdatePasswordSchema) {
+  updatePassword(@Param('id') id: string, @Body() body: UpdatePasswordDto) {
     return this.usersService.updatePassword(id, body);
   }
 

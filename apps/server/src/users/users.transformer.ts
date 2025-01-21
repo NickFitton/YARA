@@ -1,15 +1,14 @@
 import { hash } from 'argon2';
-import { CreateUserSchema } from './dto/create-user.dto';
 import { Prisma, User } from '@prisma/client';
-import { ReadUserDto } from './dto/read-user.dto';
-import { InternalUpdateUserSchema } from './dto/update-user.dto';
+import { CreateUserDto, ReadUserDto } from '@yara/api/user';
+import { UserInternalDto } from './users.internal.dto';
 
 export const createToDbEntity = async ({
   firstName,
   lastName,
   email,
   password,
-}: CreateUserSchema): Promise<Prisma.UserCreateInput> => ({
+}: CreateUserDto): Promise<Prisma.UserCreateInput> => ({
   firstName,
   lastName,
   email,
@@ -26,7 +25,7 @@ export const readFromDbEntity = ({
 export const updateToDbEntity = async ({
   password,
   ...user
-}: InternalUpdateUserSchema): Promise<Prisma.UserUpdateInput> => {
+}: Partial<UserInternalDto>): Promise<Prisma.UserUpdateInput> => {
   const entity: Prisma.UserUpdateInput = { ...user };
   if (password) {
     entity.password = await hash(password);

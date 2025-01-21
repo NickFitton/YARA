@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { loginSchema, LoginSchema } from "./login.schema";
+import { loginSchema, LoginDto } from "@yara/api/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -22,14 +22,14 @@ import { useState } from "react";
 export const LoginForm = () => {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
-  const form = useForm<LoginSchema>({
+  const form = useForm<LoginDto>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  const onSubmit = async (data: LoginSchema) => {
+  const onSubmit = async (data: LoginDto) => {
     setIsPending(true);
     // I'd like to be able to tanstack this
     const response = await attemptLogin(data);

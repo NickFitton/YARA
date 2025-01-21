@@ -1,28 +1,26 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateUserSchema } from './dto/create-user.dto';
-import { InternalUpdateUserSchema } from './dto/update-user.dto';
 import { PrismaService } from 'src/services/prisma.service';
-import { UpdatePasswordSchema } from './dto/update-password.dto';
 import {
   createToDbEntity,
   readFromDbEntity,
   updateToDbEntity,
 } from './users.transformer';
-import { ReadUserDto } from './dto/read-user.dto';
 import { verify } from 'argon2';
 import { User } from '@prisma/client';
+import { CreateUserDto, ReadUserDto, UpdatePasswordDto } from '@yara/api/user';
+import { UserInternalDto } from './users.internal.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  create(user: CreateUserSchema): Promise<ReadUserDto> {
+  create(user: CreateUserDto): Promise<ReadUserDto> {
     return createToDbEntity(user)
       .then((hashedData) => this.prisma.user.create({ data: hashedData }))
       .then(readFromDbEntity);
   }
 
-  update(id: string, user: InternalUpdateUserSchema): Promise<void> {
+  update(id: string, user: Partial<UserInternalDto>): Promise<void> {
     return this.prisma.user
       .update({ where: { id }, data: updateToDbEntity(user) })
       .then();
@@ -54,7 +52,7 @@ export class UsersService {
       });
   }
 
-  updatePassword(id: string, body: UpdatePasswordSchema): Promise<void> {
+  updatePassword(id: string, body: UpdatePasswordDto): Promise<void> {
     return this.validatePassword({ id }, body.oldPassword).then(() =>
       this.update(id, { password: body.newPassword }),
     );
