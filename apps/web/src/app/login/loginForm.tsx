@@ -18,6 +18,7 @@ import { Hourglass } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { attemptLogin } from "./login.action";
 import { useState } from "react";
+import { ErrorMessage } from "@hookform/error-message";
 
 export const LoginForm = () => {
   const [isPending, setIsPending] = useState(false);
@@ -32,11 +33,18 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginDto) => {
     setIsPending(true);
     // I'd like to be able to tanstack this
-    const response = await attemptLogin(data);
-    if ("accessToken" in response && response.accessToken) {
-      router.push("/dashboard");
-    }
+    const loginResponse = await attemptLogin(data);
     setIsPending(false);
+    switch (loginResponse.status) {
+      case "ok":
+        router.push("/dashboard");
+        return;
+      case "error":
+        form.setError("password", {
+          type: "server",
+          message: loginResponse.error.reason,
+        });
+    }
   };
   return (
     <Form {...form}>

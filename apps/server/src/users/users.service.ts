@@ -38,14 +38,12 @@ export class UsersService {
       .findFirst({ where: user })
       .then((user) => {
         if (!user) {
-          console.log('Password validation - bad email');
           throw new UnauthorizedException();
         }
         return Promise.all([user, verify(user.password, password)]);
       })
       .then(([user, passwordGood]) => {
         if (!passwordGood) {
-          console.log('Password validation - bad password');
           throw new UnauthorizedException();
         }
         return user;

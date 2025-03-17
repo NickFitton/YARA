@@ -1,4 +1,4 @@
-import { LoginDto, TokenDto } from "@yara/api/auth";
+import { LoginDto } from "@yara/api/auth";
 import { CreateRecipeDto, ReadRecipeDto } from "@yara/api/recipe";
 import { CreateUserDto, ReadUserDto } from "@yara/api/user";
 
@@ -25,7 +25,9 @@ export const createRecipe = async (
   return await response.json();
 };
 
-export const getRecipes = async (accessToken: string): Promise<ReadRecipeDto[]> => {
+export const getRecipes = async (
+  accessToken: string
+): Promise<ReadRecipeDto[]> => {
   const recipesResponse = await fetch(`${baseUrl}/recipes`, {
     method: "get",
     headers: {
@@ -42,31 +44,28 @@ export const getRecipes = async (accessToken: string): Promise<ReadRecipeDto[]> 
 };
 
 export const createUser = async (data: CreateUserDto): Promise<ReadUserDto> => {
-  const signupResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, {
-    body: JSON.stringify(data),
-    method: "post",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const signupResponse = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/users`,
+    {
+      body: JSON.stringify(data),
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (signupResponse.status !== 201) {
     throw new Error("Failed to sign up");
   }
   return signupResponse.json();
 };
 
-export const login = async (data: LoginDto): Promise<TokenDto> => {
-  const loginResponse = await fetch(`${baseUrl}/auth/login`, {
+export const login = async (data: LoginDto): Promise<Response> => {
+  return fetch(`${baseUrl}/auth/login`, {
     body: JSON.stringify(data),
     method: "post",
     headers: {
       "Content-Type": "application/json",
     },
   });
-
-  if (loginResponse.status !== 201) {
-    throw new Error("Bad request");
-  }
-
-  return loginResponse.json();
 };
