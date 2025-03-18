@@ -6,6 +6,7 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
+  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -67,9 +68,12 @@ export default async function Dashboard() {
 
       {/* Recipe List */}
       <ScrollArea className="h-[calc(100vh-73px)] p-4 z-0 bg-slate-50">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {recipes.map((recipe) => (
             <Card key={recipe.id} className="overflow-hidden">
+              <CardHeader className="p-0">
+                <img alt="Recipe image" src="https://placehold.co/300x150" />
+              </CardHeader>
               <CardContent className="p-4">
                 <CardTitle>{recipe.name}</CardTitle>
                 <CardDescription>{recipe.description}</CardDescription>
