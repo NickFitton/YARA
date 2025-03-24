@@ -70,24 +70,17 @@ export default async function Dashboard() {
       <ScrollArea className="h-[calc(100vh-73px)] p-4 z-0 bg-slate-50">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {recipes.map((recipe) => (
-            <Card key={recipe.id} className="overflow-hidden">
-              <CardHeader className="p-0">
-                <img alt="Recipe image" src="https://placehold.co/300x150" />
-              </CardHeader>
-              <CardContent className="p-4">
-                <CardTitle>{recipe.name}</CardTitle>
-                <CardDescription>{recipe.description}</CardDescription>
-              </CardContent>
-              <CardFooter className="p-4 pt-0 flex justify-between">
-                <Button variant="outline" size="sm">
-                  Save
-                </Button>
-                <Button size="sm">
-                  View Recipe
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </CardFooter>
-            </Card>
+            <Link key={recipe.id} href={`/recipes/${recipe.id}`}>
+              <Card className="overflow-hidden">
+                <CardHeader className="p-0">
+                  <img alt="Recipe image" src="https://placehold.co/300x150" />
+                </CardHeader>
+                <CardContent className="p-4">
+                  <CardTitle>{recipe.name}</CardTitle>
+                  <CardDescription>{recipe.description}</CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
           <Card className="overflow-hidden">
             <CardContent className="p-4">

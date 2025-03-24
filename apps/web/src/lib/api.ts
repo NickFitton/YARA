@@ -43,6 +43,25 @@ export const getRecipes = async (
   return recipesResponse.json();
 };
 
+export const getRecipe = async (
+  accessToken: string,
+  recipeId: string
+): Promise<ReadRecipeDto> => {
+  const recipesResponse = await fetch(`${baseUrl}/recipes/${recipeId}`, {
+    method: "get",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (recipesResponse.status !== 200) {
+    console.log(recipesResponse);
+    throw new Error("failed to fetch recipes");
+  }
+  return recipesResponse.json();
+};
+
 export const createUser = async (data: CreateUserDto): Promise<ReadUserDto> => {
   const signupResponse = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/users`,
