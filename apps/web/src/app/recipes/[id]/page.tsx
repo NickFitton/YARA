@@ -16,7 +16,9 @@ import {
   ForwardRefExoticComponent,
   PropsWithChildren,
   RefAttributes,
+  useState,
 } from "react";
+import { RecipeContent } from "./RecipeContent";
 
 type MissingData = {
   totalTime: string;
@@ -46,7 +48,7 @@ function InfoCard({
 }
 function ActionCard({ Icon, title }: { title: string; Icon: Icon }) {
   return (
-    <Card className="border-orange-400 bg-orange-50">
+    <Card className="border-orange-400 bg-orange-50 h-full">
       <CardContent className="flex flex-col items-center justify-center p-4">
         <Icon className="mb-2 h-6 w-6 text-orange-500" />
         <p className="text-sm text-muted-foreground text-orange-700">{title}</p>
@@ -56,12 +58,12 @@ function ActionCard({ Icon, title }: { title: string; Icon: Icon }) {
 }
 
 function QuickInfo({
-  recipe: { totalTime, servings, difficulty, calories },
+  recipe: { id, totalTime, servings, difficulty, calories },
 }: {
   recipe: ReadRecipeDto & MissingData;
 }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-5 w-full">
+    <div className="grid gap-4 grid-cols-4 w-full">
       <InfoCard Icon={Clock} title="Total Time">
         <p className="font-semibold">{totalTime}</p>
       </InfoCard>
@@ -82,7 +84,9 @@ function QuickInfo({
       <InfoCard Icon={Scale} title="Calories">
         <p className="font-semibold">{calories}</p>
       </InfoCard>
-      <ActionCard Icon={ChefHat} title="Let's cook!" />
+      {/* <Link className="h-full" href={`/recipes/${id}/cook`}>
+        <ActionCard Icon={ChefHat} title="Let's cook!" />
+      </Link> */}
     </div>
   );
 }
@@ -115,51 +119,6 @@ function Header({ recipe: { name, description } }: { recipe: ReadRecipeDto }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function RecipeContent({ recipe }: { recipe: ReadRecipeDto }) {
-  return (
-    <main className="flex flex-col gap-2 mt-4 mb-4">
-      <section id="ingredients">
-        <h2 className="mb-4 text-2xl font-bold">Ingredients</h2>
-        <Card className="p-4">
-          <CardContent className="pb-0">
-            <ul className="flex flex-col gap-2">
-              {recipe.ingredients.map((ingredient) => {
-                return (
-                  <li
-                    key={ingredient.id}
-                    className="list-disc marker:text-orange-500"
-                  >
-                    {ingredient.quantity} - {ingredient.name}
-                  </li>
-                );
-              })}
-            </ul>
-          </CardContent>
-        </Card>
-      </section>
-      <section id="instructions">
-        <h2 className="mb-4 text-2xl font-bold">Instructions</h2>
-        <Card className="p-4">
-          <CardContent className="pb-0">
-            <ol className="flex flex-col gap-2">
-              {recipe.instructions.map((instruction) => {
-                return (
-                  <li
-                    key={instruction.id}
-                    className="list-decimal marker:text-orange-500"
-                  >
-                    {instruction.step}
-                  </li>
-                );
-              })}
-            </ol>
-          </CardContent>
-        </Card>
-      </section>
-    </main>
   );
 }
 
