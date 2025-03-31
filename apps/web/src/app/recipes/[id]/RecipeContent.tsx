@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ReadRecipeDto } from "@yara/api/recipe";
 import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 type ContentState = "view" | "editIngredients" | "editInstructions";
 export function RecipeContent({ recipe }: { recipe: ReadRecipeDto }) {
@@ -50,21 +51,34 @@ export function RecipeContent({ recipe }: { recipe: ReadRecipeDto }) {
           />
         </div>
         <Card className="p-4">
-          <CardContent className={state === "view" ? "pb-0" : "pb-0 pl-0"}>
+          <CardContent className={state === "view" ? "p-0 pl-px ml-px" : "p-0"}>
             <ul className="flex flex-col gap-2" ref={container}>
               {recipe.ingredients.map((ingredient) => {
                 return (
                   <li
                     data-swapy-slot={ingredient.id}
                     key={ingredient.id}
-                    // className={`list-disc marker:text-orange-500`}
-                    className={`${state === "view" ? "list-disc" : "list-none"} marker:text-orange-500`}
+                    className={
+                      state === "editIngredients"
+                        ? "list-none marker:text-orange-500"
+                        : "list-disc marker:text-orange-500 ml-5"
+                    }
                   >
-                    <div data-swapy-item={ingredient.id} className="flex">
+                    <div data-swapy-item={ingredient.id} className="flex gap-2">
                       {state === "editIngredients" ? (
                         <GripVertical className="my-auto h-4 text-orange-500" />
                       ) : null}
-                      {ingredient.quantity} - {ingredient.name}
+                      <Input
+                        value={ingredient.quantity}
+                        className={
+                          state === "editIngredients" ? "w-24" : "w-24 ml-2"
+                        }
+                        disabled={state === "view"}
+                      />
+                      <Input
+                        value={ingredient.name}
+                        disabled={state === "view"}
+                      />
                     </div>
                   </li>
                 );
