@@ -1,11 +1,15 @@
 "use client";
 import { createSwapy, Swapy } from "swapy";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ReadRecipeDto } from "@yara/api/recipe";
 import { useEffect, useRef, useState } from "react";
-import { GripVertical } from "lucide-react";
-import { Input } from "@/components/ui/input";
 
 type ContentState = "view" | "editIngredients" | "editInstructions";
 export function RecipeContent({ recipe }: { recipe: ReadRecipeDto }) {
@@ -41,45 +45,19 @@ export function RecipeContent({ recipe }: { recipe: ReadRecipeDto }) {
   return (
     <main className="flex flex-col gap-8 mt-4 mb-4">
       <section id="ingredients">
-        <div className="flex justify-between">
-          <h2 className="mb-4 text-2xl font-bold">Ingredients</h2>
-          <IngredientActions
-            state={state}
-            onEdit={editIngredients}
-            onSave={() => console.log("on ingredients save")}
-            onCancel={view}
-          />
-        </div>
-        <Card className="p-4">
-          <CardContent className={state === "view" ? "p-0 pl-px ml-px" : "p-0"}>
-            <ul className="flex flex-col gap-2" ref={container}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Ingredients</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="flex flex-col gap-2">
               {recipe.ingredients.map((ingredient) => {
                 return (
                   <li
-                    data-swapy-slot={ingredient.id}
                     key={ingredient.id}
-                    className={
-                      state === "editIngredients"
-                        ? "list-none marker:text-orange-500"
-                        : "list-disc marker:text-orange-500 ml-5"
-                    }
+                    className={"list-disc marker:text-orange-500 ml-5"}
                   >
-                    <div data-swapy-item={ingredient.id} className="flex gap-2">
-                      {state === "editIngredients" ? (
-                        <GripVertical className="my-auto h-4 text-orange-500" />
-                      ) : null}
-                      <Input
-                        value={ingredient.quantity}
-                        className={
-                          state === "editIngredients" ? "w-24" : "w-24 ml-2"
-                        }
-                        disabled={state === "view"}
-                      />
-                      <Input
-                        value={ingredient.name}
-                        disabled={state === "view"}
-                      />
-                    </div>
+                    {ingredient.quantity} - {ingredient.name}
                   </li>
                 );
               })}
@@ -88,17 +66,11 @@ export function RecipeContent({ recipe }: { recipe: ReadRecipeDto }) {
         </Card>
       </section>
       <section id="instructions">
-        <div className="flex justify-between">
-          <h2 className="mb-4 text-2xl font-bold">Instructions</h2>
-          <InstructionActions
-            state={state}
-            onEdit={() => setState("editInstructions")}
-            onSave={() => console.log("on instructions save")}
-            onCancel={() => setState("view")}
-          />
-        </div>
-        <Card className="p-4">
-          <CardContent className="pb-0">
+        <Card>
+          <CardHeader>
+            <CardTitle>Instructions</CardTitle>
+          </CardHeader>
+          <CardContent>
             <ol className="flex flex-col gap-2">
               {recipe.instructions.map((instruction) => {
                 switch (state) {
@@ -107,7 +79,7 @@ export function RecipeContent({ recipe }: { recipe: ReadRecipeDto }) {
                     return (
                       <li
                         key={instruction.id}
-                        className="list-decimal marker:text-orange-500"
+                        className="list-decimal marker:text-orange-500 ml-5"
                       >
                         {instruction.step}
                       </li>
@@ -132,12 +104,12 @@ function IngredientActions({ state, onEdit, onCancel, onSave }: ActionProps) {
   switch (state) {
     case "editIngredients":
       return (
-        <div className="flex gap-2">
+        <>
+          <Button onClick={onSave}>Save</Button>
           <Button variant="link" onClick={onCancel}>
             Cancel
           </Button>
-          <Button onClick={onSave}>Save</Button>
-        </div>
+        </>
       );
     default:
       return (
@@ -152,12 +124,12 @@ function InstructionActions({ state, onEdit, onCancel, onSave }: ActionProps) {
   switch (state) {
     case "editInstructions":
       return (
-        <div className="flex gap-2">
+        <>
+          <Button onClick={onSave}>Save</Button>
           <Button variant="link" onClick={onCancel}>
             Cancel
           </Button>
-          <Button onClick={onSave}>Save</Button>
-        </div>
+        </>
       );
     default:
       return (
