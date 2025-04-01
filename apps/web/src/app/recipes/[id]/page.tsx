@@ -16,7 +16,6 @@ import {
   ForwardRefExoticComponent,
   PropsWithChildren,
   RefAttributes,
-  useState,
 } from "react";
 import { RecipeContent } from "./RecipeContent";
 
@@ -46,19 +45,9 @@ function InfoCard({
     </Card>
   );
 }
-function ActionCard({ Icon, title }: { title: string; Icon: Icon }) {
-  return (
-    <Card className="border-orange-400 bg-orange-50 h-full">
-      <CardContent className="flex flex-col items-center justify-center p-4">
-        <Icon className="mb-2 h-6 w-6 text-orange-500" />
-        <p className="text-sm text-muted-foreground text-orange-700">{title}</p>
-      </CardContent>
-    </Card>
-  );
-}
 
 function QuickInfo({
-  recipe: { id, totalTime, servings, difficulty, calories },
+  recipe: { totalTime, servings, difficulty, calories },
 }: {
   recipe: ReadRecipeDto & MissingData;
 }) {

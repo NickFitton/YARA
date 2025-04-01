@@ -7,7 +7,6 @@ export function middleware(request: NextRequest) {
   if (!cookie) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-
   try {
     const expDate = new Date(
       JSON.parse(atob(cookie.value.split(".")[1])).exp * 1000
@@ -21,9 +20,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-return NextResponse.next();
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: ['/dashboard'],
+  matcher: ["/dashboard", "/recipes", "/recipes/:id*"],
 };
