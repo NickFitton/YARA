@@ -18,7 +18,6 @@ import { Hourglass } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { attemptLogin } from "./login.action";
 import { useState } from "react";
-import { ErrorMessage } from "@hookform/error-message";
 
 export const LoginForm = () => {
   const [isPending, setIsPending] = useState(false);
@@ -37,7 +36,7 @@ export const LoginForm = () => {
     setIsPending(false);
     switch (loginResponse.status) {
       case "ok":
-        router.push("/dashboard");
+        router.push("/recipes");
         return;
       case "error":
         form.setError("password", {

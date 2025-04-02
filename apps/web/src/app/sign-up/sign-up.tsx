@@ -33,7 +33,7 @@ export const SignUpForm = () => {
   const onSubmit = (data: CreateUserDto) => {
     mutate(data, {
       onSuccess: () => {
-        router.push("/dashboard");
+        router.push("/recipes");
       },
       onError: (e) => {
         console.error("Request failed");
@@ -110,7 +110,9 @@ export const SignUpForm = () => {
               <ChevronLeft />
               Back to login
             </Link>
-            <Button className="w-32" type="submit" disabled={isPending}>{isPending ? <Hourglass size="1rem"/> : "Submit"}</Button>
+            <Button className="w-32" type="submit" disabled={isPending}>
+              {isPending ? <Hourglass size="1rem" /> : "Submit"}
+            </Button>
           </div>
         </div>
       </form>

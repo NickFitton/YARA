@@ -23,7 +23,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRecipes } from "@/lib/api";
 
-export default async function Dashboard() {
+export default async function Recipes() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")!;
   const recipes = await getRecipes(accessToken.value);
