@@ -4,9 +4,6 @@ import createMDX from "@next/mdx";
 const nextConfig = {
   pageExtensions: ["md", "mdx", "tsx", "ts"],
   output: "standalone",
-  images: {
-    remotePatterns: [new URL("https://placehold.co/300x150")],
-  },
 };
 
 const withMDX = createMDX({});

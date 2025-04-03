@@ -4,10 +4,11 @@ import { ChefHat, Clock, Maximize2, PencilLine, Users } from "lucide-react";
 import { cookies } from "next/headers";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
-import { DialogContent } from "@/components/ui/dialog";
+import { DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 type MissingData = {
   totalTime: string;
@@ -24,9 +25,8 @@ export default async function RecipeModal({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")!;
-  console.log(accessToken.value);
   const recipe = {
     ...(await getRecipe(accessToken.value, id)),
     totalTime: "4h 20m",
@@ -37,11 +37,14 @@ export default async function RecipeModal({
 
   return (
     <DialogContent className="max-w-3xl p-0 sm:max-h-[90vh] sm:overflow-auto">
+      <VisuallyHidden>
+        <DialogTitle>{recipe.name}</DialogTitle>
+      </VisuallyHidden>
       <div className="grid grid-cols-1 md:grid-cols-2">
         {/* Image Section */}
         <div className="relative h-64 md:h-full">
           <Image
-            src={recipe.image || "https://placehold.co/300x150"}
+            src={recipe.image || "./placeholder.svg"}
             alt={recipe.name}
             fill
             className="object-cover"

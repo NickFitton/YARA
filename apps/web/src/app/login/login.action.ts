@@ -20,11 +20,12 @@ type Response<D = undefined, E = unknown> = D extends undefined
 // I'd like this request to be a bit more trustworthy
 type LoginResponse = Response<undefined>;
 export const attemptLogin = async (data: LoginDto): Promise<LoginResponse> => {
+  const cookiesP = cookies();
   const response = await login(data);
   switch (response.status) {
     case 201: {
       const body = (await response.json()) as TokenDto;
-      cookies().set("accessToken", body.accessToken);
+      (await cookiesP).set("accessToken", body.accessToken);
       return { status: "ok" };
     }
     case 401: {

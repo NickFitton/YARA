@@ -21,9 +21,8 @@ export default async function RecipePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")!;
-  console.log(accessToken.value);
   const recipe = {
     ...(await getRecipe(accessToken.value, id)),
     totalTime: "4h 20m",

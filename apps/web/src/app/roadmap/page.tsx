@@ -1,5 +1,4 @@
 "use client";
-
 import { Footer } from "@/components/organisms/footer";
 import { Header } from "@/components/organisms/header";
 import {
@@ -17,6 +16,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+import type { JSX } from "react";
 
 const determineStatus = (features: Feature[]): Status => {
   if (features.every(({ status }) => status === "pending")) {

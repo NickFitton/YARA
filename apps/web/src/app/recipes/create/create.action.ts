@@ -7,6 +7,6 @@ import { CreateRecipeDto, ReadRecipeDto } from "@yara/api/recipe";
 export const createRecipe = async (
   data: CreateRecipeDto
 ): Promise<ReadRecipeDto> => {
-  const accessToken = cookies().get("accessToken")!.value;
+  const accessToken = (await cookies()).get("accessToken")!.value;
   return createRecipeApi(data, accessToken);
 };
