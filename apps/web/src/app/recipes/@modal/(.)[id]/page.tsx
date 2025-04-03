@@ -1,6 +1,6 @@
 import { getRecipe } from "@/lib/api";
 import { ReadRecipeDto } from "@yara/api/recipe";
-import { ArrowRight, ChefHat, Clock, ThumbsUp, Users } from "lucide-react";
+import { ChefHat, Clock, Maximize2, PencilLine, Users } from "lucide-react";
 import { cookies } from "next/headers";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
@@ -41,7 +41,7 @@ export default async function RecipeModal({
         {/* Image Section */}
         <div className="relative h-64 md:h-full">
           <Image
-            src={recipe.image || "/placeholder.svg"}
+            src={recipe.image || "https://placehold.co/300x150"}
             alt={recipe.name}
             fill
             className="object-cover"
@@ -149,24 +149,47 @@ export default async function RecipeModal({
           <Separator className="my-4" />
 
           {/* Actions */}
-          <div className="flex flex-col gap-2">
-            <Link href={`/recipes/${recipe.id}`}>
-              View Full Recipe
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-            <div className="grid grid-cols-2 gap-2">
-              <Link href={`/recipes/${recipe.id}/cook`}>
-                <ThumbsUp className="mr-2 h-4 w-4" />
-                Cook
-              </Link>
-              <Link href={`/recipes/${recipe.id}/edit`}>
-                <ThumbsUp className="mr-2 h-4 w-4" />
-                Edit
-              </Link>
-            </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant={"default"} asChild className={`w-full col-span-2`}>
+              <a
+                href={`/recipes/${recipe.id}`}
+                className="flex flex-row justify-center items-center gap-2"
+              >
+                View Full Recipe
+                <Maximize2 className="mr-2 h-4 w-4" />
+              </a>
+            </Button>
+            <IconLink Icon={ChefHat} href={`/recipes/${recipe.id}/cook`}>
+              Cook
+            </IconLink>
+            <IconLink Icon={PencilLine} href={`/recipes/${recipe.id}/edit`}>
+              Edit
+            </IconLink>
           </div>
         </div>
       </div>
     </DialogContent>
   );
 }
+
+const IconLink = ({
+  Icon,
+  children,
+  href,
+}: {
+  Icon: (props: { className: string }) => React.ReactNode;
+  children: string;
+  href: string;
+}) => {
+  return (
+    <Button variant="outline" asChild className={`w-full`}>
+      <Link
+        href={href}
+        className="flex flex-row justify-center items-center gap-2"
+      >
+        {children}
+        <Icon className="mr-2 h-4 w-4" />
+      </Link>
+    </Button>
+  );
+};
