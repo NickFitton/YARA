@@ -162,7 +162,7 @@ export default async function RecipeModal({
                 <Maximize2 className="mr-2 h-4 w-4" />
               </a>
             </Button>
-            <IconLink Icon={ChefHat} href={`/recipes/${recipe.id}/cook`}>
+            <IconLink Icon={ChefHat} href={`/cook/${recipe.id}`}>
               Cook
             </IconLink>
             <IconLink Icon={PencilLine} href={`/recipes/${recipe.id}/edit`}>

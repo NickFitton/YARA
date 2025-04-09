@@ -155,7 +155,7 @@ export default function RecipeOverview({ recipe }: RecipePageData) {
 
             <div className="space-y-3">
               <Button className="w-full bg-orange-500 hover:bg-orange-600">
-                Start Cooking
+                <Link href={`/cook/${recipe.id}`}>Start Cooking</Link>
               </Button>
               <Button variant="outline" className="w-full" asChild>
                 <Link href={`/recipes/${recipe.id}/edit`}>Edit Recipe</Link>

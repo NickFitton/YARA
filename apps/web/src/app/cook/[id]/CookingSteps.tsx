@@ -1,10 +1,11 @@
 "use client";
 
 import { RecipePageData } from "@/app/recipes/[id]/types";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ReadIngredientDto, ReadInstructionDto } from "@yara/api/recipe";
+import { ReadIngredientDto } from "@yara/api/recipe";
 import { UtensilsCrossed } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -46,17 +47,13 @@ function StepIndicator({
   );
 }
 
-function Ingredient({
-  name,
-  quantity,
-  key,
-}: ReadIngredientDto & { key: string }) {
+function Ingredient({ name, quantity, id }: ReadIngredientDto) {
   return (
     <div className="items-top flex space-x-2">
-      <Checkbox id={key} />
+      <Checkbox id={id} />
       <div className="grid gap-1.5 leading-none">
         <label
-          htmlFor={key}
+          htmlFor={id}
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
           {name}
@@ -67,15 +64,41 @@ function Ingredient({
   );
 }
 
+function Equipment({ equipment }: { equipment: string }) {
+  return (
+    <div className="items-top flex space-x-2">
+      <Checkbox id={equipment} />
+      <div className="grid gap-1.5 leading-none">
+        <label
+          htmlFor={equipment}
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          {equipment}
+        </label>
+      </div>
+    </div>
+  );
+}
+
 function Prep(props: RecipePageData) {
   return (
     <div>
-      <p>Before you start cooking, make sure you've got everything ready:</p>
+      <p>
+        Before you start cooking, make sure you&apos;ve got everything ready:
+      </p>
       <section>
         <h3 className="text-lg font-semibold">Ingredients</h3>
         <div className="grid grid-cols-3 gap-4 mt-4">
-          {props.recipe.ingredients.map((ingredient) => {
-            return <Ingredient key={ingredient.id} {...ingredient} />;
+          {props.recipe.ingredients.map((ingredient) => (
+            <Ingredient key={ingredient.id} {...ingredient} />
+          ))}
+        </div>
+      </section>
+      <section>
+        <h3 className="text-lg font-semibold">Equipment</h3>
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          {props.recipe.equipment.map((equipment) => {
+            return <Equipment key={equipment} equipment={equipment} />;
           })}
         </div>
       </section>
@@ -83,7 +106,38 @@ function Prep(props: RecipePageData) {
   );
 }
 function Step(props: RecipePageData & { step: number }) {
-  return <div></div>;
+  const instruction = props.recipe.instructions.find(
+    ({ order }) => order === props.step
+  )!;
+  return (
+    <div className="flex flex-col gap-4">
+      <section>
+        <p>{instruction.step}</p>
+      </section>
+      <section>
+        <h3 className="font-semibold">Ingredients for this step:</h3>
+        <div className="flex gap-2 p-2">
+          <Badge variant="outline" className="bg-orange-50 text-orange-800">
+            Salt
+          </Badge>
+          <Badge variant="outline" className="bg-orange-50 text-orange-800">
+            Pepper
+          </Badge>
+        </div>
+      </section>
+      <section>
+        <h3 className="font-semibold">Ingredients for this step:</h3>
+        <div className="flex gap-2 p-2">
+          <Badge variant="outline" className="bg-blue-50 text-blue-800">
+            Whisk
+          </Badge>
+          <Badge variant="outline" className="bg-blue-50 text-blue-800">
+            Burner
+          </Badge>
+        </div>
+      </section>
+    </div>
+  );
 }
 
 function InstructionCard({
@@ -108,16 +162,22 @@ function InstructionCard({
           )}
         </CardContent>
       </Card>
-      <Actions currentNumber={currentNumber} />
+      <Actions
+        currentNumber={currentNumber}
+        steps={recipe.instructions.length}
+      />
     </div>
   );
 }
 
-function Actions({ currentNumber }: StepProps) {
+function Actions({ currentNumber, steps }: StepProps & { steps: number }) {
+  const isFirstStep = currentNumber === 0;
+  const isLastStep = currentNumber === steps;
+  console.log(isLastStep, currentNumber, steps);
   const r = useRouter();
   return (
     <div className="grid grid-cols-[1fr_auto_1fr]">
-      {currentNumber === 0 ? (
+      {isFirstStep ? (
         <div />
       ) : (
         <Button
@@ -129,12 +189,16 @@ function Actions({ currentNumber }: StepProps) {
         </Button>
       )}
       <div className="w-20"></div>
-      <Button
-        className="h-12 font-semibold"
-        onClick={() => r.replace(`?s=${currentNumber + 1}`)}
-      >
-        Next
-      </Button>
+      {isLastStep ? (
+        <div />
+      ) : (
+        <Button
+          className="h-12 font-semibold"
+          onClick={() => r.replace(`?s=${currentNumber + 1}`)}
+        >
+          Next
+        </Button>
+      )}
     </div>
   );
 }
