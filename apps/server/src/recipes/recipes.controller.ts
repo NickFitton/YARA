@@ -17,7 +17,7 @@ import {
   createRecipeSchema,
   UpdateRecipeDto,
   updateRecipeSchema,
-  ReadRecipeDto
+  ReadRecipeDto,
 } from '@yara/api/recipe';
 import { ZodValidationPipe } from '../pipes/zod.pipe';
 import { z } from 'zod';
