@@ -37,7 +37,6 @@ export default async function RecipePage({
     ...(await getRecipe(accessToken.value, id)),
     ...missingData,
   };
-  console.log(JSON.stringify(recipe));
 
   return (
     <div className="min-h-screen w-full bg-gray-50">
