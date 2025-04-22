@@ -4,6 +4,11 @@ import createMDX from "@next/mdx";
 const nextConfig = {
   pageExtensions: ["md", "mdx", "tsx", "ts"],
   output: "standalone",
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
 };
 
 const withMDX = createMDX({});

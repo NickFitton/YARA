@@ -18,6 +18,7 @@ import {
   FieldPath,
   FieldValues,
   useForm,
+  UseFormReturn,
 } from "react-hook-form";
 import { RecipePageData } from "../types";
 import {
@@ -30,7 +31,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ForwardRefExoticComponent, RefAttributes } from "react";
+import {
+  ForwardRefExoticComponent,
+  RefAttributes,
+  useEffect,
+  useRef,
+} from "react";
 import {
   Select,
   SelectContent,
@@ -38,6 +44,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { updateRecipe } from "./update.action";
+import { toast } from "@/hooks/use-toast";
 
 interface FieldProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -99,6 +107,27 @@ function TextField<
     />
   );
 }
+
+function NumberField<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({ placeholder = "", ...fieldProps }: FieldProps<TFieldValues, TName>) {
+  return (
+    <Field
+      {...fieldProps}
+      render={({ field }) => (
+        <Input
+          type="number"
+          inputMode="numeric"
+          pattern="[0-9]+"
+          placeholder={placeholder}
+          {...field}
+        />
+      )}
+    />
+  );
+}
+
 function TextAreaField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -132,13 +161,13 @@ function SelectField<
     <FormField
       control={control}
       name={name}
-      render={({ field, fieldState, formState }) => (
+      render={({ field: { onChange, value } }) => (
         <FormItem>
           <FormLabel className="flex gap-1 items-center">
             {Icon ? <Icon className="w-4 h-4 text-orange-500" /> : null}
             {label}
           </FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select onValueChange={onChange} defaultValue={value}>
             <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder="1" />
@@ -172,18 +201,55 @@ const basicInformationSchema = updateRecipeSchema
   })
   .merge(incompleteSchema);
 
+const emptyNumberValue = "" as unknown as number;
+
+function useFormInactivity<T extends FieldValues>(
+  form: UseFormReturn<T>,
+  onSubmit: (formData: T) => Promise<void> | void
+) {
+  const formValues = form.watch();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      onSubmit(formValues);
+    }, 2000);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [onSubmit, formValues]);
+}
+
 export default function BasicInformationEditor({ recipe }: RecipePageData) {
+  const defaultValues = {
+    name: recipe.name,
+    description: recipe.description,
+    prep: emptyNumberValue,
+    cook: emptyNumberValue,
+    servings: emptyNumberValue,
+    difficulty: emptyNumberValue,
+  };
   const form = useForm<z.infer<typeof basicInformationSchema>>({
     resolver: zodResolver(basicInformationSchema),
-    defaultValues: {
-      name: recipe.name,
-      description: recipe.description,
-    },
+    defaultValues: { ...defaultValues },
   });
 
-  const onSubmit = (values: z.infer<typeof basicInformationSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof basicInformationSchema>) => {
+    const response = await updateRecipe(recipe.id, values);
+    toast({
+      title: "Changes saved",
+      description: "Basic Information updated",
+    });
+    console.log(response);
   };
+  useFormInactivity(form, onSubmit);
 
   return (
     <TabCard
@@ -215,32 +281,32 @@ export default function BasicInformationEditor({ recipe }: RecipePageData) {
             name="description"
             label="Description"
           />
-          <div className="grid grid-cols-3 gap-5">
-            <TextField
+          <div className="grid grid-cols-4 gap-5">
+            <NumberField
               control={form.control}
               name="prep"
               label="Prep Time"
               Icon={UtensilsCrossed}
             />
-            <TextField
+            <NumberField
               control={form.control}
               name="cook"
               label="Cook Time"
               Icon={ChefHat}
             />
-            <SelectField
+            <NumberField
               control={form.control}
               name="servings"
               label="Servings"
               Icon={Users}
             />
+            <SelectField
+              control={form.control}
+              name="difficulty"
+              label="Difficulty"
+              Icon={Puzzle}
+            />
           </div>
-          <TextField
-            control={form.control}
-            name="difficulty"
-            label="Difficulty"
-            Icon={Puzzle}
-          />
         </form>
       </Form>
     </TabCard>

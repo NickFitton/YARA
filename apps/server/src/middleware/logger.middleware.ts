@@ -17,6 +17,14 @@ export class LoggerMiddleware implements NestMiddleware {
       );
     });
 
+    res.on('error', () => {
+      const { statusCode } = res;
+      const duration = Date.now() - start;
+      this.logger.log(
+        `< ${method} ${originalUrl} ${statusCode} - ${duration}ms`,
+      );
+    });
+
     next();
   }
 }

@@ -17,6 +17,7 @@ import Instructions from "./Instructions";
 import RecipeTags from "./RecipeTags";
 import Nutrition from "./Nutrition";
 import Media from "./Media";
+import { Toaster } from "@/components/ui/toaster";
 
 const missingData: Omit<RecipePageData["recipe"], keyof ReadRecipeDto> = {
   totalTime: 60,
@@ -87,26 +88,21 @@ export default async function EditRecipePage({
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 pb-12">
-      <section id="hero">
-        <HeroSection recipe={recipe} />
-        <EditTabs>
-          <BasicInformation recipe={recipe} />
-          <Ingredients />
-          <Instructions />
-          <RecipeTags />
-          <Nutrition />
-          <Media />
-        </EditTabs>
-      </section>
-    </div>
+    <>
+      <Toaster />
+      <div className="min-h-screen w-full bg-gray-50 pb-12">
+        <section id="hero">
+          <HeroSection recipe={recipe} />
+          <EditTabs>
+            <BasicInformation recipe={recipe} />
+            <Ingredients />
+            <Instructions />
+            <RecipeTags />
+            <Nutrition />
+            <Media />
+          </EditTabs>
+        </section>
+      </div>
+    </>
   );
 }
-
-/*
-ingredients
-instructions
-details
-nutrition
-media
- */
